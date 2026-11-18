@@ -1,6 +1,7 @@
 # Spine 批量应用规格
 
-> v0.4 · 2026-11-18 · GDD v0.2.1 / 程序0.1.1.0
+> v0.5 · 2026-11-18 · GDD v0.2.3 / 程序0.1.1.2
+> v0.5：修复派生JSON/atlas旧import remap依赖与便携包骨架静默为空；重新生成时仅在本项目assets/actors内删除对应旧.import，包内逐套检查真实骨架不能仅看日志/资源对象存在。
 > v0.4：修复速度接口的原生TrackEntry调用；13套真渲染0/1/2倍率、暂停冻结与动作恢复严格日志验收通过。
 > v0.3：首批13底模配置定稿；deform迁移到4.3 attachments/skin/slot/attachment/deform，保留顶点与时点、转换时间/比例Bezier，逐套原生动画探针和独立截图验证。
 > v0.2：确定扫描字段、原始/派生隔离、分进程运行测试和SpineActor统一接口；批量接入不预先承诺兼容或发行授权。
@@ -49,3 +50,9 @@ GTX1050/OpenGL3.3独占渲染，64真实独立Spine实例（12英雄+52敌兵，
 原生atlas loader在未导入纹理时可能崩溃，SpineActor在加载骨架前先检查页Texture2D可用；缺失/未导入时回退占位。bootstrap必须先执行Godot编辑器导入，再跑独立探针，资源复制与原生加载不能并发。
 
 速度使用`set_animation`返回并保存的`SpineTrackEntry.set_time_scale`，不使用当前运行库不存在的`SpineAnimationState.get_current`。`SpinePlayback.gd`逐套断言0/1/2倍率、原生track_time冻结/推进、动作暂停/恢复、重配和释放；验收同时检查stderr，内部JSON或退出码单独不能证明无脚本错误。
+
+## 派生JSON与便携包依赖
+
+`actor.spine-json.import`可能把读取重定向到`.godot/imported/*.spjson`，`actor.atlas.import`则指向`*.spatlas`。拷贝源.import而不拷贝匹配产物时，PNG/ctex、data.tres及原始JSON均可存在，`load(tres)`仍返回Resource，但原生`get_skeleton()`为空且日志没有错误。0.1.1.1旧便携包的097/312/314/072/084受此影响；其中四名保留角色还缺atlas原生产物。其余八套没有这些.import，原始加载正常。
+
+每次import重写派生JSON/atlas后，仅删除新项目`assets/actors/NNN/actor.spine-json.import`和`actor.atlas.import`旧remap，解析绝对路径确认在允许根内，编号严格三位整数；外部源包和旧项目.import不动。不删除其他纹理.import，纹理仍需先Godot导入。便携包构建从源文件复制时过滤*.import/*.uid，再在包自身目录导入；不能以单个图鉴using_spine、退出码或无ERROR声称所有骨架通过。所有13套需用包内exe/项目根逐套探针，八角色实际战斗实例也须检查using_spine与截图。

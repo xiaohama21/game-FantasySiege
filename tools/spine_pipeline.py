@@ -31,6 +31,30 @@ def write(path, value):
 def read(path):
     return json.loads(path.read_text(encoding='utf-8-sig'))
 
+def invalidate_native_imports(runtime_dir):
+    """Remove only derived JSON/atlas stale remaps inside this project's actor root.
+
+    A copied .import can point to absent *.spjson/*.spatlas; the native
+    skeleton resource then silently has no skeleton although PNG loading works.
+    """
+    project_root = ROOT.resolve()
+    actors_root = (ROOT/'assets/actors').resolve()
+    directory = Path(runtime_dir).resolve()
+    actors_root.relative_to(project_root)
+    if directory.parent != actors_root or not re.fullmatch(r'\d{3}', directory.name):
+        raise ValueError('native remap invalidation target is outside assets/actors/NNN')
+    targets = [directory/name for name in ('actor.spine-json.import','actor.atlas.import')]
+    for target in targets:
+        if target.is_symlink():
+            raise ValueError('refusing to remove a symlinked native remap')
+        target.resolve().relative_to(directory)
+    removed = []
+    for target in targets:
+        if target.exists():
+            target.unlink()
+            removed.append(target.name)
+    return removed
+
 def duration(value):
     if isinstance(value, dict):
         return max([float(value.get('time', 0))] + [duration(v) for v in value.values()])
@@ -150,6 +174,8 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
     for number in ids:
         number=number.zfill(3)
         try:
+            if not re.fullmatch(r'\d{3}',number) or not 1 <= int(number) <= 315:
+                raise ValueError('source ID must be a three-digit number from 001 to 315')
             entry=entries[number]; exports=entry['exports']
             if len(exports)!=1: raise ValueError(f'expected one export, got {len(exports)}')
             export=exports[0]; original=read(Path(export['json']))
@@ -194,6 +220,7 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
                 for p in export['texture_pages']: shutil.copy2(Path(export['atlas']).parent/p,dest/p)
                 runtime_origin=None
             write(dest/'actor.spine-json',converted)
+            native_imports_invalidated=invalidate_native_imports(dest)
             tres=f'''[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3]
 [ext_resource type="SpineAtlasResource" path="res://assets/actors/{number}/actor.atlas" id="1"]
 [ext_resource type="SpineSkeletonFileResource" path="res://assets/actors/{number}/actor.spine-json" id="2"]
@@ -220,6 +247,7 @@ default_mix = 0.08
             config['d69_'+number]=spec
             provenance={'schema':1,'source_id':number,'status':'converted','method':method,'source_files':hashes,'source_export_version':export['version'],
                         'runtime_source':runtime_origin,'converter_sha256':sha(Path(converter.__file__)),'warnings':list(converter.WARNINGS),'risks':export['risks'],
+                        'native_imports_invalidated':native_imports_invalidated,
                         'license':entry['license'],'disclaimer':'Local research and runtime verification only; does not establish commercial rights or release readiness.',
                         'runtime_files':{p.name:sha(p) for p in dest.iterdir() if p.is_file() and p.name!='provenance.json'}}
             write(dest/'provenance.json',provenance)

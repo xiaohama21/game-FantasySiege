@@ -60,6 +60,9 @@ func run() -> void:
 		app.battle.advance(0.8)
 		await process_frame
 	app._update_hud()
+	for actor: Dictionary in app.battle.units:
+		if bool(actor.get("alive", false)):
+			check(is_instance_valid(actor.get("visual")) and actor.visual.using_spine(), "battle must use native Spine: " + str(actor.get("id", "")))
 	await capture("05_battle")
 	var old = app.battle
 	app.start_stage(stage_id)

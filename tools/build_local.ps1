@@ -13,7 +13,15 @@ foreach ($name in @('scripts','scenes','resources','bin')) {
 New-Item -ItemType Directory -Path (Join-Path $destination 'assets') -Force | Out-Null
 foreach ($name in @('actors','fonts','audio')) {
     $sourcePath = Join-Path $projectRoot ('assets\' + $name)
-    if (Test-Path -LiteralPath $sourcePath) { Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $destination 'assets') -Recurse -Force }
+    if (Test-Path -LiteralPath $sourcePath) {
+        foreach ($assetFile in (Get-ChildItem -LiteralPath $sourcePath -Recurse -File)) {
+            if ($assetFile.Extension -in @('.import','.uid')) { continue }
+            $relativeAsset = $assetFile.FullName.Substring($sourcePath.Length).TrimStart([char[]]@('\','/'))
+            $targetFile = Join-Path $destination ('assets\' + $name + '\' + $relativeAsset)
+            New-Item -ItemType Directory -Path (Split-Path -Parent $targetFile) -Force | Out-Null
+            Copy-Item -LiteralPath $assetFile.FullName -Destination $targetFile -Force
+        }
+    }
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'project.godot') -Destination $destination -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'assets\icon.svg') -Destination (Join-Path $destination 'assets') -Force

@@ -30,7 +30,8 @@
       "intelligence": 1
     },
     "skill_name": "青龙横扫",
-    "skill_description": "自动：物理攻击影响目标周围68px的敌人。"
+    "skill_description": "自动：物理攻击影响目标周围68px的敌人。",
+    "playable": true
   },
   "zhaoyun": {
     "name": "赵云",
@@ -63,7 +64,8 @@
       "intelligence": 1
     },
     "skill_name": "银枪连刺",
-    "skill_description": "自动：快速单体物理突刺，出手间隔随敏捷缩短。"
+    "skill_description": "自动：快速单体物理突刺，出手间隔随敏捷缩短。",
+    "playable": true
   },
   "zhugeliang": {
     "name": "诸葛亮",
@@ -100,7 +102,8 @@
       "intelligence": 2
     },
     "skill_name": "星阵束流",
-    "skill_description": "自动：60px范围魔法攻击，移动速度降至65%，基础持续2s，受智力提升。"
+    "skill_description": "自动：60px范围魔法攻击，移动速度降至65%，基础持续2s，受智力提升。",
+    "playable": true
   },
   "diaochan": {
     "name": "貂蝉",
@@ -137,7 +140,8 @@
       "intelligence": 2
     },
     "skill_name": "流光缚影",
-    "skill_description": "自动：单体魔法攻击，移动速度降至50%，基础持续2.5s，受智力提升。"
+    "skill_description": "自动：单体魔法攻击，移动速度降至50%，基础持续2.5s，受智力提升。",
+    "playable": true
   },
   "lubu": {
     "name": "吕布",
@@ -170,7 +174,8 @@
       "intelligence": 1
     },
     "skill_name": "陨星重斩",
-    "skill_description": "自动：90px范围物理重击，命中前摇0.7s。"
+    "skill_description": "自动：90px范围物理重击，命中前摇0.7s。",
+    "playable": true
   },
   "iron_guard": {
     "name": "铁卫·洛恩",
@@ -203,7 +208,8 @@
       "intelligence": 1
     },
     "skill_name": "盾卫守线",
-    "skill_description": "自动：持盾近战，以高生命和护甲承受前线伤害。"
+    "skill_description": "自动：持盾近战，以高生命和护甲承受前线伤害。",
+    "playable": true
   },
   "ember_archer": {
     "name": "烬羽·艾拉",
@@ -236,7 +242,8 @@
       "intelligence": 1
     },
     "skill_name": "烬羽长射",
-    "skill_description": "自动：240px射程单体物理箭击，命中延迟0.35s。"
+    "skill_description": "自动：240px射程单体物理箭击，命中延迟0.35s。",
+    "playable": true
   },
   "rune_medic": {
     "name": "符医·缇露",
@@ -271,7 +278,8 @@
       "intelligence": 2
     },
     "skill_name": "符灯回春",
-    "skill_description": "自动：优先治疗220px内受伤伙伴，治疗随主属性、等级和智力成长；无法修复基地。"
+    "skill_description": "自动：优先治疗220px内受伤伙伴，治疗随主属性、等级和智力成长；无法修复基地。",
+    "playable": true
   },
   "riftling": {
     "name": "裂隙小鬼",
@@ -302,7 +310,8 @@
       "strength": 0,
       "agility": 0,
       "intelligence": 0
-    }
+    },
+    "playable": false
   },
   "ash_runner": {
     "name": "灰烬浮灵",
@@ -333,7 +342,8 @@
       "strength": 0,
       "agility": 0,
       "intelligence": 0
-    }
+    },
+    "playable": false
   },
   "obsidian_guard": {
     "name": "黑曜棒卫",
@@ -364,7 +374,8 @@
       "strength": 0,
       "agility": 0,
       "intelligence": 0
-    }
+    },
+    "playable": false
   },
   "ember_caster": {
     "name": "烬火咒师",
@@ -395,7 +406,8 @@
       "strength": 0,
       "agility": 0,
       "intelligence": 0
-    }
+    },
+    "playable": false
   },
   "obsidian_warden": {
     "name": "黑曜守门者",
@@ -433,6 +445,297 @@
       "strength": 0,
       "agility": 0,
       "intelligence": 0
-    }
+    },
+    "playable": false
+  },
+  "star_hammer": {
+    "name": "星槌卫士·赫洛",
+    "description": "高甲重盾承受重击，守住前线为伙伴争取输出时间。",
+    "role": "重甲守线",
+    "role_name": "重甲守线",
+    "visual_id": "d69_110",
+    "hp": 850,
+    "damage": 22,
+    "armor": 45,
+    "speed": 30,
+    "range": 52,
+    "attack_interval": 1.5,
+    "hit_delay": 0.4,
+    "cost": 110,
+    "cooldown": 10,
+    "damage_type": "physical",
+    "attributes": {
+      "strength": 20,
+      "agility": 6,
+      "intelligence": 7
+    },
+    "primary_attribute": "strength",
+    "attribute_growth": {
+      "strength": 2,
+      "agility": 1,
+      "intelligence": 1
+    },
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#decda5",
+    "skill_name": "星槌壁垒",
+    "skill_description": "自动：高生命与45护甲承担前线伤害，52px近战。",
+    "playable": true,
+    "unlock_stage": "stage_02"
+  },
+  "rivet_gunner": {
+    "name": "绞弩炮手·诺雅",
+    "description": "长射程真实伤害击穿重甲，攻击基地时额外增伤。",
+    "role": "破甲攻城",
+    "role_name": "破甲攻城",
+    "visual_id": "d69_023",
+    "hp": 180,
+    "damage": 52,
+    "armor": 6,
+    "speed": 36,
+    "range": 290,
+    "attack_interval": 2.5,
+    "hit_delay": 0.65,
+    "cost": 140,
+    "cooldown": 15,
+    "damage_type": "true",
+    "attributes": {
+      "strength": 6,
+      "agility": 19,
+      "intelligence": 10
+    },
+    "primary_attribute": "agility",
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 2,
+      "intelligence": 1
+    },
+    "aoe_radius": 0,
+    "special": {
+      "type": "siege",
+      "base_damage_multiplier": 1.8
+    },
+    "color": "#efcf8d",
+    "skill_name": "贯星绞弩",
+    "skill_description": "自动：290px射程真实攻击，忽略护甲；对敌基地伤害×1.8。",
+    "playable": true,
+    "unlock_stage": "stage_04"
+  },
+  "moon_mage": {
+    "name": "月灯术士·瑟琳",
+    "description": "大范围月华减缓每名命中敌人，控制机械群的推进。",
+    "role": "范围控制",
+    "role_name": "范围控制",
+    "visual_id": "d69_147",
+    "hp": 220,
+    "damage": 48,
+    "armor": 7,
+    "speed": 38,
+    "range": 260,
+    "attack_interval": 2.5,
+    "hit_delay": 0.5,
+    "cost": 135,
+    "cooldown": 15,
+    "damage_type": "magic",
+    "attributes": {
+      "strength": 5,
+      "agility": 8,
+      "intelligence": 20
+    },
+    "primary_attribute": "intelligence",
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 1,
+      "intelligence": 2
+    },
+    "aoe_radius": 90,
+    "special": {
+      "type": "slow",
+      "ratio": 0.42,
+      "duration": 2.2
+    },
+    "color": "#badff1",
+    "skill_name": "月华迟滞",
+    "skill_description": "自动：90px范围魔法攻击，所有命中者移速降至42%，基础持续2.2s，受智力提升。",
+    "playable": true,
+    "unlock_stage": "stage_06"
+  },
+  "spirit_beast": {
+    "name": "灵契兽卫·洛迦",
+    "description": "快速奔赴前线，以范围扑击兼顾补线与清杂。",
+    "role": "快移补线",
+    "role_name": "快移补线",
+    "visual_id": "d69_069",
+    "hp": 500,
+    "damage": 44,
+    "armor": 14,
+    "speed": 75,
+    "range": 56,
+    "attack_interval": 1.5,
+    "hit_delay": 0.35,
+    "cost": 100,
+    "cooldown": 10,
+    "damage_type": "physical",
+    "attributes": {
+      "strength": 18,
+      "agility": 14,
+      "intelligence": 5
+    },
+    "primary_attribute": "strength",
+    "attribute_growth": {
+      "strength": 2,
+      "agility": 1,
+      "intelligence": 1
+    },
+    "aoe_radius": 52,
+    "special": "cleave",
+    "color": "#9bd6ba",
+    "skill_name": "灵契扑击",
+    "skill_description": "自动：较快移动并进行52px范围物理扑击，不能穿过前排。",
+    "playable": true,
+    "unlock_stage": "stage_08"
+  },
+  "brass_chomper": {
+    "name": "铁颚机偶",
+    "description": "铁颚机关小兵行进较快，用低费前排挡住它。",
+    "role": "机械小兵",
+    "role_name": "机械小兵",
+    "visual_id": "d69_057",
+    "hp": 155,
+    "damage": 22,
+    "armor": 20,
+    "speed": 63,
+    "range": 44,
+    "attack_interval": 1.2,
+    "hit_delay": 0.3,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "attributes": {
+      "strength": 8,
+      "agility": 14,
+      "intelligence": 2
+    },
+    "primary_attribute": "agility",
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    },
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#a3b17c",
+    "skill_name": "铁颚咬合",
+    "skill_description": "自动：单体物理攻击。",
+    "playable": false
+  },
+  "brass_guard": {
+    "name": "黄铜甲卫",
+    "description": "金色重甲和慢移重击，真实攻击能击穿其防护。",
+    "role": "机械重甲",
+    "role_name": "机械重甲",
+    "visual_id": "d69_059",
+    "hp": 800,
+    "damage": 46,
+    "armor": 45,
+    "speed": 29,
+    "range": 70,
+    "attack_interval": 2.15,
+    "hit_delay": 0.7,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "attributes": {
+      "strength": 20,
+      "agility": 5,
+      "intelligence": 2
+    },
+    "primary_attribute": "strength",
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    },
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#e2ba6d",
+    "skill_name": "黄铜重撞",
+    "skill_description": "自动：0.7s重击前摇，高护甲。",
+    "playable": false
+  },
+  "rail_stoker": {
+    "name": "磁轨司炉",
+    "description": "操纵远程范围符火，常躲在黄铜甲卫身后。",
+    "role": "机械法术",
+    "role_name": "机械法术",
+    "visual_id": "d69_036",
+    "hp": 255,
+    "damage": 34,
+    "armor": 12,
+    "speed": 35,
+    "range": 240,
+    "attack_interval": 2.1,
+    "hit_delay": 0.6,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "magic",
+    "attributes": {
+      "strength": 6,
+      "agility": 8,
+      "intelligence": 18
+    },
+    "primary_attribute": "intelligence",
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    },
+    "aoe_radius": 75,
+    "special": "cleave",
+    "color": "#c3a0d4",
+    "skill_name": "磁焰流束",
+    "skill_description": "自动：240px射程，75px范围魔法伤害。",
+    "playable": false
+  },
+  "rail_colossus": {
+    "name": "裂轨巨匠",
+    "description": "重锤驱动浮空核心，半血过热；读前摇，用脉冲打断。",
+    "role": "过热首领",
+    "role_name": "过热首领",
+    "visual_id": "d69_094",
+    "hp": 3000,
+    "damage": 75,
+    "armor": 30,
+    "speed": 27,
+    "range": 96,
+    "attack_interval": 3.7,
+    "hit_delay": 0.85,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "attributes": {
+      "strength": 24,
+      "agility": 6,
+      "intelligence": 8
+    },
+    "primary_attribute": "strength",
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    },
+    "aoe_radius": 145,
+    "special": {
+      "type": "cleave",
+      "phase_threshold": 0.5,
+      "phase_damage_mult": 1.4,
+      "phase_speed_mult": 1.15,
+      "phase_attack_mult": 0.75,
+      "phase_name": "过热锻击"
+    },
+    "color": "#dd9a70",
+    "skill_name": "裂轨锻击",
+    "skill_description": "自动：145px范围重击，0.85s前摇；半血进入过热锻击。",
+    "playable": false
   }
 }

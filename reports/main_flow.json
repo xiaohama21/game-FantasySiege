@@ -1,7 +1,10 @@
 {
+	"checks": 96,
 	"failures": [],
 	"isolation": "res://tests/.user/main_flow",
 	"passed": true,
 	"real_spine": true,
-	"screenshots": 5
+	"screenshots": 8,
+	"stages_sha256": "a8fe332baebd9918e14ce87368e306ae8539a5b67d66ddcac40dcbdd84608b92",
+	"world_width": 2560
 }

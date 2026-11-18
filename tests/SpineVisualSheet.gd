@@ -1,7 +1,7 @@
 extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
-const IDS := ["097", "312", "314", "072", "163", "084", "018", "168", "253", "254", "046", "285", "271"]
+const IDS := ["097", "312", "314", "072", "163", "084", "018", "168", "110", "023", "147", "069", "253", "254", "046", "285", "271", "057", "059", "036", "094"]
 var actors: Array = []
 
 func _initialize() -> void:
@@ -15,7 +15,7 @@ func label(text: String, point: Vector2, size: int = 18) -> void:
 	root.add_child(item)
 
 func _run() -> void:
-	root.size = Vector2i(1280, 720)
+	root.size = Vector2i(2900, 1560)
 	var title := Label.new()
 	title.position = Vector2(32, 28)
 	title.add_theme_font_size_override("font_size", 28)
@@ -23,11 +23,11 @@ func _run() -> void:
 	for index in IDS.size():
 		var actor := Actor.new()
 		root.add_child(actor)
-		actor.position = Vector2(94 + (index % 7) * 179, 322 + (index / 7) * 255)
+		actor.position = Vector2(250 + (index % 7) * 400, 440 + (index / 7) * 440)
 		actor.configure("d69_" + IDS[index], 1)
 		actors.append(actor)
-		label("D69 " + IDS[index], actor.position + Vector2(-46, 20))
-	label("Native Spine / local research / model source and recipe QA", Vector2(32, 675), 17)
+		label("D69 " + IDS[index], actor.position + Vector2(-46, 35))
+	label("Native Spine / local research / model source and recipe QA", Vector2(32, 1515), 17)
 	var folder := "res://reports/spine_visuals"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
 	for recipe in [["idle",1,0.25], ["idle",-1,0.25], ["move",1,0.25], ["attack",1,0.3], ["skill",1,0.4], ["hurt",1,0.12], ["death",1,0.65]]:

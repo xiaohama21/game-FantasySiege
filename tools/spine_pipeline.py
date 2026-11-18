@@ -171,6 +171,9 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
     cfgpath = ROOT/'resources/visuals.json'
     config = read(cfgpath) if cfgpath.exists() else {}
     results=[]
+    archive_root=ROOT/'assets/source'
+    archive_root.mkdir(parents=True,exist_ok=True)
+    (archive_root/'.gdignore').write_text('',encoding='utf-8')
     for number in ids:
         number=number.zfill(3)
         try:

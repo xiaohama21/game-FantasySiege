@@ -1,6 +1,7 @@
 extends Control
 
 var world: WorldBackdrop
+var world_host: Node2D
 var screen: Control
 var battle
 var tab := "远征"
@@ -9,6 +10,15 @@ var run_token := ""
 var paused := false
 var speed := 1.0
 var selected_actor := "guanyu"
+var selected_visual := "d69_097"
+var selected_chapter := 1
+var view_x := 0.0
+var view_max := 0.0
+var follow_frontline := true
+var dragging := false
+var follow_button: Button
+var pulse_button: Button
+var view_slider: HSlider
 var draft_roster: Array = []
 var summon_buttons: Array[Button] = []
 var summon_labels: Array = []
@@ -29,8 +39,10 @@ var motes: Array = []
 
 func _ready() -> void:
 	theme = SiegeStyle.make_theme()
+	world_host = Node2D.new()
+	add_child(world_host)
 	world = WorldBackdrop.new()
-	add_child(world)
+	world_host.add_child(world)
 	show_home()
 
 func _process(delta: float) -> void:
@@ -39,6 +51,7 @@ func _process(delta: float) -> void:
 		if is_instance_valid(toast): toast.visible = toast_time > 0
 	if is_instance_valid(battle):
 		if not paused: battle.advance(delta * speed)
+		_update_camera(delta)
 		_update_hud()
 	for mote: Dictionary in motes.duplicate():
 		mote.life -= delta
@@ -49,6 +62,49 @@ func _process(delta: float) -> void:
 			if is_instance_valid(mote.node): mote.node.queue_free()
 			motes.erase(mote)
 
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(battle): return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if not event.pressed:
+			dragging = false
+		else:
+			var point: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
+			if point.y >= 164 and point.y < 526 and point.x >= 0 and point.x <= 1280 and not is_instance_valid(result_panel):
+				dragging = true
+				follow_frontline = false
+	elif event is InputEventMouseMotion and dragging:
+		var local_motion: Vector2 = get_global_transform_with_canvas().basis_xform_inv(event.relative)
+		_set_view_position(view_x - local_motion.x)
+
+func _set_view_position(value: float) -> void:
+	view_x = clampf(value, 0, view_max)
+	world_host.position.x = -view_x
+	if is_instance_valid(view_slider): view_slider.set_value_no_signal(view_x)
+
+func _update_camera(delta: float) -> void:
+	if not is_instance_valid(result_panel):
+		var movement := float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT))
+		var mouse := get_local_mouse_position()
+		if not dragging and mouse.y >= 164 and mouse.y < 526:
+			if mouse.x >= 0 and mouse.x < 24: movement -= 1
+			elif mouse.x > 1256 and mouse.x <= 1280: movement += 1
+		if movement != 0:
+			follow_frontline = false
+			_set_view_position(view_x + movement * 650 * delta)
+	if follow_frontline and not dragging:
+		var snap: Dictionary = battle.get_snapshot()
+		var target := clampf(float(snap.get("frontline_x", 100)) - 560, 0, view_max)
+		_set_view_position(lerpf(view_x, target, minf(1, delta * 4.5)))
+	if is_instance_valid(follow_button): follow_button.text = "跟随中" if follow_frontline else "跟随战线"
+
+func _resume_follow() -> void:
+	follow_frontline = true
+	dragging = false
+
+func _slide_view(value: float) -> void:
+	follow_frontline = false
+	_set_view_position(value)
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if is_instance_valid(battle):
@@ -57,6 +113,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			if index < draft_roster.size(): _summon(str(draft_roster[index]))
 		elif event.keycode == KEY_SPACE: _toggle_pause()
 		elif event.keycode == KEY_F: _toggle_speed()
+		elif event.keycode == KEY_P: _pulse()
+		elif event.keycode == KEY_C: _resume_follow()
 		elif event.keycode == KEY_ESCAPE: show_home()
 	elif event.keycode == KEY_ESCAPE: show_home()
 
@@ -65,22 +123,33 @@ func _clear_screen() -> void:
 		remove_child(screen)
 		screen.queue_free()
 	screen = Control.new()
+	screen.z_index = 100
 	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	screen.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(screen)
 	viewer = null
+	view_slider = null
 	toast = null
 	result_panel = null
+	for mote: Dictionary in motes:
+		if is_instance_valid(mote.node): mote.node.queue_free()
 	motes.clear()
 
-func _stop_battle() -> void:
+func _stop_battle() -> bool:
+	if is_instance_valid(battle) and not run_token.is_empty() and str(battle.get_snapshot().get("outcome", "")) == "victory":
+		_message("奖励尚未保存，请先重试领取。")
+		return false
 	if not run_token.is_empty(): ProfileStore.abandon(run_token)
 	run_token = ""
 	if is_instance_valid(battle):
 		battle.stop()
-		remove_child(battle)
+		battle.get_parent().remove_child(battle)
 		battle.queue_free()
 	battle = null
+	dragging = false
+	view_max = 0
+	_set_view_position(0)
+	return true
 
 func _panel(rect: Rect2, color: Color = SiegeStyle.PAPER, parent: Node = null) -> Panel:
 	var p := Panel.new()
@@ -124,10 +193,11 @@ func _message(value: String) -> void:
 	toast_time = 5
 
 func show_home(next_tab: String = "远征") -> void:
-	_stop_battle()
+	if not _stop_battle(): return
 	_clear_screen()
 	tab = next_tab
 	world.battle_mode = false
+	world.configure_width(1280, 1)
 	var sidebar := _panel(Rect2(20, 20, 200, 680), Color("162e3b"))
 	_label("FANTASY SIEGE", Rect2(16, 20, 175, 25), 14, Color("a3c6bd"), sidebar)
 	_label("星灯远征", Rect2(16, 48, 180, 45), 32, Color("f5deb1"), sidebar)
@@ -146,47 +216,72 @@ func show_home(next_tab: String = "远征") -> void:
 	else: _gallery_page()
 	if not ProfileStore.error_message.is_empty(): _message(ProfileStore.error_message)
 
-func _stage_unlocked(index: int) -> bool:
-	if index <= 0: return true
-	var stages := Catalog.stages()
-	return index < stages.size() and ProfileStore.data.get("cleared", []).has(str(stages[index - 1].id))
+func _select_chapter(value: int) -> void:
+	selected_chapter = value
+	show_home("远征")
 
 func _campaign_page() -> void:
-	var hero := _panel(Rect2(254, 93, 1000, 139), Color("224957"))
-	_label("第一章  /  裂隙初明", Rect2(24, 15, 750, 38), 29, Color("f4e8cb"), hero)
-	_label("灯塔熄灭之后，仍有人选择守住微光。", Rect2(24, 57, 750, 30), 20, Color("bdcfca"), hero)
-	_label("召唤、守线、反攻。每一种英魂，都有突破困局的方式。", Rect2(24, 94, 900, 25), 17, Color("91b8b7"), hero)
+	var cleared: Array = ProfileStore.data.get("cleared", [])
+	var hero := _panel(Rect2(254, 93, 1000, 125), Color("224957"))
+	_label("沿着微光，重连破碎的航路", Rect2(24, 14, 750, 38), 29, Color("f4e8cb"), hero)
+	_label("星灯 %d / 8  ·  英魂 %d / 12" % [cleared.size(), ProfileStore.data.get("owned", []).size()], Rect2(24, 61, 560, 30), 20, Color("bdcfca"), hero)
+	_button("裂隙初明", Rect2(616, 59, 163, 44), _select_chapter.bind(1), hero, selected_chapter == 1)
+	_button("黄铜迷航", Rect2(795, 59, 180, 44), _select_chapter.bind(2), hero, selected_chapter == 2)
 	var stages := Catalog.stages()
-	for i in mini(stages.size(), 3):
+	var column := 0
+	for i in stages.size():
 		var stage: Dictionary = stages[i]
-		var p := _panel(Rect2(254 + i * 339, 252, 321, 350))
-		var unlocked := _stage_unlocked(i)
-		var cleared: bool = ProfileStore.data.get("cleared", []).has(str(stage.id))
-		_label("0%d   %s" % [i + 1, "已点亮" if cleared else "待远征" if unlocked else "未抵达"], Rect2(20, 17, 285, 30), 17, SiegeStyle.TEAL if cleared else SiegeStyle.MUTED, p)
-		_label(str(stage.get("name", "无名遗迹")), Rect2(20, 63, 284, 46), 27, SiegeStyle.INK, p)
-		var sub := _label(str(stage.get("subtitle", "")), Rect2(20, 119, 277, 85), 19, SiegeStyle.MUTED, p)
-		sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var advice := _label(str(stage.get("hint", ["低费前排持续补线，远程负责突破。", "用范围攻击清理聚集敌军，留下能量补线。", "重击来临前补上前排，用治疗守住输出。"][i])), Rect2(20, 210, 277, 67), 17, SiegeStyle.INK, p)
+		if int(stage.get("chapter", 1)) != selected_chapter: continue
+		var p := _panel(Rect2(254 + column * 252, 237, 238, 362))
+		column += 1
+		var unlocked: bool = ProfileStore.stage_unlocked(str(stage.id))
+		var complete: bool = cleared.has(str(stage.id))
+		_label("%02d  ·  %s" % [i + 1, "已点亮" if complete else "待远征" if unlocked else "未抵达"], Rect2(16, 14, 205, 26), 16, SiegeStyle.TEAL if complete else SiegeStyle.MUTED, p)
+		_label(str(stage.get("name", "无名遗迹")), Rect2(16, 49, 205, 40), 25, SiegeStyle.INK, p)
+		_label("推荐主力 Lv.%d" % int(stage.get("recommended_level", 1)), Rect2(16, 98, 205, 28), 17, SiegeStyle.TEAL, p)
+		var advice := _label(str(stage.get("hint", "前排持续补线，远程负责突破。")), Rect2(16, 136, 205, 85), 17, SiegeStyle.INK, p)
 		advice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var b := _button("重访" if cleared else "出征" if unlocked else "先点亮前一座灯塔", Rect2(20, 288, 281, 43), start_stage.bind(str(stage.id)), p, unlocked)
-		b.disabled = not unlocked
-	_label("1—8 召唤  ·  空格 暂停  ·  F 倍速  ·  Esc 返回营地", Rect2(261, 622, 966, 28), 17, Color("b6c8c2"))
+		var reward: Dictionary = ProfileStore.reward_preview(str(stage.id))
+		_label("%s %d 星砂" % ["重访" if complete else "首通", int(reward.credits)], Rect2(16, 226, 205, 26), 18, Color("9a712d"), p)
+		var names: Array[String] = []
+		for id: String in Catalog.reward_units(str(stage.id)): names.append(str(Catalog.unit(id).get("name", id)))
+		var reward_text := "英魂 · " + "、".join(names) if not names.is_empty() else "星砂用于训练英魂"
+		var reward_label := _label(reward_text, Rect2(16, 257, 205, 48), 15, SiegeStyle.MUTED, p)
+		reward_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var button := _button("重访" if complete else "出征" if unlocked else "先点亮前一关", Rect2(16, 311, 205, 38), start_stage.bind(str(stage.id)), p, unlocked)
+		button.disabled = not unlocked or not ProfileStore.can_modify()
+	_label("1—8 召唤  ·  P 脉冲  ·  空格 暂停  ·  ← → / 鼠标拖动查看战场", Rect2(261, 618, 973, 30), 17, Color("b6c8c2"))
+
+func _card_grid(rect: Rect2, columns: int) -> GridContainer:
+	var scroll := ScrollContainer.new()
+	scroll.position = rect.position
+	scroll.size = rect.size
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	screen.add_child(scroll)
+	var grid := GridContainer.new()
+	grid.columns = columns
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 14)
+	scroll.add_child(grid)
+	return grid
 
 func _hero_card(id: String, rect: Rect2, parent: Node = null) -> Panel:
 	var unit := Catalog.unit(id)
 	var p := _panel(rect, SiegeStyle.PAPER, parent)
 	_label(str(unit.get("name", id)), Rect2(16, 13, rect.size.x - 28, 35), 24, SiegeStyle.INK, p)
-	_label("%s · Lv.%d" % [str(unit.get("role_name", unit.get("role", "英魂"))), ProfileStore.level(id)], Rect2(16, 53, rect.size.x - 28, 28), 16, SiegeStyle.TEAL, p)
+	_label("%s · %s" % [str(unit.get("role_name", unit.get("role", "英魂"))), "Lv.%d" % ProfileStore.level(id) if ProfileStore.owns(id) else "未契约"], Rect2(16, 53, rect.size.x - 28, 28), 16, SiegeStyle.TEAL, p)
 	var attr := str(unit.get("primary_attribute", "strength"))
 	_label("主属性 · " + _attribute_name(attr), Rect2(16, 85, rect.size.x - 28, 28), 16, Color("b07c34"), p)
 	return p
 
 func _heroes_page() -> void:
-	if not Catalog.initial_roster().has(selected_actor): selected_actor = str(Catalog.initial_roster()[0])
-	var roster := Catalog.initial_roster()
-	for i in roster.size():
-		var id: String = roster[i]
-		var p := _hero_card(id, Rect2(254 + (i % 2) * 223, 98 + int(i / 2) * 132, 207, 117))
+	var roster := Catalog.playable_roster()
+	if not roster.has(selected_actor): selected_actor = str(roster[0])
+	var grid := _card_grid(Rect2(254, 98, 442, 535), 2)
+	for id: String in roster:
+		var p := _hero_card(id, Rect2(0, 0, 207, 117), grid)
+		p.custom_minimum_size = Vector2(207, 117)
 		var select := _button("", Rect2(0, 0, 207, 117), _select_hero.bind(id), p)
 		select.add_theme_stylebox_override("normal", SiegeStyle.box(Color.TRANSPARENT, 16, SiegeStyle.GOLD if id == selected_actor else Color.TRANSPARENT))
 		select.add_theme_stylebox_override("hover", SiegeStyle.box(Color(1, 0.9, 0.6, 0.09), 16, SiegeStyle.GOLD))
@@ -212,8 +307,8 @@ func _heroes_page() -> void:
 	var rules := _label(str(unit.get("skill_name", "战斗职责")) + " · " + str(unit.get("skill_description", "力量稳住前线，敏捷加快出手，智力提高魔抗与技能效果。主属性额外提高伤害。")), Rect2(24, 372, 488, 65), 16, SiegeStyle.MUTED, panel)
 	rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var level: int = ProfileStore.level(selected_actor)
-	var b := _button("已满级" if level >= 20 else "训练至 Lv.%d  ·  %d星砂" % [level + 1, ProfileStore.training_cost(selected_actor)], Rect2(24, 454, 488, 51), _train.bind(selected_actor), panel, true)
-	b.disabled = level >= 20 or ProfileStore.credits() < ProfileStore.training_cost(selected_actor)
+	var b := _button("通关 %s 后契约" % Catalog.unlock_stage(selected_actor) if not ProfileStore.owns(selected_actor) else "已满级" if level >= 20 else "训练至 Lv.%d  ·  %d星砂" % [level + 1, ProfileStore.training_cost(selected_actor)], Rect2(24, 454, 488, 51), _train.bind(selected_actor), panel, true)
+	b.disabled = not ProfileStore.can_modify() or not ProfileStore.owns(selected_actor) or level >= 20 or ProfileStore.credits() < ProfileStore.training_cost(selected_actor)
 
 func _attribute_name(key: String) -> String:
 	return {"strength": "力量", "agility": "敏捷", "intelligence": "智力"}.get(key, "力量")
@@ -230,13 +325,16 @@ func _train(id: String) -> void:
 func _squad_page() -> void:
 	draft_roster = ProfileStore.data.get("roster", Catalog.initial_roster()).duplicate()
 	_label("前排承压、远程破阵、辅助续航。最多携带八名英魂。", Rect2(256, 88, 995, 38), 20, Color("c2d5cb"))
-	for i in Catalog.initial_roster().size():
-		var id: String = Catalog.initial_roster()[i]
-		var p := _hero_card(id, Rect2(254 + (i % 4) * 252, 150 + int(i / 4) * 205, 238, 183))
-		var desc := _label(str(Catalog.unit(id).get("description", Catalog.unit(id).get("summary", ""))), Rect2(16, 111, 208, 28), 14, SiegeStyle.MUTED, p)
+	var grid := _card_grid(Rect2(254, 145, 1000, 442), 4)
+	for id: String in Catalog.playable_roster():
+		var p := _hero_card(id, Rect2(0, 0, 234, 190), grid)
+		p.custom_minimum_size = Vector2(234, 190)
+		var desc := _label(str(Catalog.unit(id).get("description", Catalog.unit(id).get("summary", ""))), Rect2(16, 111, 202, 28), 14, SiegeStyle.MUTED, p)
 		desc.clip_text = true
-		_button("已出战 · 移出" if draft_roster.has(id) else "加入编队", Rect2(16, 143, 206, 30), _toggle_roster.bind(id), p, draft_roster.has(id))
-	_label("当前 %d / 8 名英魂。点击即保存，至少保留一名。" % draft_roster.size(), Rect2(263, 588, 970, 39), 20, Color("c2d5cb"))
+		var owned: bool = ProfileStore.owns(id)
+		var button := _button("%s 后契约" % Catalog.unlock_stage(id) if not owned else "已出战 · 移出" if draft_roster.has(id) else "加入编队", Rect2(16, 148, 202, 30), _toggle_roster.bind(id), p, draft_roster.has(id))
+		button.disabled = not ProfileStore.can_modify() or not owned or (not draft_roster.has(id) and draft_roster.size() >= 8)
+	_label("当前 %d / 8 名英魂。点击即保存，至少保留一名。" % draft_roster.size(), Rect2(263, 610, 970, 39), 20, Color("c2d5cb"))
 
 func _toggle_roster(id: String) -> void:
 	var candidate := draft_roster.duplicate()
@@ -244,7 +342,7 @@ func _toggle_roster(id: String) -> void:
 	else: candidate.append(id)
 	var success: bool = ProfileStore.set_roster(candidate)
 	show_home("编队")
-	_message("编队已保存。" if success else "至少保留一名英魂。")
+	_message("编队已保存。" if success else ProfileStore.error_message if not ProfileStore.error_message.is_empty() else "编队需包含一至八名已契约英魂。")
 
 func _gallery_page() -> void:
 	var visuals := Catalog.visuals()
@@ -261,19 +359,19 @@ func _gallery_page() -> void:
 		for unit: Dictionary in Catalog.units().values():
 			if str(unit.get("visual_id", "")) == id: name = str(unit.get("name", id)); break
 		picker.add_item(name + " / " + id)
-	var current := ids.find(selected_actor)
+	var current := ids.find(selected_visual)
 	if current < 0: current = 0
 	picker.select(current)
 	screen.add_child(picker)
-	picker.item_selected.connect(func(index: int): selected_actor = str(ids[index]); show_home("图鉴"))
-	selected_actor = str(ids[current])
+	picker.item_selected.connect(func(index: int): selected_visual = str(ids[index]); show_home("图鉴"))
+	selected_visual = str(ids[current])
 	_label("英魂与裂隙生物", Rect2(695, 108, 520, 43), 24, Color("f1e4c6"))
 	var actor_script: Script = load("res://scripts/visuals/SpineActor.gd")
 	if actor_script != null:
 		viewer = actor_script.new()
 		viewer.position = Vector2(757, 505)
 		screen.add_child(viewer)
-		viewer.configure(selected_actor, 1)
+		viewer.configure(selected_visual, 1)
 		viewer.scale = Vector2(2.1, 2.1)
 		viewer.play_state("idle")
 	var states := ["idle", "move", "attack", "skill", "hurt", "death"]
@@ -288,15 +386,30 @@ func _preview_state(state: String) -> void:
 	if is_instance_valid(viewer): viewer.play_state(state, 2.0)
 
 func _preview_facing(facing: int) -> void:
-	if is_instance_valid(viewer): viewer.configure(selected_actor, facing); viewer.play_state("idle")
+	if is_instance_valid(viewer): viewer.configure(selected_visual, facing); viewer.play_state("idle")
 
 func start_stage(id: String) -> void:
-	_stop_battle()
+	if not ProfileStore.can_modify():
+		_message(ProfileStore.error_message)
+		return
+	if not ProfileStore.stage_unlocked(id):
+		_message("先点亮前一关，再继续这段航路。")
+		return
+	if not _stop_battle(): return
 	_clear_screen()
 	active_stage = id
 	world.battle_mode = true
+	var stage := Catalog.stage(id)
+	world.configure_width(float(stage.get("world_width", 2560)), int(stage.get("chapter", 1)))
+	view_max = world.world_width - 1280
+	follow_frontline = true
+	_set_view_position(0)
 	draft_roster = ProfileStore.data.get("roster", Catalog.initial_roster()).duplicate()
 	run_token = ProfileStore.begin_run(id)
+	if run_token.is_empty():
+		show_home()
+		_message("暂时不能进入这段航路。")
+		return
 	paused = false
 	speed = 1.0
 	var script: Script = load("res://scripts/combat/SiegeBattle.gd")
@@ -306,12 +419,12 @@ func start_stage(id: String) -> void:
 		return
 	battle = script.new()
 	battle.auto_step = false
-	add_child(battle)
-	move_child(battle, 1)
+	world_host.add_child(battle)
 	battle.battle_finished.connect(_battle_finished)
 	if battle.has_signal("combat_event"): battle.combat_event.connect(_combat_event)
 	battle.start(id, draft_roster, ProfileStore.data.get("levels", {}))
 	_build_battle_hud()
+	status_label.text = str(stage.get("hint", "持续补线，守住微光。"))
 
 func _health_bar(rect: Rect2, color: Color) -> ProgressBar:
 	var bar := ProgressBar.new()
@@ -335,7 +448,19 @@ func _build_battle_hud() -> void:
 	_button("营地", Rect2(17, 119, 91, 39), show_home.bind("远征"))
 	pause_button = _button("暂停", Rect2(119, 119, 91, 39), _toggle_pause)
 	speed_button = _button("1×", Rect2(221, 119, 79, 39), _toggle_speed)
-	status_label = _label("保留能量持续补线，远程跟在前排之后。", Rect2(343, 118, 880, 33), 18, Color("d8dfc8"))
+	follow_button = _button("跟随中", Rect2(311, 119, 113, 39), _resume_follow)
+	status_label = _label("", Rect2(439, 117, 555, 43), 16, Color("d8dfc8"))
+	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	pulse_button = _button("星灯脉冲 [P] · 80", Rect2(1009, 119, 246, 39), _pulse, null, true)
+	view_slider = HSlider.new()
+	view_slider.position = Vector2(244, 534)
+	view_slider.size = Vector2(792, 15)
+	view_slider.max_value = view_max
+	view_slider.step = 1
+	screen.add_child(view_slider)
+	view_slider.value_changed.connect(_slide_view)
+	_label("星灯", Rect2(33, 525, 130, 26), 14, Color("b6c8c2"))
+	_label("← → / 拖动查看", Rect2(1055, 525, 190, 26), 14, Color("b6c8c2"))
 	_panel(Rect2(16, 557, 1248, 148), Color("e9e3d4"))
 	summon_buttons.clear()
 	summon_labels.clear()
@@ -371,6 +496,9 @@ func _update_hud() -> void:
 	var elapsed := int(snap.get("elapsed", 0))
 	timer_label.text = "%02d:%02d    在场 %d / 64" % [int(elapsed / 60), elapsed % 60, int(snap.get("active_count", 0))]
 	var cooldowns: Dictionary = snap.get("cooldowns", {})
+	var pulse_remaining := float(snap.get("pulse_cooldown", 0))
+	pulse_button.text = "星灯脉冲 · %.1fs" % pulse_remaining if pulse_remaining > 0.05 else "星灯脉冲 [P] · 80"
+	pulse_button.disabled = paused or pulse_remaining > 0.05 or float(snap.get("energy", 0)) < float(snap.get("pulse_cost", 80)) or str(snap.get("outcome", "running")) != "running"
 	for i in summon_buttons.size():
 		var id: String = draft_roster[i]
 		var unit := Catalog.unit(id)
@@ -386,6 +514,11 @@ func _summon(id: String) -> void:
 	if not is_instance_valid(battle) or paused: return
 	if not battle.try_summon(id):
 		_message("能量不足、尚在冷却或战场已满。")
+	_update_hud()
+
+func _pulse() -> void:
+	if not is_instance_valid(battle) or paused: return
+	if not battle.try_pulse(): _message("需要80能量、冷却完成，并有可命中的敌军。")
 	_update_hud()
 
 func _toggle_pause() -> void:
@@ -404,7 +537,15 @@ func _toggle_speed() -> void:
 func _combat_event(kind: String, position_at: Vector2, amount: float, team: int) -> void:
 	if not is_instance_valid(screen): return
 	if kind == "hit" or kind == "heal" or kind == "base_hit":
-		var l := _label(("+" if kind == "heal" else "") + str(int(amount)), Rect2(position_at.x - 35, position_at.y - 87, 100, 30), 18, Color("94e7b0") if kind == "heal" else Color("ffdfa5"))
+		var l := _label(("+" if kind == "heal" else "") + str(int(amount)), Rect2(position_at.x - 35, position_at.y - 87, 100, 30), 18, Color("94e7b0") if kind == "heal" else Color("ffdfa5"), world_host)
+		l.z_index = 60
+		motes.append({"node": l, "life": 1.0})
+	elif kind == "pulse":
+		world.add_pulse(position_at)
+		status_label.text = "星灯脉冲！打断前线敌军，争取补线时间。"
+	elif kind == "stun":
+		var l := _label("打断", Rect2(position_at.x - 35, position_at.y - 55, 100, 30), 17, Color("8cf6d8"), world_host)
+		l.z_index = 60
 		motes.append({"node": l, "life": 1.0})
 	elif kind == "phase":
 		status_label.text = "裂隙狂潮！坚守阵线，寻找反攻窗口。"
@@ -428,8 +569,17 @@ func _battle_finished(victory: bool) -> void:
 	var stage := Catalog.stage(active_stage)
 	var reward: Variant = stage.get("rewards", 80)
 	var earned := int(reward.get("credits", 80)) if reward is Dictionary else int(reward)
-	var text := "获得 %d 星砂。可以训练英魂，继续远征。" % earned if victory and saved else "保存失败，请重试领取。" if victory else "尝试低费前排持续补线，再搭配范围输出或治疗。"
-	var desc := _label(text, Rect2(25, 92, 436, 76), 20, SiegeStyle.MUTED, result_panel)
+	var text := "保存失败，请重试领取。" if victory else "尝试低费前排持续补线，再搭配范围输出或治疗。"
+	if victory and saved:
+		run_token = ""
+		var award: Dictionary = ProfileStore.last_award
+		earned = int(award.get("credits", earned))
+		text = "获得 %d 星砂" % earned
+		if bool(award.get("first_clear", false)): text += "（首通额外 %d）" % int(award.get("bonus_credits", 0))
+		var names: Array[String] = []
+		for id: String in award.get("unlock_units", []): names.append(str(Catalog.unit(id).get("name", id)))
+		text += "\n新契约 · " + "、".join(names) if not names.is_empty() else "\n可以训练英魂，继续远征。"
+	var desc := _label(text, Rect2(25, 83, 436, 91), 19, SiegeStyle.MUTED, result_panel)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if victory and not saved:
 		_button("重试保存奖励", Rect2(25, 185, 436, 46), _retry_reward, result_panel, true)
@@ -440,7 +590,8 @@ func _battle_finished(victory: bool) -> void:
 			if str(stages[i].id) == active_stage and i + 1 < stages.size(): next_id = str(stages[i + 1].id)
 		_button("继续远征" if victory and not next_id.is_empty() else "再战一次", Rect2(25, 185, 436, 46), start_stage.bind(next_id if victory and not next_id.is_empty() else active_stage), result_panel, true)
 	_button("返回营地 · 整备英魂", Rect2(25, 247, 436, 46), show_home.bind("英魂" if not victory else "远征"), result_panel)
-	_label("每一次尝试，都让微光更近一步。", Rect2(25, 312, 436, 30), 16, SiegeStyle.MUTED, result_panel)
+	var ending := _label(str(stage.get("story_outro", "每一次尝试，都让微光更近一步。")) if victory and saved else "每一次尝试，都让微光更近一步。", Rect2(25, 304, 436, 49), 14, SiegeStyle.MUTED, result_panel)
+	ending.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _retry_reward() -> void:
 	if ProfileStore.win(run_token):

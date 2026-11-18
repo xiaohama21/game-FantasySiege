@@ -21,13 +21,14 @@ func _run() -> void:
 		_finish(report_path, 1)
 		return
 	var sprite := actor.spine_sprite()
+	actor.set_process(false)
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string(str(actor.spec.data).replace("actor-data.tres", "actor.spine-json")))
 	for animation: String in raw.get("animations", {}):
 		var state: Object = sprite.call("get_animation_state")
 		state.call("set_animation", animation, false, 0)
 		var visible_samples := 0
 		for step in range(36):
-			sprite.call("get_animation_state").call("update", 1.0 / 30.0)
+			sprite.call("update_skeleton", 1.0 / 30.0)
 			await process_frame
 			var sample: Rect2 = sprite.call("get_skeleton").call("get_bounds")
 			if sample.size.is_finite() and sample.position.is_finite() and sample.size.x > 0 and sample.size.y > 0: visible_samples += 1

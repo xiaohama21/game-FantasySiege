@@ -1,0 +1,87 @@
+{
+	"cases": [
+		"three_attributes",
+		"frame_independence",
+		"summon_and_fixed_step",
+		"damage_types",
+		"healing_and_target_lifetime",
+		"area_and_slow",
+		"boss_phase_and_terminal",
+		"capacity_and_restart"
+	],
+	"checks": 59,
+	"failures": [],
+	"logic_performance": {
+		"active_count": 64,
+		"ms_per_step": 0.877583333333333,
+		"realtime_factor": 18.9915487608014,
+		"simulated_seconds": 5.0,
+		"visuals": false,
+		"wall_ms": 263.275
+	},
+	"passed": true,
+	"stages": [
+		{
+			"elapsed": 81.8166666666633,
+			"enemy_hp": 0.0,
+			"id": "stage_01",
+			"max_active": 20,
+			"outcome": "victory",
+			"player_hp": 1100.0,
+			"strategy": "mixed_line",
+			"summons": 20
+		},
+		{
+			"elapsed": 96.0333333333292,
+			"enemy_hp": 1200.0,
+			"id": "stage_01",
+			"max_active": 19,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 133.166666666665,
+			"enemy_hp": 0.0,
+			"id": "stage_02",
+			"max_active": 30,
+			"outcome": "victory",
+			"player_hp": 1200.0,
+			"strategy": "mixed_line",
+			"summons": 31
+		},
+		{
+			"elapsed": 68.0833333333308,
+			"enemy_hp": 1800.0,
+			"id": "stage_02",
+			"max_active": 15,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 186.883333333374,
+			"enemy_hp": 0.0,
+			"id": "stage_03",
+			"max_active": 37,
+			"outcome": "victory",
+			"player_hp": 1400.0,
+			"strategy": "mixed_line",
+			"summons": 47
+		},
+		{
+			"elapsed": 76.8333333333303,
+			"enemy_hp": 2400.0,
+			"id": "stage_03",
+			"max_active": 16,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"strategy": "no_summon",
+			"summons": 0
+		}
+	],
+	"version": "0.1.1.0",
+	"visuals": false
+}

@@ -1,6 +1,9 @@
 # Spine 批量应用规格
 
-> v0.5 · 2026-11-18 · GDD v0.2.3 / 程序0.1.1.2
+> v0.8 · 2026-11-18 · GDD v0.3.2 / 程序0.1.2.0
+> v0.8：扩展帧分组预算API供高数量场景对照；补齐原生零delta/逻辑/绘制分项、真实renderer门禁与便携包三工具依赖。预算默认仍2组，3/4组未验收前不作为交付配置。
+> v0.7：21来源资产/20导出名家族口径；低优先级30Hz为采样上限，奇偶帧错峰避免低帧率下全部骨架同时到期；完整战斗与可见范围性能分开记录。
+> v0.6：新增四首通英魂来源；骨架manual时钟、60/30Hz优先级更新、root-motion对象缓存和真实场景性能对照，保留原始基线与原验收门槛。
 > v0.5：修复派生JSON/atlas旧import remap依赖与便携包骨架静默为空；重新生成时仅在本项目assets/actors内删除对应旧.import，包内逐套检查真实骨架不能仅看日志/资源对象存在。
 > v0.4：修复速度接口的原生TrackEntry调用；13套真渲染0/1/2倍率、暂停冻结与动作恢复严格日志验收通过。
 > v0.3：首批13底模配置定稿；deform迁移到4.3 attachments/skin/slot/attachment/deform，保留顶点与时点、转换时间/比例Bezier，逐套原生动画探针和独立截图验证。
@@ -13,7 +16,7 @@
 
 `python tools/spine_pipeline.py import --ids 097,312,314,072,163,...` 将输入独立复制到 `assets/source/d69_NNN`，派生运行文件在 `assets/actors/NNN`，provenance关联每份原文件SHA256、转换器和独立声明。转换无path/linkedmesh候选；deform需显式启用已实现的attachments格式适配并逐套原生验证，path/linkedmesh继续拒绝。按编号重复导入可扩充，不修改外部库。
 
-默认所有13底模均从给定D69源包独立转换；四份历史验证派生只作为`--prefer-previous`可选诊断对照，bootstrap无需旧项目美术文件。原生库可通过`--runtime-from <已安装bin目录>`只读复制，本地素材和库忽略Git。
+默认所有21来源资产均从给定D69源包独立转换；四份历史验证派生只作为`--prefer-previous`可选诊断对照，bootstrap无需旧项目美术文件。原生库可通过`--runtime-from <已安装bin目录>`只读复制，本地素材和库忽略Git。
 
 `python tools/verify_spine.py --ids ...` 调用 `tests/SpineProbe.gd`，每份素材独立Godot进程，记录加载、可见边界、皮肤、所有非空动画与逐帧推进。超时/崩溃/脚本错误均失败；原生返回成功且探针显式结尾才标runtime_pass。视觉与64单位真机性能另验收，runtime_pass不自动升为visual_checked。
 
@@ -56,3 +59,25 @@ GTX1050/OpenGL3.3独占渲染，64真实独立Spine实例（12英雄+52敌兵，
 `actor.spine-json.import`可能把读取重定向到`.godot/imported/*.spjson`，`actor.atlas.import`则指向`*.spatlas`。拷贝源.import而不拷贝匹配产物时，PNG/ctex、data.tres及原始JSON均可存在，`load(tres)`仍返回Resource，但原生`get_skeleton()`为空且日志没有错误。0.1.1.1旧便携包的097/312/314/072/084受此影响；其中四名保留角色还缺atlas原生产物。其余八套没有这些.import，原始加载正常。
 
 每次import重写派生JSON/atlas后，仅删除新项目`assets/actors/NNN/actor.spine-json.import`和`actor.atlas.import`旧remap，解析绝对路径确认在允许根内，编号严格三位整数；外部源包和旧项目.import不动。不删除其他纹理.import，纹理仍需先Godot导入。便携包构建从源文件复制时过滤*.import/*.uid，再在包自身目录导入；不能以单个图鉴using_spine、退出码或无ERROR声称所有骨架通过。所有13套需用包内exe/项目根逐套探针，八角色实际战斗实例也须检查using_spine与截图。
+
+## 0.1.2 手动骨架时钟与扩充
+
+四名首通英魂：110 Hellenia A→星槌卫士、023 Ballista A→绞弩炮手、147 Lania A→月灯术士、069 Derik A→灵契兽卫。新增底模先单独原生验证所有原始动画、默认皮肤归一与双朝向动作图检，再登记运行通过；新增敌方底模数量由CONTENT_PLAN与总纲同步定稿。
+
+第二章敌族采用057 Cooper A（普通机偶）/059 Cooper C（精英机偶）/036 Chancellor A（远程司炉）/094 Goblin Chieftain A（Boss），总21来源资产/21 visual IDs、20导出名家族；057/059为同家族A/C皮肤变体。source快照根写.gdignore，只供 provenance/重建，不让Godot尝试导入原3.8工程素材。
+
+新纹理首次导入须先于原生atlas importer。bootstrap在本项目安全暂存目录内临时移走派生actor.atlas/actor.spine-json/actor-data.tres，让第一次编辑器导入仅处理其原路径PNG；finally恢复所有文件，再第二次编辑器导入骨架与atlas，两次均检查退出码和日志。该暂存不触外部库，异常也恢复原路径，避免PNG尚无ctex时atlas导入报错或产生空原生资源。
+
+已复制运行资产的便携包使用`python tools/bootstrap_local.py --import-only --godot <包内引擎exe>`；项目根按工具自身位置确定。打包时同时复制`bootstrap_local.py`、`spine_pipeline.py`、`spine_upgrade_38_to_43.py`到包内tools，第三份是spine_pipeline顶层导入依赖。命令仅执行上述两阶段导入，不扫描/转换外部源、不复制原生库。任何阶段失败返回非零并留下包内reports/bootstrap_*.log，第一阶段异常也恢复全部暂存原生文件。
+
+`SpineActor.set_update_rate(hz:float)`只改变骨架采样频率。原生`SpineSprite.update_mode=2`（Manual），由Actor累计引擎传入delta，达到1/hz时`update_skeleton(累计delta)`，每帧至多一次；移动位置与逻辑命中仍60Hz。默认60Hz，Battle每0.5逻辑秒选最多12名关键交战实例60Hz，其余以30Hz为采样上限；死亡显示可短暂保持高频。低优先级实例按创建序号分到奇偶渲染帧，最多每两渲染帧采样一次；实际渲染不足60fps时采样可低于30Hz，但下次原生更新消耗完整累计delta，动作时间不变。避免慢帧中52个低优先级实例全部每帧到期、产生连续更新峰值。切换频率不清零未消费时长，保持连续；暂停速度0时不累计需补走的时间，恢复不会跳帧。track倍率保留0/1/2，动作结束计时同倍率。
+
+root-motion在configure时缓存骨架Pose对象及setup坐标；无平移timeline的候选root不注册无效回调，减少逐帧查骨骼/get_data/get_setup_pose调用。仅改变渲染约束成本，不改原始动画和战斗数据。
+
+高数量预算API `set_frame_group_count(groups:int)`支持2/3/4组，创建序号在组间均匀分配，关键60Hz实例不受该分组限流。低优先级的30Hz始终是采样上限；3/4组在60fps时分别最多20/15Hz，下次采样仍消耗完整累计delta，位置/命中/暂停倍率语义不变。当前发布默认2组；先用`battle64phase3/phase4`保持64可见原生骨架及完整生命条进行对照，只有测量确认后才把人数阈值和选定组数写入CORE/总纲。当前原生SpineSprite接口无batch/mesh合并开关，不能推测未提供的属性。
+
+工具把`play_state`的零delta原生pose评估单独计数，把真正SiegeBattle的advance、生命条_draw和每0.5s选率分开计时。headless或无显卡适配器的结果必须`passed=false`，不能作为渲染性能结论。GL/Vulkan诊断分别留报告，不能以某后端首轮较快值替代实际交付配置。
+
+性能重新测24实际场景与64压力：原0.1.1视觉基线38.36fps/p95 37.43ms保留；0.1.2仍要求压力p95<33.33ms，不通过则继续优化或如实待验收。分开列混合底模、全英雄与完整SiegeBattle范围，不把12英雄+52敌兵的测量外推到64英雄。GPU专占，不能与其他QA窗口并行。
+
+性能工具同时记录原生更新次数/耗时、渲染draw calls/图元和有效可见数。`baseline64`使用0.1.1相同八玩家/五敌方来源与12+52实例构成，避免新增大型资产导致测量被误称为原负载回归；`mixed64`覆盖扩充来源，`heroes64`仅英雄，`battle24/64`包含真正战斗逻辑、骨架和生命条，高HP fixture保留样本数量而不代表关卡平衡。截图表使用宽裕的独立素材检查画布，以容纳跃击、长武器和死亡轮廓；游戏视口仍1280×720。

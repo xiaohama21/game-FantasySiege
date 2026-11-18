@@ -1,14 +1,55 @@
 {
-  "schema": 1,
-  "document_version": "v0.5",
-  "program_version": "0.1.1.0",
-  "scope": "8 playable roster entries / 5 enemies / 3 stage configurations; source metadata is not runtime verification",
+  "schema": 2,
+  "document_version": "v0.8",
+  "program_version": "0.1.2.0",
+  "scope": "12 collectible players / 9 enemies / 8 stage configurations / 21 sources; configuration is not runtime verification",
   "theme": "星灯远征",
+  "world_width": 2560,
+  "campaign": {
+    "chapters": [
+      {
+        "id": 1,
+        "name": "裂隙余烬",
+        "stage_ids": [
+          "stage_01",
+          "stage_02",
+          "stage_03",
+          "stage_04"
+        ]
+      },
+      {
+        "id": 2,
+        "name": "黄铜迷航",
+        "stage_ids": [
+          "stage_05",
+          "stage_06",
+          "stage_07",
+          "stage_08"
+        ]
+      }
+    ],
+    "collection_target": 12,
+    "unlock_by_first_clear": {
+      "stage_02": [
+        "star_hammer"
+      ],
+      "stage_04": [
+        "rivet_gunner"
+      ],
+      "stage_06": [
+        "moon_mage"
+      ],
+      "stage_08": [
+        "spirit_beast"
+      ]
+    }
+  },
   "consumers": [
     {
       "unit_id": "guanyu",
       "visual_id": "d69_097",
       "name": "关羽",
+      "playable": true,
       "source_id": "097",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\097【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\097【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_GuanYu_A.json",
@@ -41,17 +82,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "范围前排",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "zhaoyun",
       "visual_id": "d69_312",
       "name": "赵云",
+      "playable": true,
       "source_id": "312",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\312【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\312【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_ZhaoYun_A.json",
@@ -82,17 +131,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "敏捷突击",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "zhugeliang",
       "visual_id": "d69_314",
       "name": "诸葛亮",
+      "playable": true,
       "source_id": "314",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\314【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\314【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_ZhugeLiang_A.json",
@@ -123,17 +180,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "魔法范围",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "diaochan",
       "visual_id": "d69_072",
       "name": "貂蝉",
+      "playable": true,
       "source_id": "072",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\072【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\072【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Diaochan_A.json",
@@ -164,17 +229,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "减速支援",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "lubu",
       "visual_id": "d69_163",
       "name": "吕布",
+      "playable": true,
       "source_id": "163",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\163【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\163【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_LuBu_A.json",
@@ -206,17 +279,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "重击破城",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "iron_guard",
       "visual_id": "d69_084",
       "name": "铁卫·洛恩",
+      "playable": true,
       "source_id": "084",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\084【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\084【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Evan_A.json",
@@ -248,17 +329,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "低费盾卫",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "ember_archer",
       "visual_id": "d69_018",
       "name": "烬羽·艾拉",
+      "playable": true,
       "source_id": "018",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\018【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\018【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Atalanta_A.json",
@@ -290,17 +379,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "长弓输出",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "rune_medic",
       "visual_id": "d69_168",
       "name": "符医·缇露",
+      "playable": true,
       "source_id": "168",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\168【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\168【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Lucy_A.json",
@@ -331,17 +428,25 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
       ],
+      "unlock_stage": "",
       "role": "治疗支援",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
-      "license_status": "local learning only; commercial authorization absent"
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
     },
     {
       "unit_id": "riftling",
       "visual_id": "d69_253",
       "name": "裂隙小鬼",
+      "playable": false,
       "source_id": "253",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\253【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\253【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_ShadePon_A.json",
@@ -372,8 +477,10 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04"
       ],
+      "unlock_stage": "",
       "role": "群聚小兵",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
@@ -383,6 +490,7 @@
       "unit_id": "ash_runner",
       "visual_id": "d69_254",
       "name": "灰烬浮灵",
+      "playable": false,
       "source_id": "254",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\254【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\254【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_ShadePooki_A.json",
@@ -412,8 +520,10 @@
       ],
       "appears_in": [
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04"
       ],
+      "unlock_stage": "",
       "role": "快突小兵",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
@@ -423,6 +533,7 @@
       "unit_id": "obsidian_guard",
       "visual_id": "d69_046",
       "name": "黑曜棒卫",
+      "playable": false,
       "source_id": "046",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\046【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\046【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Clops_A.json",
@@ -453,8 +564,10 @@
       "appears_in": [
         "stage_01",
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04"
       ],
+      "unlock_stage": "",
       "role": "重甲精英",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
@@ -464,6 +577,7 @@
       "unit_id": "ember_caster",
       "visual_id": "d69_285",
       "name": "烬火咒师",
+      "playable": false,
       "source_id": "285",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\285【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\285【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Velika_A.json",
@@ -493,8 +607,10 @@
       ],
       "appears_in": [
         "stage_02",
-        "stage_03"
+        "stage_03",
+        "stage_04"
       ],
+      "unlock_stage": "",
       "role": "范围远程",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
@@ -504,6 +620,7 @@
       "unit_id": "obsidian_warden",
       "visual_id": "d69_271",
       "name": "黑曜守门者",
+      "playable": false,
       "source_id": "271",
       "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\271【只有在【冰糖撞果冻】购买才可以免费更新】",
       "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\271【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Spike_A.json",
@@ -532,9 +649,384 @@
         "UI_Death"
       ],
       "appears_in": [
-        "stage_03"
+        "stage_03",
+        "stage_04"
       ],
+      "unlock_stage": "",
       "role": "狂潮首领",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent"
+    },
+    {
+      "unit_id": "star_hammer",
+      "visual_id": "d69_110",
+      "name": "星槌卫士·赫洛",
+      "playable": true,
+      "source_id": "110",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\110【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\110【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Hellenia_A.json",
+      "source_sha256": "7c0a005ba94bb16ec6bce9ac2b54664c927be7be567d5904c18a805d47cb1261",
+      "export_name": "Hero_Hellenia_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death"
+      ],
+      "appears_in": [
+        "stage_01",
+        "stage_02",
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "stage_02",
+      "role": "重甲守线",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
+    },
+    {
+      "unit_id": "rivet_gunner",
+      "visual_id": "d69_023",
+      "name": "绞弩炮手·诺雅",
+      "playable": true,
+      "source_id": "023",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\023【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\023【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Ballista_A.json",
+      "source_sha256": "95de2535cb11cb80778ef2fc8d19c533a21a7f4dc644f1d1d4d3b6eb6dde8584",
+      "export_name": "Hero_Ballista_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death"
+      ],
+      "appears_in": [
+        "stage_01",
+        "stage_02",
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "stage_04",
+      "role": "破甲攻城",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
+    },
+    {
+      "unit_id": "moon_mage",
+      "visual_id": "d69_147",
+      "name": "月灯术士·瑟琳",
+      "playable": true,
+      "source_id": "147",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\147【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\147【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Lania_A.json",
+      "source_sha256": "7b12e365eba75bf28eae96e677cd1a90a095f272f6e82f9a86fdbac49488f908",
+      "export_name": "Hero_Lania_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death",
+        "X"
+      ],
+      "appears_in": [
+        "stage_01",
+        "stage_02",
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "stage_06",
+      "role": "范围控制",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
+    },
+    {
+      "unit_id": "spirit_beast",
+      "visual_id": "d69_069",
+      "name": "灵契兽卫·洛迦",
+      "playable": true,
+      "source_id": "069",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\069【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\069【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Derik_A.json",
+      "source_sha256": "687638619d005bab5e0544c29566375ec023a6f659a8337e38d4f3742736d66a",
+      "export_name": "Hero_Derik_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death",
+        "X"
+      ],
+      "appears_in": [
+        "stage_01",
+        "stage_02",
+        "stage_03",
+        "stage_04",
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "stage_08",
+      "role": "快移补线",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent",
+      "availability_rule": "all stages after indicated unlock, including revisits"
+    },
+    {
+      "unit_id": "brass_chomper",
+      "visual_id": "d69_057",
+      "name": "铁颚机偶",
+      "playable": false,
+      "source_id": "057",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\057【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\057【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Cooper_A.json",
+      "source_sha256": "6c0114576462b4e0ce6b8af6feb2d545f36e884040fcfc5e7133ab2040446918",
+      "export_name": "Hero_Cooper_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death",
+        "roll"
+      ],
+      "appears_in": [
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "",
+      "role": "机械小兵",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent"
+    },
+    {
+      "unit_id": "brass_guard",
+      "visual_id": "d69_059",
+      "name": "黄铜甲卫",
+      "playable": false,
+      "source_id": "059",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\059【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\059【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Cooper_A.json",
+      "source_sha256": "b4f71865e619b76dce0a3a34d445a69f3c11eef052194b932fa7d4251dd9e4fe",
+      "export_name": "Hero_Cooper_A",
+      "original_skin": "C",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death",
+        "roll"
+      ],
+      "appears_in": [
+        "stage_05",
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "",
+      "role": "机械重甲",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent"
+    },
+    {
+      "unit_id": "rail_stoker",
+      "visual_id": "d69_036",
+      "name": "磁轨司炉",
+      "playable": false,
+      "source_id": "036",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\036【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\036【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Chancellor_A.json",
+      "source_sha256": "c9e18b7bb33f5faab9aaaadb3184fca3c42f62b42c7e62fc6056ece8abf4957b",
+      "export_name": "Hero_Chancellor_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Stiff",
+        "Stun",
+        "UI_Death"
+      ],
+      "appears_in": [
+        "stage_06",
+        "stage_07",
+        "stage_08"
+      ],
+      "unlock_stage": "",
+      "role": "机械法术",
+      "configuration_status": "configured",
+      "runtime_validation": "see spine verification report",
+      "license_status": "local learning only; commercial authorization absent"
+    },
+    {
+      "unit_id": "rail_colossus",
+      "visual_id": "d69_094",
+      "name": "裂轨巨匠",
+      "playable": false,
+      "source_id": "094",
+      "source_directory": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\094【只有在【冰糖撞果冻】购买才可以免费更新】",
+      "source_json": "F:\\godotProject\\D69【spine源文件】【315套Q版卡通角色spine动画】\\094【只有在【冰糖撞果冻】购买才可以免费更新】\\Hero_Goblin_Chieftain_A.json",
+      "source_sha256": "f3b5371832742ebabb2eb513c94e391dd0588add4a7a2b466b82fcb73ab6a546",
+      "export_name": "Hero_Goblin_Chieftain_A",
+      "original_skin": "A",
+      "runtime_skin": "default",
+      "animations": {
+        "idle": "Idle",
+        "move": "Move",
+        "attack": "Attack_A",
+        "hurt": "Stiff",
+        "death": "Death",
+        "skill": "Active_A"
+      },
+      "available_source_animations": [
+        "Active_A",
+        "Appear",
+        "Attack_A",
+        "Critical",
+        "Death",
+        "Idle",
+        "Move",
+        "Move2",
+        "Stiff",
+        "Stun",
+        "UI_Death"
+      ],
+      "appears_in": [
+        "stage_08"
+      ],
+      "unlock_stage": "",
+      "role": "过热首领",
       "configuration_status": "configured",
       "runtime_validation": "see spine verification report",
       "license_status": "local learning only; commercial authorization absent"
@@ -542,52 +1034,96 @@
   ],
   "planned_chapters": [
     {
-      "chapter": 2,
-      "name": "黄铜迷航",
-      "status": "planned",
-      "stage_count": 4,
-      "hero_sources": [
-        "023",
-        "186",
-        "239"
-      ],
-      "enemy_sources": [
-        "057",
-        "059",
-        "036",
-        "094"
-      ]
-    },
-    {
       "chapter": 3,
       "name": "月蚀花园",
       "status": "planned",
-      "stage_count": 4,
       "hero_sources": [
-        "147",
         "277",
-        "069"
+        "239",
+        "186"
       ],
       "enemy_sources": [
         "252",
         "173",
         "291"
       ]
-    },
-    {
-      "chapter": 1,
-      "name": "裂隙余烬扩充",
-      "status": "planned",
-      "stage_count": 2,
-      "hero_sources": [
-        "110",
-        "242"
-      ],
-      "enemy_sources": [
-        "047",
-        "272"
-      ]
     }
   ],
-  "logic_validation_report": "res://reports/battle_smoke.json"
+  "economic_validation": {
+    "scope": "arithmetic feasibility only; battle completion verified separately",
+    "initial_credits": 300,
+    "no_repeat_first_clear_income": 3240,
+    "four_core_ids": [
+      "iron_guard",
+      "ember_archer",
+      "rune_medic",
+      "guanyu"
+    ],
+    "total_training_spent": 960,
+    "ledger": [
+      {
+        "stage_id": "stage_01",
+        "recommended_level": 1,
+        "four_core_training_spent": 0,
+        "credits_after_first_clear": 510
+      },
+      {
+        "stage_id": "stage_02",
+        "recommended_level": 1,
+        "four_core_training_spent": 0,
+        "credits_after_first_clear": 790
+      },
+      {
+        "stage_id": "stage_03",
+        "recommended_level": 1,
+        "four_core_training_spent": 0,
+        "credits_after_first_clear": 1150
+      },
+      {
+        "stage_id": "stage_04",
+        "recommended_level": 2,
+        "four_core_training_spent": 240,
+        "credits_after_first_clear": 1310
+      },
+      {
+        "stage_id": "stage_05",
+        "recommended_level": 2,
+        "four_core_training_spent": 0,
+        "credits_after_first_clear": 1740
+      },
+      {
+        "stage_id": "stage_06",
+        "recommended_level": 3,
+        "four_core_training_spent": 320,
+        "credits_after_first_clear": 1890
+      },
+      {
+        "stage_id": "stage_07",
+        "recommended_level": 3,
+        "four_core_training_spent": 0,
+        "credits_after_first_clear": 2400
+      },
+      {
+        "stage_id": "stage_08",
+        "recommended_level": 4,
+        "four_core_training_spent": 400,
+        "credits_after_first_clear": 2580
+      }
+    ],
+    "credits_after_all_stages": 2580
+  },
+  "balance_revision": "wide-tail-1",
+  "source_counts": {
+    "source_packages": 21,
+    "visual_ids": 21,
+    "export_name_families": 20,
+    "shared_family": {
+      "Hero_Cooper_A": [
+        "057-A",
+        "059-C"
+      ]
+    }
+  },
+  "logic_validation_report": "res://reports/battle_smoke.json",
+  "data_frozen": true
 }

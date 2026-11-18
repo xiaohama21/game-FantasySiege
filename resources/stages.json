@@ -10,7 +10,9 @@
     "income": 18,
     "capacity": 400,
     "rewards": {
-      "credits": 90
+      "credits": 90,
+      "first_clear_credits": 120,
+      "unlock_units": []
     },
     "waves": [
       {
@@ -72,7 +74,14 @@
     ],
     "hint": "先召唤铁卫，再让射手或范围角色从后排输出。",
     "tip": "先召唤铁卫，再让射手或范围角色从后排输出。",
-    "palette": "starlight"
+    "palette": "starlight",
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "recommended_level": 1,
+    "chapter_name": "裂隙余烬",
+    "required_stage": "",
+    "story_intro": "第一盏星灯在断桥尽头等待。洛恩举起盾牌：先守住前线，再让伙伴抵达。",
+    "story_outro": "星灯重新照亮断桥，远征队找回一段失落航路。"
   },
   {
     "id": "stage_02",
@@ -85,7 +94,11 @@
     "income": 18,
     "capacity": 400,
     "rewards": {
-      "credits": 130
+      "credits": 130,
+      "first_clear_credits": 150,
+      "unlock_units": [
+        "star_hammer"
+      ]
     },
     "waves": [
       {
@@ -179,7 +192,14 @@
     ],
     "hint": "预留补线费用；减速阻挡快突，范围攻击清理敌群。",
     "tip": "预留补线费用；减速阻挡快突，范围攻击清理敌群。",
-    "palette": "ember"
+    "palette": "ember",
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "recommended_level": 1,
+    "chapter_name": "裂隙余烬",
+    "required_stage": "stage_01",
+    "story_intro": "失落炉廊仍在喷吐灰烬。浮灵沿轨道疾驰，赫洛的盾光在余火中闪烁。",
+    "story_outro": "炉火终于安静。星槌卫士·赫洛愿与远征队同行，成为新的前线守护者。"
   },
   {
     "id": "stage_03",
@@ -192,7 +212,9 @@
     "income": 20,
     "capacity": 440,
     "rewards": {
-      "credits": 180
+      "credits": 180,
+      "first_clear_credits": 180,
+      "unlock_units": []
     },
     "waves": [
       {
@@ -286,6 +308,543 @@
     ],
     "hint": "35s首领入场；半血狂潮时补前排，保护治疗和远程。",
     "tip": "35s首领入场；半血狂潮时补前排，保护治疗和远程。",
-    "palette": "obsidian"
+    "palette": "obsidian",
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "recommended_level": 1,
+    "chapter_name": "裂隙余烬",
+    "required_stage": "stage_02",
+    "story_intro": "黑曜门庭的重斧苏醒了。星灯脉冲能震散敌人攻势；等重击前摇亮起再释放。",
+    "story_outro": "守门者退入灯塔深处。队伍学会了读懂重击的节奏，真正的裂隙核心就在前方。"
+  },
+  {
+    "id": "stage_04",
+    "name": "裂隙灯塔",
+    "subtitle": "04 · 第一章终幕：让航路重新亮起",
+    "chapter": 1,
+    "chapter_name": "裂隙余烬",
+    "required_stage": "stage_03",
+    "recommended_level": 2,
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "enemy_base_hp": 2700,
+    "player_base_hp": 1500,
+    "initial_energy": 190,
+    "income": 21,
+    "capacity": 460,
+    "rewards": {
+      "credits": 180,
+      "first_clear_credits": 220,
+      "unlock_units": [
+        "rivet_gunner"
+      ]
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "riftling",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 12,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 20,
+        "unit_id": "ash_runner",
+        "count": 3,
+        "interval": 4,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 30,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 42,
+        "unit_id": "obsidian_warden",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1.25,
+        "damage_mult": 1.15
+      },
+      {
+        "time": 53,
+        "unit_id": "riftling",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 72,
+        "unit_id": "ash_runner",
+        "count": 3,
+        "interval": 4,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 86,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 5,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 108,
+        "unit_id": "obsidian_guard",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 125,
+        "unit_id": "riftling",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      }
+    ],
+    "hint": "半血狂潮前预留80能量，用脉冲打断重击并补前排。",
+    "tip": "半血狂潮前预留80能量，用脉冲打断重击并补前排。",
+    "palette": "obsidian",
+    "story_intro": "灯塔深处，守门者护住最后的裂隙。赫洛向前一步：让弩手找到瞄准的时间。",
+    "story_outro": "裂隙余烬化作星光。绞弩炮手·诺雅加入队伍，黄铜迷航的航道随之开启。"
+  },
+  {
+    "id": "stage_05",
+    "name": "黄铜码头",
+    "subtitle": "05 · 第二章开场：齿轮中的失落星砂",
+    "chapter": 2,
+    "chapter_name": "黄铜迷航",
+    "required_stage": "stage_04",
+    "recommended_level": 2,
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "enemy_base_hp": 2800,
+    "player_base_hp": 1500,
+    "initial_energy": 190,
+    "income": 21,
+    "capacity": 460,
+    "rewards": {
+      "credits": 190,
+      "first_clear_credits": 240,
+      "unlock_units": []
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "brass_chomper",
+        "count": 4,
+        "interval": 4,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 16,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 25,
+        "unit_id": "brass_chomper",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 42,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 8,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 58,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 78,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 95,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 120,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 6,
+        "hp_mult": 1,
+        "damage_mult": 1
+      }
+    ],
+    "hint": "绞弩的真实伤害可击穿机械护甲，低费盾仍能持续补线。",
+    "tip": "绞弩的真实伤害可击穿机械护甲，低费盾仍能持续补线。",
+    "palette": "brass",
+    "story_intro": "航路停在黄铜码头。铁颚机偶守着被偷走的星砂，诺雅绞紧弩弦，瞄准金色甲壳。",
+    "story_outro": "码头的齿轮慢下来，队伍拿回星砂，却听见深处磁轨上仍有火焰流动。"
+  },
+  {
+    "id": "stage_06",
+    "name": "磁轨栈桥",
+    "subtitle": "06 · 重甲后方的远程火光",
+    "chapter": 2,
+    "chapter_name": "黄铜迷航",
+    "required_stage": "stage_05",
+    "recommended_level": 3,
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "enemy_base_hp": 3100,
+    "player_base_hp": 1600,
+    "initial_energy": 200,
+    "income": 22,
+    "capacity": 480,
+    "rewards": {
+      "credits": 210,
+      "first_clear_credits": 260,
+      "unlock_units": [
+        "moon_mage"
+      ]
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "brass_chomper",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 12,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 22,
+        "unit_id": "rail_stoker",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 36,
+        "unit_id": "brass_chomper",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 46,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 59,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 76,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 91,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 108,
+        "unit_id": "rail_stoker",
+        "count": 1,
+        "interval": 6,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 126,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      }
+    ],
+    "hint": "稳住重甲前线，脉冲争取推进时间；通关后获得范围减速。",
+    "tip": "稳住重甲前线，脉冲争取推进时间；通关后获得范围减速。",
+    "palette": "brass",
+    "story_intro": "磁轨司炉把符火送向栈桥。月灯术士·瑟琳正在彼岸支起冰阵，等待远征队突破重甲。",
+    "story_outro": "栈桥火焰消散。月灯术士·瑟琳加入队伍，能够让整片敌群的脚步慢下来。"
+  },
+  {
+    "id": "stage_07",
+    "name": "机偶工坊",
+    "subtitle": "07 · 月华落在齿轮之间",
+    "chapter": 2,
+    "chapter_name": "黄铜迷航",
+    "required_stage": "stage_06",
+    "recommended_level": 3,
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "enemy_base_hp": 3300,
+    "player_base_hp": 1700,
+    "initial_energy": 210,
+    "income": 23,
+    "capacity": 500,
+    "rewards": {
+      "credits": 230,
+      "first_clear_credits": 280,
+      "unlock_units": []
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 15,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 24,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 38,
+        "unit_id": "brass_chomper",
+        "count": 6,
+        "interval": 2.8,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 51,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 69,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 86,
+        "unit_id": "brass_chomper",
+        "count": 6,
+        "interval": 2.8,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 103,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 6,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      },
+      {
+        "time": 119,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 137,
+        "unit_id": "brass_chomper",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1.1,
+        "damage_mult": 1.08
+      }
+    ],
+    "hint": "月灯术士减速整个命中群，范围输出配合绞弩击穿机械防线。",
+    "tip": "月灯术士减速整个命中群，范围输出配合绞弩击穿机械防线。",
+    "palette": "brass",
+    "story_intro": "工坊不断吐出新的机偶。瑟琳让月华覆盖整条轨道；越是密集的敌人，越需要范围控制。",
+    "story_outro": "最后一台机偶停下。灵契兽卫·洛迦发来警讯：浮空核心的巨锤已经开始过热。"
+  },
+  {
+    "id": "stage_08",
+    "name": "浮空核心",
+    "subtitle": "08 · 第二章终幕：重锤与最后的星灯",
+    "chapter": 2,
+    "chapter_name": "黄铜迷航",
+    "required_stage": "stage_07",
+    "recommended_level": 4,
+    "world_width": 2560,
+    "move_speed_multiplier": 1.45,
+    "enemy_base_hp": 3800,
+    "player_base_hp": 1800,
+    "initial_energy": 220,
+    "income": 24,
+    "capacity": 520,
+    "rewards": {
+      "credits": 260,
+      "first_clear_credits": 320,
+      "unlock_units": [
+        "spirit_beast"
+      ]
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 14,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 25,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1.05,
+        "damage_mult": 1.05
+      },
+      {
+        "time": 38,
+        "unit_id": "rail_colossus",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 50,
+        "unit_id": "brass_chomper",
+        "count": 5,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 67,
+        "unit_id": "brass_guard",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 81,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1.05,
+        "damage_mult": 1.05
+      },
+      {
+        "time": 103,
+        "unit_id": "brass_chomper",
+        "count": 6,
+        "interval": 3,
+        "hp_mult": 1.15,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 120,
+        "unit_id": "brass_guard",
+        "count": 1,
+        "interval": 7,
+        "hp_mult": 1.1,
+        "damage_mult": 1.1
+      },
+      {
+        "time": 138,
+        "unit_id": "rail_stoker",
+        "count": 2,
+        "interval": 7,
+        "hp_mult": 1.05,
+        "damage_mult": 1.05
+      }
+    ],
+    "hint": "巨匠半血过热：看到0.85s重击预警后释放脉冲，补盾并保护后排。",
+    "tip": "巨匠半血过热：看到0.85s重击预警后释放脉冲，补盾并保护后排。",
+    "palette": "brass",
+    "story_intro": "裂轨巨匠抡起核心重锤。十二盏星灯只差最后一盏，洛迦会在战斗之后与队伍缔结灵契。",
+    "story_outro": "浮空核心重归平静，两章航路重新连接。灵契兽卫·洛迦加入，十二英魂集齐；远征队可以重访所有关卡，尝试新的阵容。"
   }
 ]

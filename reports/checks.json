@@ -12,6 +12,11 @@
       "exit_code": 0
     },
     {
+      "case": "ProgressionSmoke",
+      "passed": true,
+      "exit_code": 0
+    },
+    {
       "case": "MainFlow",
       "passed": true,
       "exit_code": 0

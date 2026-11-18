@@ -1,0 +1,439 @@
+{
+	"cases": [
+		"three_attributes",
+		"frame_independence",
+		"summon_and_fixed_step",
+		"damage_types",
+		"healing_and_target_lifetime",
+		"area_and_slow",
+		"boss_phase_and_terminal",
+		"capacity_and_restart",
+		"wide_world_and_playable_roster",
+		"pulse_resource_range_stun_and_cooldown",
+		"pulse_interrupt_has_actual_benefit",
+		"four_new_roles",
+		"visual_priority_budget_logic_only"
+	],
+	"checks": 120,
+	"failures": [],
+	"logic_performance": {
+		"active_count": 64,
+		"ms_per_step": 1.60303,
+		"realtime_factor": 10.396977390733,
+		"simulated_seconds": 5.0,
+		"visuals": false,
+		"wall_ms": 480.909
+	},
+	"passed": true,
+	"pulse_benefit": {
+		"baseline_tank_hp": 481.394871794872,
+		"boss_warning_seconds": 0.75,
+		"countered_tank_hp": 609.6,
+		"prevented_damage": 128.205128205128,
+		"pulse_at_seconds": 0.2,
+		"pulse_energy_cost": 80
+	},
+	"stages": [
+		{
+			"elapsed": 126.666666666661,
+			"enemy_hp": 0.0,
+			"id": "stage_01",
+			"max_active": 30,
+			"outcome": "victory",
+			"player_hp": 1100.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "mixed_line",
+			"summons": 30
+		},
+		{
+			"elapsed": 104.966666666662,
+			"enemy_hp": 1200.0,
+			"id": "stage_01",
+			"max_active": 20,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 129.699999999995,
+			"enemy_hp": 0.0,
+			"id": "stage_02",
+			"max_active": 24,
+			"outcome": "victory",
+			"player_hp": 1200.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "mixed_line",
+			"summons": 30
+		},
+		{
+			"elapsed": 81.4999999999967,
+			"enemy_hp": 1800.0,
+			"id": "stage_02",
+			"max_active": 17,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 174.183333333364,
+			"enemy_hp": 0.0,
+			"id": "stage_03",
+			"max_active": 32,
+			"outcome": "victory",
+			"player_hp": 1400.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "mixed_line",
+			"summons": 44
+		},
+		{
+			"elapsed": 90.7333333333295,
+			"enemy_hp": 2400.0,
+			"id": "stage_03",
+			"max_active": 17,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 1,
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 204.600000000055,
+			"enemy_hp": 0.0,
+			"id": "stage_04",
+			"max_active": 42,
+			"outcome": "victory",
+			"player_hp": 1500.0,
+			"recommended_level": 2,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"zhaoyun",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "mixed_line",
+			"summons": 54
+		},
+		{
+			"elapsed": 91.2333333333294,
+			"enemy_hp": 2700.0,
+			"id": "stage_04",
+			"max_active": 21,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 2,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"zhaoyun",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 248.00000000009,
+			"enemy_hp": 0.0,
+			"id": "stage_05",
+			"max_active": 49,
+			"outcome": "victory",
+			"player_hp": 1500.0,
+			"recommended_level": 2,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "mixed_line",
+			"summons": 51
+		},
+		{
+			"elapsed": 91.0166666666628,
+			"enemy_hp": 2800.0,
+			"id": "stage_05",
+			"max_active": 18,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 2,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 256.433333333429,
+			"enemy_hp": 0.0,
+			"id": "stage_06",
+			"max_active": 50,
+			"outcome": "victory",
+			"player_hp": 1600.0,
+			"recommended_level": 3,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "mixed_line",
+			"summons": 54
+		},
+		{
+			"elapsed": 79.1833333333301,
+			"enemy_hp": 3100.0,
+			"id": "stage_06",
+			"max_active": 16,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 3,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 282.800000000071,
+			"enemy_hp": 0.0,
+			"id": "stage_07",
+			"max_active": 57,
+			"outcome": "victory",
+			"player_hp": 1700.0,
+			"recommended_level": 3,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"moon_mage",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "mixed_line",
+			"summons": 61
+		},
+		{
+			"elapsed": 80.6666666666634,
+			"enemy_hp": 3300.0,
+			"id": "stage_07",
+			"max_active": 18,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 3,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"moon_mage",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 224.183333333404,
+			"enemy_hp": 0.0,
+			"id": "stage_08",
+			"max_active": 39,
+			"outcome": "victory",
+			"player_hp": 1800.0,
+			"recommended_level": 4,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"moon_mage",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "mixed_line",
+			"summons": 52
+		},
+		{
+			"elapsed": 82.18333333333,
+			"enemy_hp": 3800.0,
+			"id": "stage_08",
+			"max_active": 17,
+			"outcome": "defeat",
+			"player_hp": 0.0,
+			"recommended_level": 4,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"moon_mage",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "no_summon",
+			"summons": 0
+		},
+		{
+			"elapsed": 204.150000000055,
+			"enemy_hp": 0.0,
+			"id": "stage_04",
+			"max_active": 41,
+			"outcome": "victory",
+			"player_hp": 1500.0,
+			"recommended_level": 2,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"zhaoyun",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "core_growth",
+			"summons": 54
+		},
+		{
+			"elapsed": 222.250000000069,
+			"enemy_hp": 0.0,
+			"id": "stage_06",
+			"max_active": 43,
+			"outcome": "victory",
+			"player_hp": 1600.0,
+			"recommended_level": 3,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"zhugeliang",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "core_growth",
+			"summons": 47
+		},
+		{
+			"elapsed": 309.350000000047,
+			"enemy_hp": 0.0,
+			"id": "stage_08",
+			"max_active": 50,
+			"outcome": "victory",
+			"player_hp": 1800.0,
+			"recommended_level": 4,
+			"roster": [
+				"iron_guard",
+				"rune_medic",
+				"ember_archer",
+				"moon_mage",
+				"guanyu",
+				"rivet_gunner",
+				"lubu",
+				"star_hammer"
+			],
+			"strategy": "core_growth",
+			"summons": 70
+		}
+	],
+	"version": "0.1.2.0",
+	"visuals": false
+}

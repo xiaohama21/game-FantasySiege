@@ -1,0 +1,14 @@
+{
+	"fps_average": 38.3639072360723,
+	"full_hero_instances": 12,
+	"max_frame_ms": 46.405,
+	"mean_frame_ms": 26.0661666666667,
+	"native_instances": 64,
+	"p95_frame_ms": 37.425,
+	"passed": false,
+	"rendering_adapter": "GeForce GTX 1050",
+	"sample_frames": 300,
+	"scope": "64 independent real Spine animation instances; rendered visual workload, combat excluded",
+	"static_memory_increase_bytes": 45296145,
+	"total_instances": 64
+}

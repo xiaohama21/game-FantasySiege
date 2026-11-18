@@ -1,0 +1,58 @@
+{
+	"animations": [
+		{
+			"bounds": "[P: (-140.497, -187.9909), S: (198.0073, 188.9997)]",
+			"name": "Active_A",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-140.497, -187.9909), S: (198.0073, 188.9997)]",
+			"name": "Appear",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-201.9597, -178.1084), S: (249.2666, 217.7761)]",
+			"name": "Attack_A",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-140.497, -187.9909), S: (198.0073, 188.9997)]",
+			"name": "Critical",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-287.6509, -93.79312), S: (273.4615, 187.7867)]",
+			"name": "Death",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-140.497, -187.9909), S: (198.0073, 188.9997)]",
+			"name": "Idle",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-180.5207, -164.9998), S: (263.5143, 226.7018)]",
+			"name": "Move",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-103.0352, -214.1077), S: (204.8591, 223.9278)]",
+			"name": "Stiff",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-156.7603, -199.9888), S: (203.3034, 205.2539)]",
+			"name": "Stun",
+			"visible_samples": 36
+		},
+		{
+			"bounds": "[P: (-131.0379, -99.10311), S: (214.4985, 179.2163)]",
+			"name": "UI_Death",
+			"visible_samples": 36
+		}
+	],
+	"errors": [],
+	"native": true,
+	"passed": true,
+	"visual_id": "d69_271"
+}

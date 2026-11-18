@@ -1,0 +1,438 @@
+{
+  "guanyu": {
+    "name": "关羽",
+    "description": "坚守前线，挥刀击退密集敌群。",
+    "role": "范围前排",
+    "role_name": "范围前排",
+    "visual_id": "d69_097",
+    "hp": 550,
+    "damage": 58,
+    "armor": 25,
+    "speed": 45,
+    "range": 64,
+    "attack_interval": 1.7,
+    "hit_delay": 0.4,
+    "cost": 125,
+    "cooldown": 12,
+    "damage_type": "physical",
+    "aoe_radius": 68,
+    "special": "cleave",
+    "color": "#76c89c",
+    "primary_attribute": "strength",
+    "attributes": {
+      "strength": 18,
+      "agility": 9,
+      "intelligence": 7
+    },
+    "attribute_growth": {
+      "strength": 2,
+      "agility": 1,
+      "intelligence": 1
+    },
+    "skill_name": "青龙横扫",
+    "skill_description": "自动：物理攻击影响目标周围68px的敌人。"
+  },
+  "zhaoyun": {
+    "name": "赵云",
+    "description": "快速补位，用连续突刺穿透敌人防线。",
+    "role": "敏捷突击",
+    "role_name": "敏捷突击",
+    "visual_id": "d69_312",
+    "hp": 320,
+    "damage": 32,
+    "armor": 14,
+    "speed": 80,
+    "range": 72,
+    "attack_interval": 0.9,
+    "hit_delay": 0.3,
+    "cost": 90,
+    "cooldown": 7,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#a3d9f2",
+    "primary_attribute": "agility",
+    "attributes": {
+      "strength": 10,
+      "agility": 20,
+      "intelligence": 6
+    },
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 2,
+      "intelligence": 1
+    },
+    "skill_name": "银枪连刺",
+    "skill_description": "自动：快速单体物理突刺，出手间隔随敏捷缩短。"
+  },
+  "zhugeliang": {
+    "name": "诸葛亮",
+    "description": "远程符术清理敌群，同时减缓其推进。",
+    "role": "魔法范围",
+    "role_name": "魔法范围",
+    "visual_id": "d69_314",
+    "hp": 240,
+    "damage": 65,
+    "armor": 6,
+    "speed": 38,
+    "range": 230,
+    "attack_interval": 2,
+    "hit_delay": 0.45,
+    "cost": 135,
+    "cooldown": 13,
+    "damage_type": "magic",
+    "aoe_radius": 60,
+    "special": {
+      "type": "slow",
+      "ratio": 0.65,
+      "duration": 2
+    },
+    "color": "#9ce4dc",
+    "primary_attribute": "intelligence",
+    "attributes": {
+      "strength": 5,
+      "agility": 7,
+      "intelligence": 20
+    },
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 1,
+      "intelligence": 2
+    },
+    "skill_name": "星阵束流",
+    "skill_description": "自动：60px范围魔法攻击，移动速度降至65%，基础持续2s，受智力提升。"
+  },
+  "diaochan": {
+    "name": "貂蝉",
+    "description": "牵制快突敌人，为前线争取补位时间。",
+    "role": "减速支援",
+    "role_name": "减速支援",
+    "visual_id": "d69_072",
+    "hp": 240,
+    "damage": 26,
+    "armor": 8,
+    "speed": 44,
+    "range": 200,
+    "attack_interval": 1.25,
+    "hit_delay": 0.35,
+    "cost": 95,
+    "cooldown": 10,
+    "damage_type": "magic",
+    "aoe_radius": 0,
+    "special": {
+      "type": "slow",
+      "ratio": 0.5,
+      "duration": 2.5
+    },
+    "color": "#e8aacd",
+    "primary_attribute": "intelligence",
+    "attributes": {
+      "strength": 6,
+      "agility": 10,
+      "intelligence": 18
+    },
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 1,
+      "intelligence": 2
+    },
+    "skill_name": "流光缚影",
+    "skill_description": "自动：单体魔法攻击，移动速度降至50%，基础持续2.5s，受智力提升。"
+  },
+  "lubu": {
+    "name": "吕布",
+    "description": "长前摇重击大范围敌人，适合攻破坚固防线。",
+    "role": "重击破城",
+    "role_name": "重击破城",
+    "visual_id": "d69_163",
+    "hp": 750,
+    "damage": 95,
+    "armor": 30,
+    "speed": 36,
+    "range": 76,
+    "attack_interval": 2.35,
+    "hit_delay": 0.7,
+    "cost": 185,
+    "cooldown": 18,
+    "damage_type": "physical",
+    "aoe_radius": 90,
+    "special": "cleave",
+    "color": "#f18c76",
+    "primary_attribute": "strength",
+    "attributes": {
+      "strength": 20,
+      "agility": 10,
+      "intelligence": 5
+    },
+    "attribute_growth": {
+      "strength": 2,
+      "agility": 1,
+      "intelligence": 1
+    },
+    "skill_name": "陨星重斩",
+    "skill_description": "自动：90px范围物理重击，命中前摇0.7s。"
+  },
+  "iron_guard": {
+    "name": "铁卫·洛恩",
+    "description": "低费持盾补线，保护远程伙伴持续输出。",
+    "role": "低费盾卫",
+    "role_name": "低费盾卫",
+    "visual_id": "d69_084",
+    "hp": 480,
+    "damage": 14,
+    "armor": 28,
+    "speed": 42,
+    "range": 48,
+    "attack_interval": 1.55,
+    "hit_delay": 0.3,
+    "cost": 40,
+    "cooldown": 3,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#dbcfad",
+    "primary_attribute": "strength",
+    "attributes": {
+      "strength": 18,
+      "agility": 6,
+      "intelligence": 5
+    },
+    "attribute_growth": {
+      "strength": 2,
+      "agility": 1,
+      "intelligence": 1
+    },
+    "skill_name": "盾卫守线",
+    "skill_description": "自动：持盾近战，以高生命和护甲承受前线伤害。"
+  },
+  "ember_archer": {
+    "name": "烬羽·艾拉",
+    "description": "从前排身后持续射击，费用适中，射程较长。",
+    "role": "长弓输出",
+    "role_name": "长弓输出",
+    "visual_id": "d69_018",
+    "hp": 170,
+    "damage": 35,
+    "armor": 5,
+    "speed": 47,
+    "range": 240,
+    "attack_interval": 1.3,
+    "hit_delay": 0.35,
+    "cost": 75,
+    "cooldown": 7,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#f2c381",
+    "primary_attribute": "agility",
+    "attributes": {
+      "strength": 6,
+      "agility": 18,
+      "intelligence": 8
+    },
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 2,
+      "intelligence": 1
+    },
+    "skill_name": "烬羽长射",
+    "skill_description": "自动：240px射程单体物理箭击，命中延迟0.35s。"
+  },
+  "rune_medic": {
+    "name": "符医·缇露",
+    "description": "治疗射程内受伤伙伴，无法修复基地。",
+    "role": "治疗支援",
+    "role_name": "治疗支援",
+    "visual_id": "d69_168",
+    "hp": 185,
+    "damage": 30,
+    "armor": 8,
+    "speed": 40,
+    "range": 220,
+    "attack_interval": 1.7,
+    "hit_delay": 0.4,
+    "cost": 85,
+    "cooldown": 9,
+    "damage_type": "magic",
+    "aoe_radius": 0,
+    "special": {
+      "type": "heal"
+    },
+    "color": "#b6ddb0",
+    "primary_attribute": "intelligence",
+    "attributes": {
+      "strength": 7,
+      "agility": 8,
+      "intelligence": 18
+    },
+    "attribute_growth": {
+      "strength": 1,
+      "agility": 1,
+      "intelligence": 2
+    },
+    "skill_name": "符灯回春",
+    "skill_description": "自动：优先治疗220px内受伤伙伴，治疗随主属性、等级和智力成长；无法修复基地。"
+  },
+  "riftling": {
+    "name": "裂隙小鬼",
+    "description": "成群近战暗灵，适合用范围攻击清理。",
+    "role": "群聚小兵",
+    "role_name": "群聚小兵",
+    "visual_id": "d69_253",
+    "hp": 70,
+    "damage": 13,
+    "armor": 1,
+    "speed": 62,
+    "range": 42,
+    "attack_interval": 1.1,
+    "hit_delay": 0.25,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#8498c9",
+    "primary_attribute": "agility",
+    "attributes": {
+      "strength": 4,
+      "agility": 10,
+      "intelligence": 3
+    },
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    }
+  },
+  "ash_runner": {
+    "name": "灰烬浮灵",
+    "description": "移动迅速，补充前排或减速可以挡住它。",
+    "role": "快突小兵",
+    "role_name": "快突小兵",
+    "visual_id": "d69_254",
+    "hp": 105,
+    "damage": 20,
+    "armor": 3,
+    "speed": 105,
+    "range": 48,
+    "attack_interval": 0.95,
+    "hit_delay": 0.22,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#b494dd",
+    "primary_attribute": "agility",
+    "attributes": {
+      "strength": 5,
+      "agility": 16,
+      "intelligence": 4
+    },
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    }
+  },
+  "obsidian_guard": {
+    "name": "黑曜棒卫",
+    "description": "重甲慢行，棒槌重击；魔法与治疗能稳住战线。",
+    "role": "重甲精英",
+    "role_name": "重甲精英",
+    "visual_id": "d69_046",
+    "hp": 620,
+    "damage": 42,
+    "armor": 40,
+    "speed": 30,
+    "range": 68,
+    "attack_interval": 1.9,
+    "hit_delay": 0.65,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "aoe_radius": 0,
+    "special": "",
+    "color": "#a9a0a9",
+    "primary_attribute": "strength",
+    "attributes": {
+      "strength": 18,
+      "agility": 5,
+      "intelligence": 3
+    },
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    }
+  },
+  "ember_caster": {
+    "name": "烬火咒师",
+    "description": "远程范围法术，不能只堆盾而缺少输出。",
+    "role": "范围远程",
+    "role_name": "范围远程",
+    "visual_id": "d69_285",
+    "hp": 190,
+    "damage": 29,
+    "armor": 5,
+    "speed": 36,
+    "range": 210,
+    "attack_interval": 1.8,
+    "hit_delay": 0.6,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "magic",
+    "aoe_radius": 65,
+    "special": "cleave",
+    "color": "#d594bc",
+    "primary_attribute": "intelligence",
+    "attributes": {
+      "strength": 5,
+      "agility": 8,
+      "intelligence": 18
+    },
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    }
+  },
+  "obsidian_warden": {
+    "name": "黑曜守门者",
+    "description": "半血进入裂甲狂潮，提前补线并保护远程与治疗。",
+    "role": "狂潮首领",
+    "role_name": "狂潮首领",
+    "visual_id": "d69_271",
+    "hp": 2100,
+    "damage": 65,
+    "armor": 22,
+    "speed": 27,
+    "range": 82,
+    "attack_interval": 3.4,
+    "hit_delay": 0.75,
+    "cost": 0,
+    "cooldown": 0,
+    "damage_type": "physical",
+    "aoe_radius": 110,
+    "special": {
+      "type": "cleave",
+      "phase_threshold": 0.5,
+      "phase_damage_mult": 1.3,
+      "phase_speed_mult": 1.15,
+      "phase_attack_mult": 0.8,
+      "phase_name": "裂甲狂潮"
+    },
+    "color": "#f0976e",
+    "primary_attribute": "strength",
+    "attributes": {
+      "strength": 22,
+      "agility": 8,
+      "intelligence": 6
+    },
+    "attribute_growth": {
+      "strength": 0,
+      "agility": 0,
+      "intelligence": 0
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "program_version": "0.1.1.0",
+  "visual_ids": [
+    "d69_097",
+    "d69_312",
+    "d69_314",
+    "d69_072",
+    "d69_163",
+    "d69_084",
+    "d69_018",
+    "d69_168",
+    "d69_253",
+    "d69_254",
+    "d69_046",
+    "d69_285",
+    "d69_271"
+  ],
+  "native_probe_passed": true,
+  "original_animation_count": 135,
+  "sheets": [
+    "reports\\spine_visuals\\attack_right.png",
+    "reports\\spine_visuals\\death_right.png",
+    "reports\\spine_visuals\\hurt_right.png",
+    "reports\\spine_visuals\\idle_left.png",
+    "reports\\spine_visuals\\idle_right.png",
+    "reports\\spine_visuals\\move_right.png",
+    "reports\\spine_visuals\\skill_right.png"
+  ],
+  "checked_states": [
+    "idle_right",
+    "idle_left",
+    "move",
+    "attack",
+    "skill",
+    "hurt",
+    "death"
+  ],
+  "notes": [
+    "A skin required for 084/018/253/254; setup slots reset",
+    "163 original mounted Active_A includes dismount/lunge; combat cleave uses Attack_A",
+    "Ghost dark silhouettes require bright battlefield screenshot QA",
+    "Death contour may extend beyond source review cell"
+  ],
+  "commercial_clearance": false,
+  "performance_checked": false
+}

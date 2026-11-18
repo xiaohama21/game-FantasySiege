@@ -1,0 +1,147 @@
+class_name SpineActor
+extends Node2D
+
+## Visual playback only. Combat hit timing never depends on animation events.
+static var _resources: Dictionary = {}
+static var _catalog: Dictionary = {}
+static var _checked_textures: Dictionary = {}
+var visual_id := ""
+var facing := 1
+var spec: Dictionary = {}
+var _sprite: Node2D
+var _state := ""
+var _remaining := 0.0
+var _spine_ok := false
+var _configured := false
+var _playback_speed := 1.0
+var _track_scale := 1.0
+var _current_track: Object
+
+func _ready() -> void:
+	if _configured: _build()
+
+func configure(id: String, direction: int = 1) -> void:
+	visual_id = id
+	facing = 1 if direction >= 0 else -1
+	if _catalog.is_empty() and FileAccess.file_exists("res://resources/visuals.json"):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://resources/visuals.json"))
+		if parsed is Dictionary: _catalog = parsed
+	spec = _catalog.get(id, {}).duplicate(true)
+	_configured = true
+	if is_inside_tree(): _build()
+
+func _build() -> void:
+	_current_track = null
+	if is_instance_valid(_sprite):
+		remove_child(_sprite)
+		_sprite.queue_free()
+	_sprite = null
+	_spine_ok = false
+	_state = ""
+	var path := str(spec.get("data", ""))
+	if not path.is_empty() and ClassDB.class_exists("SpineSprite") and ResourceLoader.exists(path) and _dependencies_ready(path):
+		if not _resources.has(path): _resources[path] = load(path)
+		var data: Resource = _resources.get(path)
+		if data != null:
+			_sprite = ClassDB.instantiate("SpineSprite") as Node2D
+			_sprite.set("skeleton_data_res", data)
+			add_child(_sprite)
+			var skeleton: Object = _sprite.call("get_skeleton")
+			if skeleton != null:
+				skeleton.call("set_skin_by_name", str(spec.get("skin", "default")))
+				if skeleton.has_method("set_slots_to_setup_pose"): skeleton.call("set_slots_to_setup_pose")
+				elif skeleton.has_method("set_to_setup_pose"): skeleton.call("set_to_setup_pose")
+				_spine_ok = true
+				_sprite.position.y = float(spec.get("foot", 0))
+				var visual_scale := float(spec.get("scale", 0.5))
+				_sprite.scale = Vector2(visual_scale * facing * int(spec.get("native_facing", -1)), visual_scale)
+				_sprite.modulate = Color(str(spec.get("tint", "ffffff")))
+				if _sprite.has_signal("before_world_transforms_change"):
+					_sprite.connect("before_world_transforms_change", _limit_root_motion)
+	play_state("idle")
+	queue_redraw()
+
+func _dependencies_ready(data_path: String) -> bool:
+	## The native atlas loader can crash on an unimported page. Check before
+	## constructing native skeleton data; bootstrap imports textures first.
+	var atlas_path := data_path.replace("actor-data.tres", "actor.atlas")
+	if not FileAccess.file_exists(atlas_path): return false
+	var previous_blank := true
+	for raw: String in FileAccess.get_file_as_string(atlas_path).split("\n"):
+		var line := raw.strip_edges()
+		if line.is_empty():
+			previous_blank = true
+			continue
+		if previous_blank and not line.contains(":"):
+			var page := atlas_path.get_base_dir().path_join(line)
+			if not _checked_textures.has(page):
+				if not ResourceLoader.exists(page): return false
+				var texture: Resource = ResourceLoader.load(page, "Texture2D")
+				if texture == null: return false
+				_checked_textures[page] = texture
+		previous_blank = false
+	return true
+
+func using_spine() -> bool:
+	return _spine_ok
+
+func spine_sprite() -> Node2D:
+	return _sprite
+
+func _limit_root_motion(actor: Node2D) -> void:
+	var skeleton: Object = actor.call("get_skeleton")
+	for name: Variant in spec.get("root_motion_bones", []):
+		var bone: Object = skeleton.call("find_bone", str(name))
+		if bone == null: continue
+		var pose: Object = bone.call("get_pose")
+		var setup: Object = bone.call("get_data").call("get_setup_pose")
+		var factor := float(spec.get("root_motion_scale", 0.0))
+		pose.call("set_x", float(setup.call("get_x")) + (float(pose.call("get_x")) - float(setup.call("get_x"))) * factor)
+		pose.call("set_y", float(setup.call("get_y")) + (float(pose.call("get_y")) - float(setup.call("get_y"))) * factor)
+
+func play_state(state: String, duration: float = 0.0) -> void:
+	if state == _state: return
+	_state = state
+	_remaining = 0.0
+	if not _spine_ok: return
+	var animation := str(spec.get("animations", {}).get(state, ""))
+	if animation.is_empty(): return
+	var loop := state in ["idle", "move"]
+	var animation_state: Object = _sprite.call("get_animation_state")
+	var track: Object = animation_state.call("set_animation", animation, loop, 0)
+	if track == null: return
+	_current_track = track
+	var natural := float(spec.get("durations", {}).get(state, 0.5))
+	_track_scale = natural / duration if duration > 0 and natural > 0 else 1.0
+	track.call("set_time_scale", _track_scale * _playback_speed)
+	if not loop and state != "death": _remaining = duration if duration > 0 else maxf(natural, 0.1)
+
+func _process(delta: float) -> void:
+	if _remaining > 0:
+		_remaining -= delta * _playback_speed
+		if _remaining <= 0: play_state("idle")
+
+func set_playback_speed(multiplier: float) -> void:
+	_playback_speed = maxf(multiplier, 0.0)
+	if _spine_ok and is_instance_valid(_current_track):
+		_current_track.call("set_time_scale", _track_scale * _playback_speed)
+
+func _draw() -> void:
+	var ring := Color(str(spec.get("ring", "68cdd0")))
+	var radius := float(spec.get("ring_radius", 24))
+	draw_set_transform(Vector2(0, 1), 0, Vector2(1, 0.25))
+	draw_circle(Vector2.ZERO, radius, Color(0.025, 0.04, 0.08, 0.42))
+	draw_arc(Vector2.ZERO, radius, 0, TAU, 40, Color(ring, 0.55), 2.0, true)
+	draw_set_transform(Vector2.ZERO)
+	if not _spine_ok:
+		draw_circle(Vector2(0, -55), 18, ring)
+		draw_style_box(_fallback_style(ring), Rect2(-17, -40, 34, 37))
+		draw_line(Vector2(-9, -4), Vector2(-15, 0), ring, 5)
+		draw_line(Vector2(9, -4), Vector2(15, 0), ring, 5)
+
+func _fallback_style(color: Color) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = color.darkened(0.3)
+	box.corner_radius_top_left = 9
+	box.corner_radius_top_right = 9
+	return box

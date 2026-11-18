@@ -1,0 +1,448 @@
+{
+  "d69_097": {
+    "data": "res://assets/actors/097/actor-data.tres",
+    "skin": "default",
+    "scale": 0.42,
+    "foot": 0.25,
+    "native_facing": 1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Critical",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 2.1333,
+      "move": 0.6667,
+      "attack": 0.7333,
+      "skill": 0.8667,
+      "hurt": 0.3333,
+      "death": 1.4333
+    },
+    "source_id": "097",
+    "export_name": "Hero_GuanYu_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_312": {
+    "data": "res://assets/actors/312/actor-data.tres",
+    "skin": "default",
+    "scale": 0.58,
+    "foot": -6.29,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0,
+      "move": 0.5,
+      "attack": 0.9333,
+      "skill": 1.3333,
+      "hurt": 0.3333,
+      "death": 0.8333
+    },
+    "source_id": "312",
+    "export_name": "Hero_ZhaoYun_A",
+    "root_motion_bones": [
+      "root",
+      "Character"
+    ],
+    "root_motion_scale": 0.08,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_314": {
+    "data": "res://assets/actors/314/actor-data.tres",
+    "skin": "default",
+    "scale": 0.64,
+    "foot": -1.95,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Critical",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0,
+      "move": 2.0,
+      "attack": 0.7667,
+      "skill": 1.0,
+      "hurt": 0.3333,
+      "death": 1.0
+    },
+    "source_id": "314",
+    "export_name": "Hero_ZhugeLiang_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_072": {
+    "data": "res://assets/actors/072/actor-data.tres",
+    "skin": "default",
+    "scale": 0.69,
+    "foot": -1.03,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.1667,
+      "move": 0.8667,
+      "attack": 1.0,
+      "skill": 1.2333,
+      "hurt": 0.3333,
+      "death": 0.6667
+    },
+    "source_id": "072",
+    "export_name": "Hero_Diaochan_A",
+    "root_motion_bones": [
+      "root",
+      "Character"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_163": {
+    "data": "res://assets/actors/163/actor-data.tres",
+    "skin": "default",
+    "scale": 0.535,
+    "foot": 0.48,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 2.0,
+      "move": 1.0,
+      "attack": 0.7333,
+      "skill": 1.3333,
+      "hurt": 0.3333,
+      "death": 1.1667
+    },
+    "source_id": "163",
+    "export_name": "Hero_LuBu_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_084": {
+    "data": "res://assets/actors/084/actor-data.tres",
+    "skin": "A",
+    "scale": 0.746,
+    "foot": -6.21,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0,
+      "move": 0.8333,
+      "attack": 0.6,
+      "skill": 0.7333,
+      "hurt": 0.3333,
+      "death": 0.8333
+    },
+    "source_id": "084",
+    "export_name": "Hero_Evan_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_018": {
+    "data": "res://assets/actors/018/actor-data.tres",
+    "skin": "A",
+    "scale": 0.858,
+    "foot": -1.4,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0667,
+      "move": 1.0,
+      "attack": 0.8333,
+      "skill": 0.9667,
+      "hurt": 0.3333,
+      "death": 1.0
+    },
+    "source_id": "018",
+    "export_name": "Hero_Atalanta_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_168": {
+    "data": "res://assets/actors/168/actor-data.tres",
+    "skin": "default",
+    "scale": 0.735,
+    "foot": -0.73,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0,
+      "move": 1.0,
+      "attack": 1.0,
+      "skill": 1.2667,
+      "hurt": 0.3333,
+      "death": 1.1667
+    },
+    "source_id": "168",
+    "export_name": "Hero_Lucy_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "74d2c8",
+    "ring_radius": 23
+  },
+  "d69_253": {
+    "data": "res://assets/actors/253/actor-data.tres",
+    "skin": "A",
+    "scale": 0.638,
+    "foot": -0.64,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Critical",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 0.6,
+      "move": 0.6,
+      "attack": 0.5,
+      "skill": 1.3333,
+      "hurt": 0.3333,
+      "death": 1.0
+    },
+    "source_id": "253",
+    "export_name": "Hero_ShadePon_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "807bd8",
+    "ring_radius": 23
+  },
+  "d69_254": {
+    "data": "res://assets/actors/254/actor-data.tres",
+    "skin": "A",
+    "scale": 0.69,
+    "foot": -0.7,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 0.8333,
+      "move": 0.5,
+      "attack": 0.8333,
+      "skill": 1.5,
+      "hurt": 0.3333,
+      "death": 0.6667
+    },
+    "source_id": "254",
+    "export_name": "Hero_ShadePooki_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "ce729b",
+    "ring_radius": 23
+  },
+  "d69_046": {
+    "data": "res://assets/actors/046/actor-data.tres",
+    "skin": "default",
+    "scale": 0.617,
+    "foot": -14.81,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.1667,
+      "move": 0.8333,
+      "attack": 0.5,
+      "skill": 1.3333,
+      "hurt": 0.3333,
+      "death": 1.5
+    },
+    "source_id": "046",
+    "export_name": "Hero_Clops_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "e6a37d",
+    "ring_radius": 23
+  },
+  "d69_285": {
+    "data": "res://assets/actors/285/actor-data.tres",
+    "skin": "default",
+    "scale": 0.563,
+    "foot": -19.15,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Idle",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.0,
+      "move": 0.8333,
+      "attack": 0.6,
+      "skill": 1.1667,
+      "hurt": 1.0,
+      "death": 1.0
+    },
+    "source_id": "285",
+    "export_name": "Hero_Velika_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [
+      "hurt"
+    ],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "f29c71",
+    "ring_radius": 23
+  },
+  "d69_271": {
+    "data": "res://assets/actors/271/actor-data.tres",
+    "skin": "default",
+    "scale": 0.87,
+    "foot": -2.62,
+    "native_facing": -1,
+    "animations": {
+      "idle": "Idle",
+      "move": "Move",
+      "attack": "Attack_A",
+      "skill": "Active_A",
+      "hurt": "Stiff",
+      "death": "Death"
+    },
+    "durations": {
+      "idle": 1.3333,
+      "move": 0.8333,
+      "attack": 0.6667,
+      "skill": 1.2333,
+      "hurt": 0.3333,
+      "death": 1.3333
+    },
+    "source_id": "271",
+    "export_name": "Hero_Spike_A",
+    "root_motion_bones": [
+      "root"
+    ],
+    "root_motion_scale": 0.0,
+    "status": "visual_checked",
+    "animation_substitutions": [],
+    "license_status": "research_only_not_commercially_cleared",
+    "ring": "ff7652",
+    "ring_radius": 32
+  }
+}

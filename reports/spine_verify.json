@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "results": [
+    {
+      "visual_id": "d69_097",
+      "source_id": "097",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 12,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_097.log"
+    },
+    {
+      "visual_id": "d69_312",
+      "source_id": "312",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_312.log"
+    },
+    {
+      "visual_id": "d69_314",
+      "source_id": "314",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_314.log"
+    },
+    {
+      "visual_id": "d69_072",
+      "source_id": "072",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_072.log"
+    },
+    {
+      "visual_id": "d69_163",
+      "source_id": "163",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 11,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_163.log"
+    },
+    {
+      "visual_id": "d69_084",
+      "source_id": "084",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 11,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_084.log"
+    },
+    {
+      "visual_id": "d69_018",
+      "source_id": "018",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 11,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_018.log"
+    },
+    {
+      "visual_id": "d69_168",
+      "source_id": "168",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_168.log"
+    },
+    {
+      "visual_id": "d69_253",
+      "source_id": "253",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_253.log"
+    },
+    {
+      "visual_id": "d69_254",
+      "source_id": "254",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_254.log"
+    },
+    {
+      "visual_id": "d69_046",
+      "source_id": "046",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_046.log"
+    },
+    {
+      "visual_id": "d69_285",
+      "source_id": "285",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_285.log"
+    },
+    {
+      "visual_id": "d69_271",
+      "source_id": "271",
+      "passed": true,
+      "exit_code": 0,
+      "animation_count": 10,
+      "log": "F:\\godotProject\\FantasySiege\\reports\\spine_probes\\d69_271.log"
+    }
+  ],
+  "passed": true
+}

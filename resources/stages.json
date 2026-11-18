@@ -1,0 +1,291 @@
+[
+  {
+    "id": "stage_01",
+    "name": "裂隙前哨",
+    "subtitle": "01 · 点亮断桥上的第一盏星灯",
+    "chapter": 1,
+    "enemy_base_hp": 1200,
+    "player_base_hp": 1100,
+    "initial_energy": 160,
+    "income": 18,
+    "capacity": 400,
+    "rewards": {
+      "credits": 90
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "riftling",
+        "count": 2,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 12,
+        "unit_id": "riftling",
+        "count": 3,
+        "interval": 4,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 30,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 40,
+        "unit_id": "riftling",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 62,
+        "unit_id": "riftling",
+        "count": 5,
+        "interval": 2,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 84,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 88,
+        "unit_id": "riftling",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      }
+    ],
+    "hint": "先召唤铁卫，再让射手或范围角色从后排输出。",
+    "tip": "先召唤铁卫，再让射手或范围角色从后排输出。",
+    "palette": "starlight"
+  },
+  {
+    "id": "stage_02",
+    "name": "燃烬长廊",
+    "subtitle": "02 · 穿过仍在运转的失落炉廊",
+    "chapter": 1,
+    "enemy_base_hp": 1800,
+    "player_base_hp": 1200,
+    "initial_energy": 160,
+    "income": 18,
+    "capacity": 400,
+    "rewards": {
+      "credits": 130
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "riftling",
+        "count": 3,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 10,
+        "unit_id": "ash_runner",
+        "count": 2,
+        "interval": 4,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 22,
+        "unit_id": "ember_caster",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 35,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 38,
+        "unit_id": "riftling",
+        "count": 3,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 50,
+        "unit_id": "ash_runner",
+        "count": 3,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 58,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 5,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 76,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 80,
+        "unit_id": "riftling",
+        "count": 4,
+        "interval": 2,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 96,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 110,
+        "unit_id": "ash_runner",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      }
+    ],
+    "hint": "预留补线费用；减速阻挡快突，范围攻击清理敌群。",
+    "tip": "预留补线费用；减速阻挡快突，范围攻击清理敌群。",
+    "palette": "ember"
+  },
+  {
+    "id": "stage_03",
+    "name": "黑曜城门",
+    "subtitle": "03 · 守门者的重斧正在苏醒",
+    "chapter": 1,
+    "enemy_base_hp": 2400,
+    "player_base_hp": 1400,
+    "initial_energy": 180,
+    "income": 20,
+    "capacity": 440,
+    "rewards": {
+      "credits": 180
+    },
+    "waves": [
+      {
+        "time": 0,
+        "unit_id": "riftling",
+        "count": 3,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 12,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 18,
+        "unit_id": "ash_runner",
+        "count": 2,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 26,
+        "unit_id": "ember_caster",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 35,
+        "unit_id": "obsidian_warden",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 45,
+        "unit_id": "riftling",
+        "count": 4,
+        "interval": 3,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 58,
+        "unit_id": "ash_runner",
+        "count": 3,
+        "interval": 4,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 72,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 6,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 92,
+        "unit_id": "obsidian_guard",
+        "count": 1,
+        "interval": 0,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 104,
+        "unit_id": "riftling",
+        "count": 5,
+        "interval": 2,
+        "hp_mult": 1,
+        "damage_mult": 1
+      },
+      {
+        "time": 125,
+        "unit_id": "ember_caster",
+        "count": 2,
+        "interval": 5,
+        "hp_mult": 1,
+        "damage_mult": 1
+      }
+    ],
+    "hint": "35s首领入场；半血狂潮时补前排，保护治疗和远程。",
+    "tip": "35s首领入场；半血狂潮时补前排，保护治疗和远程。",
+    "palette": "obsidian"
+  }
+]

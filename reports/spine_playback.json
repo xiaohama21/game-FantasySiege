@@ -1,0 +1,12 @@
+{
+	"action_pause_resume": true,
+	"failures": [],
+	"native_visuals": 13,
+	"passed": true,
+	"reconfigure_and_free": true,
+	"tested_speeds": [
+		0,
+		1,
+		2
+	]
+}

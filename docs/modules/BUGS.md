@@ -1,6 +1,7 @@
 # Bug 修复记录
 
-> v0.2 · 2026-11-18 · GDD v0.2.0 / 程序0.1.1.0
+> v0.3 · 2026-11-18 · GDD v0.2.2 / 程序0.1.1.1
+> v0.3：便携包必须等待图形版引擎进程并检查实际退出码和错误日志。
 > v0.2：记录接续初版时发现的存档恢复与未来版本保护边界。
 
 新项目初始记录。每个后续修复填写：问题、复现、根因、处理、GDD版本与程序版本。实现前设计迭代不是运行时bug；真正发现的运行/导入问题均在此登记。
@@ -69,3 +70,11 @@
 - 处理：使用set_animation实际返回的TrackEntry持有引用并设置倍率；新增run_checks.py同时检查结束标记、返回码和SCRIPT ERROR/ERROR日志。
 - 验证：真正Spine的召唤、暂停0、恢复1及2×经过MainFlow，严格runner必须无脚本错误。
 - 关联版本：GDD v0.2.1、CORE v0.6、SPINE_PIPELINE当前版、程序0.1.1.0。
+
+## FS-009：便携包导入没有等待图形版引擎退出
+
+- 问题/复现：build_local.ps1直接调用拷贝的图形版FantasySiege.exe并立即读取LASTEXITCODE，可能读到旧值，报告“导入失败”或未完成就判成功。
+- 根因：PowerShell对Windows GUI进程不按控制台命令同步等待，LASTEXITCODE不是该进程真实退出码。
+- 处理：后台导入使用Start-Process -WindowStyle Hidden -Wait -PassThru并读取进程ExitCode，stdout/stderr分别保存且拒绝错误日志；便携包再做实际主页及战场验证。
+- 验证：0.1.1.1本地包完整导入、实际运行与隔离MainFlow截图；失败时显示真实日志。
+- 关联版本：GDD v0.2.2、ROADMAP v0.2、程序0.1.1.1。

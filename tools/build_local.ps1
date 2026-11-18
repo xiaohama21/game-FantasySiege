@@ -33,6 +33,9 @@ Godot Engine https://godotengine.org/license/ (MIT)
 字体许可见 assets/fonts/OFL.txt。
 Spine原生运行库与角色素材的商业再分发条件须单独核实。
 '@ | Set-Content -LiteralPath (Join-Path $destination '使用说明.txt') -Encoding utf8
-& (Join-Path $destination 'FantasySiege.exe') --headless --path $destination --editor --quit
-if ($LASTEXITCODE -ne 0) { throw 'Portable project import failed' }
+$stdoutPath = Join-Path $destination 'import.log'
+$stderrPath = Join-Path $destination 'import.err'
+$importProcess = Start-Process -FilePath (Join-Path $destination 'FantasySiege.exe') -ArgumentList @('--headless','--path',('"' + $destination + '"'),'--editor','--quit') -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+$importOutput = (Get-Content -LiteralPath $stdoutPath -Raw -ErrorAction SilentlyContinue) + (Get-Content -LiteralPath $stderrPath -Raw -ErrorAction SilentlyContinue)
+if ($importProcess.ExitCode -ne 0 -or $importOutput -match 'SCRIPT ERROR:|ERROR:') { throw ('Portable project import failed: ' + $importOutput) }
 Write-Output $destination

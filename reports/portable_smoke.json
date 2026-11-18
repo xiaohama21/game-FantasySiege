@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "program_version": "0.1.1.1",
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.1.1",
+  "runtime": "bundled Godot Windows executable",
+  "source_tests": "MainFlow.gd",
+  "main_flow": {
+    "failures": [],
+    "isolation": "res://tests/.user/main_flow",
+    "passed": true,
+    "real_spine": true,
+    "screenshots": 5
+  },
+  "stderr_empty": true,
+  "dependencies_imported": true
+}

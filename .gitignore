@@ -1,0 +1,9 @@
+.godot/
+build/
+__pycache__/
+*.pyc
+*.tmp
+tests/.user/
+docs/reviews/runtime/
+Thumbs.db
+.DS_Store

@@ -29,5 +29,24 @@ static func stage(id: String) -> Dictionary:
 static func initial_roster() -> Array:
 	return INITIAL_ROSTER.duplicate()
 
+static func playable_roster() -> Array:
+	var result: Array = []
+	for id: String in units():
+		if bool(units()[id].get("playable", INITIAL_ROSTER.has(id))): result.append(id)
+	return result
+
+static func reward_units(stage_id: String) -> Array:
+	var reward: Variant = stage(stage_id).get("rewards", {})
+	if not reward is Dictionary: return []
+	var result: Array = []
+	for id: Variant in reward.get("unlock_units", []):
+		if id is String and playable_roster().has(id) and not result.has(id): result.append(id)
+	return result
+
+static func unlock_stage(id: String) -> String:
+	for entry: Dictionary in stages():
+		if reward_units(str(entry.id)).has(id): return str(entry.get("name", entry.id))
+	return "初始契约"
+
 static func visuals() -> Dictionary:
 	return _read("res://resources/visuals.json", {})

@@ -11,10 +11,20 @@ const GROUND_Y := 510.0
 const SPACING := 16.0
 const MAX_UNITS := 64
 const CORPSE_DURATION := 0.8
+const PULSE_COST := 80.0
+const PULSE_COOLDOWN := 35.0
+const PULSE_RADIUS := 180.0
+const PULSE_DAMAGE := 90.0
+const PULSE_STUN := 1.2
+const PULSE_PUSH := 60.0
 
 var auto_step := true
 var render_visuals := true
 var units: Array = []
+var world_width := 2560.0
+var player_x := PLAYER_X
+var enemy_x := 2460.0
+var _move_speed_multiplier := 1.35
 var _stage: Dictionary = {}
 var _roster: Array = []
 var _levels: Dictionary = {}
@@ -38,6 +48,9 @@ var _unit_lookup: Dictionary = {}
 var _line_units: Dictionary = {1: [], -1: []}
 var _friendly_ahead: Dictionary = {}
 var _lines_valid := false
+var _pulse_cooldown := 0.0
+var _visual_rate_timer := 0.0
+var _defer_visual_positions := false
 
 func _process(delta: float) -> void:
 	if auto_step:
@@ -57,8 +70,14 @@ func start(stage_id: String, roster: Array, levels: Dictionary = {}) -> void:
 	_stage = Catalog.stage(stage_id)
 	if _stage.is_empty():
 		return
+	world_width = maxf(1280.0, float(_stage.get("world_width", 2560.0)))
+	player_x = clampf(float(_stage.get("player_x", 100.0)), 32.0, world_width - 132.0)
+	enemy_x = clampf(float(_stage.get("enemy_x", world_width - 100.0)), player_x + 64.0, world_width - 32.0)
+	_move_speed_multiplier = maxf(0.01, float(_stage.get("move_speed_multiplier", 1.35)))
 	for id: Variant in roster:
-		if Catalog.initial_roster().has(id) and not _roster.has(id) and not Catalog.unit(str(id)).is_empty():
+		if _roster.size() >= 8:
+			break
+		if Catalog.playable_roster().has(id) and not _roster.has(id) and not Catalog.unit(str(id)).is_empty():
 			_roster.append(str(id))
 	_levels = levels.duplicate(true)
 	_capacity = maxf(1.0, float(_stage.get("capacity", 400.0)))
@@ -108,6 +127,9 @@ func stop() -> void:
 	_accumulator = 0.0
 	_energy = 0.0
 	_next_uid = 1
+	_pulse_cooldown = 0.0
+	_visual_rate_timer = 0.0
+	_defer_visual_positions = false
 	_outcome = "idle"
 	queue_redraw()
 
@@ -127,6 +149,44 @@ func try_summon(id: String) -> bool:
 	_cooldowns[id] = maxf(0.0, float(definition.get("cooldown", 1.0)))
 	return true
 
+func try_pulse() -> bool:
+	if _outcome != "running" or _pulse_cooldown > 0.00001 or _energy + 0.00001 < PULSE_COST:
+		return false
+	var center_x := INF
+	for actor: Dictionary in units:
+		if bool(actor.alive) and int(actor.team) == -1:
+			center_x = minf(center_x, float(actor.x))
+	if center_x == INF:
+		return false
+	var affected: Array = []
+	var interrupted: Dictionary = {}
+	for actor: Dictionary in units:
+		if bool(actor.alive) and int(actor.team) == -1 and absf(float(actor.x) - center_x) <= PULSE_RADIUS:
+			affected.append(actor)
+			interrupted[int(actor.uid)] = true
+	_energy = maxf(0.0, _energy - PULSE_COST)
+	_pulse_cooldown = PULSE_COOLDOWN
+	_hits = _hits.filter(func(hit: Dictionary) -> bool: return not interrupted.has(int(hit.attacker)))
+	combat_event.emit("pulse", Vector2(center_x, GROUND_Y - 45.0), PULSE_RADIUS, 1)
+	for actor: Dictionary in affected:
+		_damage_unit(actor, PULSE_DAMAGE, "true", 1)
+		if not bool(actor.alive):
+			continue
+		actor.stun_timer = maxf(float(actor.stun_timer), PULSE_STUN)
+		actor.action_timer = maxf(float(actor.action_timer), PULSE_STUN)
+		var push := PULSE_PUSH * (0.25 if actor.special.has("phase_threshold") else 1.0)
+		actor.x = maxf(float(actor.x), minf(float(actor.x) + push, world_width - 32.0))
+		var visual: Variant = actor.visual
+		if is_instance_valid(visual):
+			visual.position = Vector2(float(actor.x), GROUND_Y)
+			actor.render_x = float(actor.x)
+		_set_visual_state(actor, "hurt", PULSE_STUN)
+		combat_event.emit("stun", Vector2(float(actor.x), GROUND_Y - 95.0), PULSE_STUN, -1)
+	_lines_valid = false
+	_visual_rate_timer = 0.0
+	queue_redraw()
+	return true
+
 func active_count() -> int:
 	var total := 0
 	for unit: Dictionary in units:
@@ -136,11 +196,64 @@ func active_count() -> int:
 
 func get_snapshot() -> Dictionary:
 	return {"stage_id": str(_stage.get("id", "")), "elapsed": _elapsed,
+		"world_width": world_width, "player_x": player_x, "enemy_x": enemy_x, "frontline_x": _frontline_x(),
 		"energy": _energy, "capacity": _capacity, "income": _income,
 		"player_hp": _player_hp, "player_max_hp": _player_max_hp,
 		"enemy_hp": _enemy_hp, "enemy_max_hp": _enemy_max_hp,
 		"cooldowns": _cooldowns.duplicate(true), "active_count": active_count(),
+		"pulse_cooldown": _pulse_cooldown, "pulse_cost": PULSE_COST, "pulse_max_cooldown": PULSE_COOLDOWN,
 		"wave_pending": _waves.size(), "outcome": _outcome}
+
+func _frontline_x() -> float:
+	var player_front := player_x
+	var enemy_front := INF
+	for actor: Dictionary in units:
+		if not bool(actor.alive):
+			continue
+		if int(actor.team) == 1:
+			player_front = maxf(player_front, float(actor.x))
+		else:
+			enemy_front = minf(enemy_front, float(actor.x))
+	var point := (player_front + enemy_front) * 0.5 if enemy_front != INF and enemy_front - player_front <= 900.0 else player_front + 100.0
+	return clampf(point, player_x, enemy_x)
+
+func seed_performance_units(count: int = 24) -> bool:
+	if _outcome != "running" or _roster.is_empty() or count < 2 or count > MAX_UNITS:
+		return false
+	var enemies: Array = []
+	for id: String in Catalog.units():
+		if not Catalog.playable_roster().has(id):
+			enemies.append(id)
+	if enemies.is_empty():
+		return false
+	for actor: Dictionary in units:
+		if is_instance_valid(actor.visual):
+			actor.visual.free()
+	units.clear()
+	_unit_lookup.clear()
+	_line_units[1].clear()
+	_line_units[-1].clear()
+	_friendly_ahead.clear()
+	_lines_valid = false
+	_waves.clear()
+	_hits.clear()
+	_visual_rate_timer = 0.0
+	var player_count := (count + 1) / 2
+	var center := world_width * 0.5
+	for index: int in count:
+		var team := 1 if index < player_count else -1
+		var row := index if team == 1 else index - player_count
+		var id: String = _roster[row % _roster.size()] if team == 1 else enemies[row % enemies.size()]
+		var actor := _spawn(id, team, {"hp_mult": 20.0})
+		actor.max_hp = maxf(float(actor.max_hp), 100000.0)
+		actor.hp = float(actor.max_hp)
+		actor.x = center - 60.0 - row * SPACING if team == 1 else center + 60.0 + row * SPACING
+		if is_instance_valid(actor.visual):
+			actor.visual.position = Vector2(float(actor.x), GROUND_Y)
+			actor.render_x = float(actor.x)
+	_update_visual_rates()
+	queue_redraw()
+	return true
 
 func advance(delta: float) -> void:
 	if delta <= 0.0 or not is_finite(delta):
@@ -149,14 +262,27 @@ func advance(delta: float) -> void:
 		_decay_corpses(delta)
 		return
 	_accumulator += delta
+	_defer_visual_positions = true
 	while _accumulator + 0.0000001 >= FIXED_STEP and _outcome == "running":
 		_accumulator -= FIXED_STEP
 		_step(FIXED_STEP)
+	_defer_visual_positions = false
+	if render_visuals: _sync_visual_positions()
 	queue_redraw()
+
+func _sync_visual_positions() -> void:
+	for actor: Dictionary in units:
+		var x := float(actor.x)
+		if is_equal_approx(x, float(actor.get("render_x", INF))): continue
+		var visual: Variant = actor.visual
+		if is_instance_valid(visual):
+			visual.position = Vector2(x, GROUND_Y)
+			actor.render_x = x
 
 func _step(delta: float) -> void:
 	_elapsed += delta
 	_energy = minf(_capacity, _energy + _income * delta)
+	_pulse_cooldown = maxf(0.0, _pulse_cooldown - delta)
 	for id: String in _cooldowns:
 		_cooldowns[id] = maxf(0.0, float(_cooldowns[id]) - delta)
 	_decay_corpses(delta)
@@ -174,9 +300,12 @@ func _step(delta: float) -> void:
 		actor.attack_timer = maxf(0.0, float(actor.attack_timer) - delta)
 		actor.action_timer = maxf(0.0, float(actor.action_timer) - delta)
 		actor.slow_timer = maxf(0.0, float(actor.slow_timer) - delta)
+		actor.stun_timer = maxf(0.0, float(actor.stun_timer) - delta)
 		if float(actor.slow_timer) <= 0.0:
 			actor.slow_ratio = 1.0
 		_check_phase(actor)
+		if float(actor.stun_timer) > 0.00001:
+			continue
 		var special: Dictionary = actor.special
 		var healing_target: Dictionary = {}
 		if str(special.get("type", "")) == "heal":
@@ -197,6 +326,10 @@ func _step(delta: float) -> void:
 		else:
 			_move_actor(actor, distance, delta)
 	_resolve_hits()
+	_visual_rate_timer -= delta
+	if render_visuals and _visual_rate_timer <= 0.0:
+		_update_visual_rates()
+		_visual_rate_timer = 0.5
 
 func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 	var definition := Catalog.unit(id)
@@ -206,7 +339,7 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 	var calculated := UnitStats.calculate(definition, level)
 	var hp := maxf(1.0, float(calculated.hp) * maxf(0.01, float(wave.get("hp_mult", 1.0))))
 	var damage := maxf(0.0, float(calculated.damage) * maxf(0.0, float(wave.get("damage_mult", 1.0))))
-	var spawn_x := PLAYER_X + 32.0 if team == 1 else ENEMY_X - 32.0
+	var spawn_x := player_x + 32.0 if team == 1 else enemy_x - 32.0
 	for other: Dictionary in units:
 		if bool(other.alive) and int(other.team) == team:
 			if team == 1:
@@ -220,17 +353,18 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 	else:
 		special.type = str(special_value)
 	var actor := {"uid": _next_uid, "id": id, "name": str(definition.get("name", id)), "team": team,
-		"x": spawn_x, "hp": hp, "max_hp": hp, "damage": damage,
+		"x": spawn_x, "render_x": spawn_x, "hp": hp, "max_hp": hp, "damage": damage,
 		"armor": maxf(0.0, float(definition.get("armor", 0.0))),
 		"range": maxf(SPACING, float(definition.get("range", 40.0))),
-		"speed": float(calculated.speed), "stats": calculated.stats,
+		"speed": float(calculated.speed) * _move_speed_multiplier, "stats": calculated.stats,
 		"magic_armor": float(calculated.magic_armor), "heal_multiplier": float(calculated.heal_multiplier),
 		"attack_interval": float(calculated.attack_interval),
 		"hit_delay": maxf(0.0, float(definition.get("hit_delay", 0.25))),
 		"damage_type": str(definition.get("damage_type", "physical")),
 		"aoe_radius": maxf(0.0, float(definition.get("aoe_radius", 0.0))),
 		"special": special, "attack_timer": 0.0, "action_timer": 0.0,
-		"slow_timer": 0.0, "slow_ratio": 1.0, "alive": true, "phase": false,
+		"slow_timer": 0.0, "slow_ratio": 1.0, "stun_timer": 0.0, "alive": true, "phase": false,
+		"visual_update_rate": 30,
 		"corpse_timer": CORPSE_DURATION, "visual": null, "state": "", "level": level,
 		"color": Color(str(definition.get("color", "#6be2d0" if team == 1 else "#ed8274")))}
 	_next_uid += 1
@@ -245,6 +379,8 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 		visual.call("configure", str(definition.get("visual_id", id)), team)
 		if visual.has_method("set_playback_speed"):
 			visual.call("set_playback_speed", _visual_playback_multiplier)
+		if visual.has_method("set_update_rate"):
+			visual.call("set_update_rate", 30)
 		actor.visual = visual
 		_set_visual_state(actor, "move")
 	combat_event.emit("spawn", Vector2(spawn_x, GROUND_Y - 25.0), 0.0, team)
@@ -256,7 +392,7 @@ func _nearest_enemy(actor: Dictionary) -> Dictionary:
 	for other: Dictionary in _line_units[-int(actor.team)]:
 		if bool(other.alive) and (float(other.x) - float(actor.x)) * int(actor.team) >= -0.00001:
 			return other
-	return {"base": true, "team": -int(actor.team), "x": ENEMY_X if int(actor.team) == 1 else PLAYER_X}
+	return {"base": true, "team": -int(actor.team), "x": enemy_x if int(actor.team) == 1 else player_x}
 
 func _rebuild_lines() -> void:
 	_line_units[1].clear()
@@ -301,13 +437,22 @@ func _move_actor(actor: Dictionary, target_distance: float, delta: float) -> voi
 	elif float(actor.action_timer) <= 0.0:
 		_set_visual_state(actor, "idle")
 	var visual: Variant = actor.visual
-	if is_instance_valid(visual):
+	if not _defer_visual_positions and is_instance_valid(visual):
 		visual.position = Vector2(float(actor.x), GROUND_Y)
+		actor.render_x = float(actor.x)
 
 func _begin_attack(actor: Dictionary, target: Dictionary, heal: bool) -> void:
 	actor.attack_timer = float(actor.attack_interval)
-	actor.action_timer = maxf(0.25, float(actor.hit_delay))
-	_set_visual_state(actor, "skill" if heal else "attack", float(actor.action_timer))
+	var state := "skill" if heal else "attack"
+	var natural := 0.9
+	var visual: Variant = actor.visual
+	if is_instance_valid(visual):
+		var spec: Dictionary = visual.get("spec")
+		natural = maxf(0.1, float(spec.get("durations", {}).get(state, 0.9)))
+	actor.action_timer = maxf(float(actor.hit_delay), minf(natural, minf(float(actor.attack_interval) * 0.85, 1.2)))
+	if str(actor.state) == state:
+		_set_visual_state(actor, "idle")
+	_set_visual_state(actor, state, float(actor.action_timer))
 	_hits.append({"due": _elapsed + float(actor.hit_delay), "attacker": int(actor.uid),
 		"target": int(target.get("uid", 0)), "base": bool(target.get("base", false)),
 		"target_team": int(target.team), "heal": heal})
@@ -329,12 +474,12 @@ func _resolve_hits() -> void:
 		if attacker.is_empty() or not bool(attacker.alive):
 			continue
 		if bool(hit.base):
-			var amount := float(attacker.damage)
+			var amount := float(attacker.damage) * maxf(0.0, float(attacker.special.get("base_damage_multiplier", 1.0)))
 			if int(hit.target_team) == 1:
 				_player_hp = maxf(0.0, _player_hp - amount)
 			else:
 				_enemy_hp = maxf(0.0, _enemy_hp - amount)
-			combat_event.emit("base_hit", Vector2(PLAYER_X if int(hit.target_team) == 1 else ENEMY_X, GROUND_Y - 70.0), amount, int(attacker.team))
+			combat_event.emit("base_hit", Vector2(player_x if int(hit.target_team) == 1 else enemy_x, GROUND_Y - 70.0), amount, int(attacker.team))
 			_check_finish()
 			continue
 		var target := _unit_by_uid(int(hit.target))
@@ -373,6 +518,7 @@ func _damage_unit(target: Dictionary, raw: float, damage_type: String, attacker_
 		target.corpse_timer = CORPSE_DURATION
 		_set_visual_state(target, "death", CORPSE_DURATION)
 		combat_event.emit("death", Vector2(float(target.x), GROUND_Y - 15.0), 0.0, int(target.team))
+		_visual_rate_timer = 0.0
 	elif float(target.action_timer) <= 0.0:
 		target.action_timer = 0.12
 		_set_visual_state(target, "hurt", 0.12)
@@ -405,6 +551,37 @@ func _check_finish() -> void:
 
 func _unit_by_uid(uid: int) -> Dictionary:
 	return _unit_lookup.get(uid, {})
+
+func _update_visual_rates() -> void:
+	var candidates: Array = []
+	for actor: Dictionary in units:
+		if not bool(actor.alive) or not is_instance_valid(actor.visual):
+			continue
+		var enemy := _nearest_enemy(actor)
+		var distance := absf(float(enemy.x) - float(actor.x))
+		var priority := 1000.0 - minf(distance, 1000.0)
+		if actor.special.has("phase_threshold"):
+			priority += 250.0
+		if str(actor.state) == "attack" or str(actor.state) == "skill":
+			priority += 120.0
+		if float(actor.range) >= 100.0:
+			priority += 80.0
+		candidates.append({"actor": actor, "priority": priority})
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if float(a.priority) == float(b.priority):
+			return int(a.actor.uid) < int(b.actor.uid)
+		return float(a.priority) > float(b.priority))
+	var critical: Dictionary = {}
+	for index: int in mini(12, candidates.size()):
+		critical[int(candidates[index].actor.uid)] = true
+	for actor: Dictionary in units:
+		var rate := 60 if critical.has(int(actor.uid)) else 30
+		if int(actor.visual_update_rate) == rate:
+			continue
+		actor.visual_update_rate = rate
+		var visual: Variant = actor.visual
+		if is_instance_valid(visual) and visual.has_method("set_update_rate"):
+			visual.call("set_update_rate", rate)
 
 func _set_visual_state(actor: Dictionary, state: String, duration: float = 0.0) -> void:
 	if str(actor.state) == state and duration <= 0.0:
@@ -447,3 +624,5 @@ func _draw() -> void:
 		draw_rect(Rect2(x - width * 0.5, bar_y, width * clampf(float(actor.hp) / float(actor.max_hp), 0.0, 1.0), 3.0), tint)
 		if bool(actor.phase):
 			draw_arc(Vector2(x, GROUND_Y - 5.0), 42.0, PI, TAU, 18, Color(1.0, 0.42, 0.13, 0.65), 2.5)
+		if float(actor.stun_timer) > 0.00001:
+			draw_arc(Vector2(x, GROUND_Y - 100.0), 12.0, 0.0, TAU, 18, Color(1.0, 0.84, 0.34), 2.0)

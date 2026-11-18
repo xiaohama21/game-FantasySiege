@@ -1,0 +1,75 @@
+{
+  "program_version": "0.1.2.0",
+  "measurement_phase": "Before parity frame grouping; real renderer outputs preserved for comparison",
+  "rendering_method": "gl_compatibility",
+  "rendering_adapter": "GeForce GTX 1050",
+  "sample_frames": 300,
+  "results": [
+    {
+      "mode": "heroes24",
+      "total_instances": 24,
+      "native_instances": 24,
+      "alive_min": 24,
+      "visible_min": 24,
+      "fps_average": 57.9927659823713,
+      "mean_frame_ms": 17.24353,
+      "p95_frame_ms": 21.99,
+      "passed": true
+    },
+    {
+      "mode": "mixed64",
+      "total_instances": 64,
+      "native_instances": 64,
+      "alive_min": 64,
+      "visible_min": 64,
+      "fps_average": 34.4080062384009,
+      "mean_frame_ms": 29.0630033333333,
+      "p95_frame_ms": 41.343,
+      "passed": false
+    },
+    {
+      "mode": "heroes64",
+      "total_instances": 64,
+      "native_instances": 64,
+      "alive_min": 64,
+      "visible_min": 64,
+      "fps_average": 18.7399565545341,
+      "mean_frame_ms": 53.3619166666667,
+      "p95_frame_ms": 62.504,
+      "passed": false
+    },
+    {
+      "mode": "battle24",
+      "total_instances": 24,
+      "native_instances": 24,
+      "alive_min": 24,
+      "visible_min": 24,
+      "fps_average": 50.6628216962521,
+      "mean_frame_ms": 19.73834,
+      "p95_frame_ms": 24.83,
+      "passed": false
+    },
+    {
+      "mode": "battle64",
+      "total_instances": 64,
+      "native_instances": 64,
+      "alive_min": 64,
+      "visible_min": 64,
+      "fps_average": 22.065357146561,
+      "mean_frame_ms": 45.31991,
+      "p95_frame_ms": 63.663,
+      "passed": false
+    },
+    {
+      "mode": "offscreen64",
+      "total_instances": 64,
+      "native_instances": 64,
+      "alive_min": 64,
+      "visible_min": 38,
+      "fps_average": 53.1912630159021,
+      "mean_frame_ms": 18.80008,
+      "p95_frame_ms": 30.007,
+      "passed": true
+    }
+  ]
+}

@@ -5,6 +5,7 @@ extends Node2D
 static var _resources: Dictionary = {}
 static var _catalog: Dictionary = {}
 static var _checked_textures: Dictionary = {}
+static var _next_sample_lane := 0
 var visual_id := ""
 var facing := 1
 var spec: Dictionary = {}
@@ -16,6 +17,20 @@ var _configured := false
 var _playback_speed := 1.0
 var _track_scale := 1.0
 var _current_track: Object
+var _update_rate := 60.0
+var _sample_elapsed := 0.0
+var _sample_until := 0.0
+var _sample_lane := 0
+var _root_motion_cache: Array = []
+var profile_native_updates := false
+var native_update_count := 0
+var native_update_usec := 0
+var native_pose_update_count := 0
+var native_pose_update_usec := 0
+
+func _init() -> void:
+	_sample_lane = _next_sample_lane % 2
+	_next_sample_lane += 1
 
 func _ready() -> void:
 	if _configured: _build()
@@ -32,6 +47,9 @@ func configure(id: String, direction: int = 1) -> void:
 
 func _build() -> void:
 	_current_track = null
+	_root_motion_cache.clear()
+	_sample_elapsed = 0.0
+	_sample_until = (float(get_instance_id() % 7) / 7.0) / _update_rate
 	if is_instance_valid(_sprite):
 		remove_child(_sprite)
 		_sprite.queue_free()
@@ -46,6 +64,7 @@ func _build() -> void:
 			_sprite = ClassDB.instantiate("SpineSprite") as Node2D
 			_sprite.set("skeleton_data_res", data)
 			add_child(_sprite)
+			_sprite.call("set_update_mode", 2)
 			var skeleton: Object = _sprite.call("get_skeleton")
 			if skeleton != null:
 				skeleton.call("set_skin_by_name", str(spec.get("skin", "default")))
@@ -56,7 +75,13 @@ func _build() -> void:
 				var visual_scale := float(spec.get("scale", 0.5))
 				_sprite.scale = Vector2(visual_scale * facing * int(spec.get("native_facing", -1)), visual_scale)
 				_sprite.modulate = Color(str(spec.get("tint", "ffffff")))
-				if _sprite.has_signal("before_world_transforms_change"):
+				for name: Variant in spec.get("root_motion_bones", []):
+					var bone: Object = skeleton.call("find_bone", str(name))
+					if bone == null: continue
+					var pose: Object = bone.call("get_pose")
+					var setup: Object = bone.call("get_data").call("get_setup_pose")
+					_root_motion_cache.append({"pose":pose,"x":float(setup.call("get_x")),"y":float(setup.call("get_y"))})
+				if not _root_motion_cache.is_empty() and _sprite.has_signal("before_world_transforms_change"):
 					_sprite.connect("before_world_transforms_change", _limit_root_motion)
 	play_state("idle")
 	queue_redraw()
@@ -89,18 +114,15 @@ func spine_sprite() -> Node2D:
 	return _sprite
 
 func _limit_root_motion(actor: Node2D) -> void:
-	var skeleton: Object = actor.call("get_skeleton")
-	for name: Variant in spec.get("root_motion_bones", []):
-		var bone: Object = skeleton.call("find_bone", str(name))
-		if bone == null: continue
-		var pose: Object = bone.call("get_pose")
-		var setup: Object = bone.call("get_data").call("get_setup_pose")
-		var factor := float(spec.get("root_motion_scale", 0.0))
-		pose.call("set_x", float(setup.call("get_x")) + (float(pose.call("get_x")) - float(setup.call("get_x"))) * factor)
-		pose.call("set_y", float(setup.call("get_y")) + (float(pose.call("get_y")) - float(setup.call("get_y"))) * factor)
+	var factor := float(spec.get("root_motion_scale", 0.0))
+	for cached: Dictionary in _root_motion_cache:
+		var pose: Object = cached.pose
+		pose.call("set_x", cached.x + (float(pose.call("get_x")) - cached.x) * factor)
+		pose.call("set_y", cached.y + (float(pose.call("get_y")) - cached.y) * factor)
 
 func play_state(state: String, duration: float = 0.0) -> void:
 	if state == _state: return
+	_flush_sample()
 	_state = state
 	_remaining = 0.0
 	if not _spine_ok: return
@@ -115,16 +137,44 @@ func play_state(state: String, duration: float = 0.0) -> void:
 	_track_scale = natural / duration if duration > 0 and natural > 0 else 1.0
 	track.call("set_time_scale", _track_scale * _playback_speed)
 	if not loop and state != "death": _remaining = duration if duration > 0 else maxf(natural, 0.1)
+	var started := Time.get_ticks_usec() if profile_native_updates else 0
+	_sprite.call("update_skeleton", 0.0)
+	if profile_native_updates:
+		native_pose_update_count += 1
+		native_pose_update_usec += Time.get_ticks_usec() - started
 
 func _process(delta: float) -> void:
+	if _spine_ok and _playback_speed > 0:
+		_sample_elapsed += delta
+		_sample_until -= delta
+		var eligible_frame := _update_rate > 30.0 or Engine.get_process_frames() % 2 == _sample_lane
+		if _sample_until <= 0 and eligible_frame:
+			_flush_sample()
+			_sample_until += 1.0 / _update_rate
+			if _sample_until <= 0: _sample_until = 1.0 / _update_rate
 	if _remaining > 0:
 		_remaining -= delta * _playback_speed
 		if _remaining <= 0: play_state("idle")
 
 func set_playback_speed(multiplier: float) -> void:
+	_flush_sample()
 	_playback_speed = maxf(multiplier, 0.0)
 	if _spine_ok and is_instance_valid(_current_track):
 		_current_track.call("set_time_scale", _track_scale * _playback_speed)
+
+func set_update_rate(hz: float) -> void:
+	var previous_rate := _update_rate
+	_update_rate = clampf(hz, 1.0, 60.0)
+	_sample_until = clampf(_sample_until * previous_rate / _update_rate, 0.0, 1.0 / _update_rate)
+
+func _flush_sample() -> void:
+	if _spine_ok and _sample_elapsed > 0:
+		var started := Time.get_ticks_usec() if profile_native_updates else 0
+		_sprite.call("update_skeleton", _sample_elapsed)
+		if profile_native_updates:
+			native_update_count += 1
+			native_update_usec += Time.get_ticks_usec() - started
+	_sample_elapsed = 0.0
 
 func _draw() -> void:
 	var ring := Color(str(spec.get("ring", "68cdd0")))

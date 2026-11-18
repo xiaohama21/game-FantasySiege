@@ -2,7 +2,9 @@ class_name SiegeProfile
 extends Node
 
 signal changed
+const SCHEMA := 2
 var data: Dictionary = {}
+var last_award: Dictionary = {}
 var save_path := "user://profile.json"
 var error_message := ""
 var _runs: Dictionary = {}
@@ -14,12 +16,13 @@ func _ready() -> void:
 func _fresh() -> Dictionary:
 	var levels: Dictionary = {}
 	for id: String in Catalog.initial_roster(): levels[id] = 1
-	return {"schema": 1, "credits": 300, "levels": levels, "cleared": [], "roster": Catalog.initial_roster(), "transactions": []}
+	return {"schema": SCHEMA, "credits": 300, "levels": levels, "cleared": [], "roster": Catalog.initial_roster(), "owned": Catalog.initial_roster(), "transactions": []}
 
 func configure_path(path: String) -> void:
 	save_path = path
 	data = {}
 	_runs.clear()
+	last_award.clear()
 	_blocked = false
 
 func _read(path: String) -> Dictionary:
@@ -31,8 +34,11 @@ func _read(path: String) -> Dictionary:
 	if not (parsed.get("credits") is int or parsed.get("credits") is float): return {}
 	if float(parsed.credits) != int(parsed.credits) or int(parsed.credits) < 0: return {}
 	if not (parsed.get("schema") is int or parsed.get("schema") is float): return {}
+	if int(parsed.schema) == SCHEMA and not parsed.get("owned") is Array: return {}
+	for id: Variant in parsed.get("owned", []):
+		if not id is String or not Catalog.playable_roster().has(id): return {}
 	for id: Variant in parsed.roster:
-		if not id is String or not Catalog.initial_roster().has(id): return {}
+		if not id is String or not Catalog.playable_roster().has(id): return {}
 	if parsed.roster.is_empty() or parsed.roster.size() > 8: return {}
 	for id: Variant in parsed.cleared:
 		if not id is String or Catalog.stage(id).is_empty(): return {}
@@ -40,13 +46,29 @@ func _read(path: String) -> Dictionary:
 		if not token is String: return {}
 	for id: Variant in parsed.levels:
 		if not (parsed.levels[id] is int or parsed.levels[id] is float): return {}
-		if not Catalog.initial_roster().has(id) or float(parsed.levels[id]) != int(parsed.levels[id]) or int(parsed.levels[id]) < 1 or int(parsed.levels[id]) > 20: return {}
+		if not Catalog.playable_roster().has(id) or float(parsed.levels[id]) != int(parsed.levels[id]) or int(parsed.levels[id]) < 1 or int(parsed.levels[id]) > 20: return {}
 	return parsed
 
 func _future_schema(path: String) -> bool:
 	if not FileAccess.file_exists(path): return false
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	return parsed is Dictionary and (parsed.get("schema") is int or parsed.get("schema") is float) and float(parsed.schema) > 1
+	return parsed is Dictionary and (parsed.get("schema") is int or parsed.get("schema") is float) and float(parsed.schema) > SCHEMA
+
+func _sync_owned(candidate: Dictionary) -> void:
+	var owned: Array = Catalog.initial_roster()
+	for id: Variant in candidate.get("owned", []):
+		if Catalog.playable_roster().has(id) and not owned.has(id): owned.append(id)
+	for stage_id: Variant in candidate.get("cleared", []):
+		for id: String in Catalog.reward_units(str(stage_id)):
+			if not owned.has(id): owned.append(id)
+	candidate.owned = owned
+	for id: String in owned:
+		if not candidate.levels.has(id): candidate.levels[id] = 1
+	var roster: Array = []
+	for id: Variant in candidate.get("roster", []):
+		if owned.has(id) and not roster.has(id): roster.append(id)
+	candidate.roster = roster if not roster.is_empty() else Catalog.initial_roster()
+	candidate.schema = SCHEMA
 
 func load_profile() -> void:
 	_blocked = false
@@ -56,15 +78,15 @@ func load_profile() -> void:
 		data = _fresh()
 		error_message = "存档版本较新，当前版本仅可浏览"
 		return
-	data = primary if int(primary.get("schema", 0)) == 1 else _read(save_path + ".bak")
-	if data.is_empty() or int(data.get("schema", 0)) != 1: data = _fresh()
-	for id: String in Catalog.initial_roster():
-		if not data.levels.has(id): data.levels[id] = 1
+	data = primary if int(primary.get("schema", 0)) in [1, SCHEMA] else _read(save_path + ".bak")
+	if data.is_empty() or not (int(data.get("schema", 0)) in [1, SCHEMA]): data = _fresh()
+	_sync_owned(data)
 	error_message = ""
 	changed.emit()
 
 func _commit(candidate: Dictionary) -> bool:
 	if _blocked: return false
+	_sync_owned(candidate)
 	var temp := save_path + ".tmp"
 	var file := FileAccess.open(temp, FileAccess.WRITE)
 	if file == null:
@@ -99,14 +121,38 @@ func _commit(candidate: Dictionary) -> bool:
 func credits() -> int:
 	return int(data.get("credits", 0))
 
+func can_modify() -> bool:
+	return not _blocked
+
 func level(id: String) -> int:
 	return int(data.get("levels", {}).get(id, 1))
+
+func owns(id: String) -> bool:
+	return Catalog.playable_roster().has(id) and data.get("owned", Catalog.initial_roster()).has(id)
+
+func stage_unlocked(id: String) -> bool:
+	var stages := Catalog.stages()
+	for i in stages.size():
+		if str(stages[i].id) == id:
+			var required := str(stages[i].get("required_stage", str(stages[i - 1].id) if i > 0 else ""))
+			return required.is_empty() or data.get("cleared", []).has(required)
+	return false
+
+func reward_preview(id: String) -> Dictionary:
+	var reward: Variant = Catalog.stage(id).get("rewards", 0)
+	var base := int(reward.get("credits", 0)) if reward is Dictionary else int(reward)
+	var first: bool = not data.get("cleared", []).has(id)
+	var bonus := int(reward.get("first_clear_credits", 0)) if reward is Dictionary and first else 0
+	var unlocks: Array = []
+	for unit_id: String in Catalog.reward_units(id):
+		if not owns(unit_id): unlocks.append(unit_id)
+	return {"stage_id": id, "credits": base + bonus, "base_credits": base, "bonus_credits": bonus, "first_clear": first, "unlock_units": unlocks}
 
 func training_cost(id: String) -> int:
 	return 40 + level(id) * 20
 
 func upgrade(id: String) -> bool:
-	if not Catalog.initial_roster().has(id) or level(id) >= 20 or credits() < training_cost(id): return false
+	if not owns(id) or level(id) >= 20 or credits() < training_cost(id): return false
 	var candidate := data.duplicate(true)
 	candidate.credits = credits() - training_cost(id)
 	candidate.levels[id] = level(id) + 1
@@ -115,14 +161,17 @@ func upgrade(id: String) -> bool:
 func set_roster(roster: Array) -> bool:
 	var valid: Array = []
 	for id: Variant in roster:
-		if Catalog.initial_roster().has(id) and not valid.has(id): valid.append(id)
+		if not id is String or not owns(id): return false
+		if not valid.has(id): valid.append(id)
 	if valid.is_empty() or valid.size() > 8: return false
 	var candidate := data.duplicate(true)
 	candidate.roster = valid
 	return _commit(candidate)
 
 func begin_run(stage_id: String) -> String:
-	if Catalog.stage(stage_id).is_empty(): return ""
+	if _blocked: return ""
+	if not stage_unlocked(stage_id): return ""
+	last_award.clear()
 	var token := "%s-%d-%d" % [stage_id, Time.get_ticks_usec(), randi()]
 	_runs[token] = stage_id
 	return token
@@ -132,13 +181,13 @@ func win(token: String) -> bool:
 	var id: String = _runs[token]
 	var stage := Catalog.stage(id)
 	var candidate := data.duplicate(true)
-	var reward: Variant = stage.get("rewards", 80)
-	var earned := int(reward.get("credits", 80)) if reward is Dictionary else int(reward)
-	candidate.credits = credits() + earned
+	var preview := reward_preview(id)
+	candidate.credits = credits() + int(preview.credits)
 	if not candidate.cleared.has(id): candidate.cleared.append(id)
 	candidate.transactions.append(token)
 	while candidate.transactions.size() > 32: candidate.transactions.pop_front()
 	if not _commit(candidate): return false
+	last_award = preview
 	_runs.erase(token)
 	return true
 

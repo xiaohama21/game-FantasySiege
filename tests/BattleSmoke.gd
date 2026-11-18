@@ -2,7 +2,7 @@ extends SceneTree
 
 var failures: Array = []
 var checks := 0
-var report: Dictionary = {"version": "0.1.1.0", "visuals": false, "cases": [], "stages": []}
+var report: Dictionary = {"version": "0.1.2.0", "visuals": false, "cases": [], "stages": []}
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -16,12 +16,12 @@ func _check(condition: bool, message: String) -> void:
 func _near(a: float, b: float) -> bool:
 	return absf(a - b) <= 0.0001
 
-func _battle(stage_id: String = "stage_01") -> SiegeBattle:
+func _battle(stage_id: String = "stage_01", roster: Array = [], levels: Dictionary = {}) -> SiegeBattle:
 	var battle := SiegeBattle.new()
 	battle.auto_step = false
 	battle.render_visuals = false
 	root.add_child(battle)
-	battle.start(stage_id, Catalog.initial_roster())
+	battle.start(stage_id, Catalog.initial_roster() if roster.is_empty() else roster, levels)
 	return battle
 
 func _empty_battle() -> SiegeBattle:
@@ -34,8 +34,11 @@ func _run() -> void:
 		push_error("内容配置尚未完成：缺units.json或stages.json，不能执行战斗验收")
 		quit(2)
 		return
-	_check(Catalog.stages().size() == 3, "首版必须有3个可玩关卡")
+	report.units_sha256 = FileAccess.get_sha256("res://resources/units.json")
+	report.stages_sha256 = FileAccess.get_sha256("res://resources/stages.json")
+	_check(Catalog.stages().size() == 8, "0.1.2必须有8个可玩关卡")
 	_check(Catalog.initial_roster().size() == 8, "首版必须有8个初始角色")
+	_check(Catalog.playable_roster().size() == 12, "0.1.2必须有12个玩家角色")
 	_test_stats()
 	_test_frame_independence()
 	_test_resources()
@@ -44,10 +47,17 @@ func _run() -> void:
 	_test_aoe_and_slow()
 	_test_phase_and_finish()
 	_test_restart_and_capacity()
+	_test_wide_world_and_roster()
+	_test_pulse()
+	_test_pulse_interrupt_benefit()
+	_test_new_roles()
+	_test_visual_rate_budget()
 	_benchmark_64()
 	for stage: Dictionary in Catalog.stages():
 		_simulate_stage(str(stage.id), true)
 		_simulate_stage(str(stage.id), false)
+	for stage_id: String in ["stage_04", "stage_06", "stage_08"]:
+		_simulate_stage(stage_id, true, true)
 	report.checks = checks
 	report.failures = failures
 	report.passed = failures.is_empty()
@@ -263,8 +273,177 @@ func _benchmark_64() -> void:
 	print("LOGIC64 wall=%.1fms step=%.3fms realtime=%.1fx" % [wall_ms, wall_ms / 300.0, 5000.0 / maxf(wall_ms, 0.001)])
 	battle.free()
 
-func _simulate_stage(stage_id: String, summon: bool) -> void:
-	var battle := _battle(stage_id)
+func _test_wide_world_and_roster() -> void:
+	var battle := _empty_battle()
+	var snapshot := battle.get_snapshot()
+	_check(_near(float(snapshot.world_width), 2560.0) and _near(float(snapshot.player_x), 100.0) and _near(float(snapshot.enemy_x), 2460.0), "两屏宽地图基地使用动态世界坐标")
+	var enemy := battle._spawn("riftling", -1)
+	_check(_near(float(enemy.x), float(snapshot.enemy_x) - 32.0), "敌军出生点使用宽地图右基地")
+	_check(_near(float(battle.get_snapshot().frontline_x), 200.0), "远方敌人不开场跳空地图中央")
+	var player := battle._spawn("iron_guard", 1)
+	player.x = 500.0
+	enemy.x = 1100.0
+	_check(_near(float(battle.get_snapshot().frontline_x), 800.0), "两阵线接近时前线点取中点")
+	enemy.x = 2000.0
+	_check(_near(float(battle.get_snapshot().frontline_x), 600.0), "敌人远离时镜头点随玩家前线")
+	var unit_stats := UnitStats.calculate(Catalog.unit("iron_guard"), 1)
+	_check(_near(float(player.speed), float(unit_stats.speed) * 1.45), "双方长地图行军倍率进入实际移动")
+	battle.start("stage_01", ["riftling", "unknown", "star_hammer", "iron_guard"])
+	_check(battle._roster == ["star_hammer", "iron_guard"] and not battle.try_summon("riftling"), "新玩家可进编队，敌人与未知ID不能进玩家阵容")
+	battle.start("stage_01", Catalog.playable_roster())
+	_check(battle._roster.size() == 8, "出战阵容最多八个不同型号")
+	battle.free()
+	report.cases.append("wide_world_and_playable_roster")
+
+func _test_pulse() -> void:
+	var battle := _empty_battle()
+	var initial_energy := battle._energy
+	_check(not battle.try_pulse() and _near(battle._energy, initial_energy) and _near(battle._pulse_cooldown, 0.0), "无敌军脉冲不扣费或开冷却")
+	var ally := battle._spawn("iron_guard", 1)
+	var enemy := battle._spawn("obsidian_guard", -1)
+	var boss := battle._spawn("obsidian_warden", -1)
+	var far_enemy := battle._spawn("riftling", -1)
+	ally.x = 500.0
+	enemy.x = 550.0
+	boss.x = 620.0
+	far_enemy.x = 900.0
+	for actor: Dictionary in [enemy, boss, far_enemy]:
+		actor.hp = 1000.0
+		actor.max_hp = 1000.0
+		actor.hit_delay = 0.75
+		actor.damage = 0.0 if actor == far_enemy else 200.0
+	ally.damage = 0.0
+	ally.speed = 0.0
+	ally.attack_timer = 100.0
+	battle._begin_attack(enemy, ally, false)
+	battle._begin_attack(boss, {"base": true, "team": 1, "x": battle.player_x}, false)
+	battle._begin_attack(far_enemy, ally, false)
+	battle._energy = 79.0
+	_check(not battle.try_pulse() and _near(battle._energy, 79.0) and _near(battle._pulse_cooldown, 0.0), "能量不足脉冲无副作用")
+	battle._energy = 160.0
+	var ally_hp := float(ally.hp)
+	var base_hp := battle._player_hp
+	_check(battle.try_pulse(), "前线脉冲成功")
+	_check(_near(battle._energy, 80.0) and _near(battle._pulse_cooldown, 35.0), "成功脉冲一次性扣80能量并开35秒冷却")
+	_check(_near(float(enemy.hp), 910.0) and _near(float(boss.hp), 910.0) and _near(float(far_enemy.hp), 1000.0), "脉冲90真实伤害只作用180px敌军范围")
+	_check(_near(float(enemy.x), 610.0) and _near(float(boss.x), 635.0), "脉冲普通兵后推60px，Boss后推15px")
+	_check(_near(float(enemy.stun_timer), 1.2) and _near(float(boss.stun_timer), 1.2), "脉冲敌军与Boss均晕眩1.2秒")
+	_check(battle._hits.size() == 1 and int(battle._hits[0].attacker) == int(far_enemy.uid), "脉冲取消被击中敌军全部预警攻击，保留远处攻击")
+	var after_energy := battle._energy
+	_check(not battle.try_pulse() and _near(battle._energy, after_energy), "冷却中的脉冲失败不重复扣费")
+	var after_push := float(enemy.x)
+	battle.advance(0.5)
+	_check(_near(float(enemy.x), after_push) and _near(float(ally.hp), ally_hp) and _near(battle._player_hp, base_hp), "晕眩停止移动且打断攻击不结算单位或基地伤害")
+	battle.advance(0.8)
+	_check(float(enemy.stun_timer) <= 0.00001 and float(enemy.x) < after_push, "晕眩到期恢复移动")
+	battle._enemy_hp = 0.0
+	battle._check_finish()
+	var terminal := battle.get_snapshot()
+	_check(not battle.try_pulse() and _near(battle._energy, float(terminal.energy)), "终局脉冲不扣费")
+	battle.free()
+	var cooldown_battle := _empty_battle()
+	var stationary := cooldown_battle._spawn("obsidian_guard", -1)
+	stationary.hp = 10000.0
+	stationary.max_hp = 10000.0
+	stationary.speed = 0.0
+	stationary.damage = 0.0
+	stationary.x = cooldown_battle.world_width - 40.0
+	_check(cooldown_battle.try_pulse(), "冷却测试首个脉冲成功")
+	_check(_near(float(stationary.x), cooldown_battle.world_width - 32.0), "脉冲后推夹在宽地图边缘，不把单位推到可视世界外")
+	cooldown_battle.advance(35.0)
+	_check(_near(cooldown_battle._pulse_cooldown, 0.0) and cooldown_battle.try_pulse(), "35秒固定步后脉冲恢复可用")
+	cooldown_battle.stop()
+	_check(_near(cooldown_battle._pulse_cooldown, 0.0), "重开/退出清空脉冲冷却")
+	cooldown_battle.free()
+	report.cases.append("pulse_resource_range_stun_and_cooldown")
+
+func _test_pulse_interrupt_benefit() -> void:
+	var baseline := _empty_battle()
+	var countered := _empty_battle()
+	var tanks: Array = []
+	for battle: SiegeBattle in [baseline, countered]:
+		var tank := battle._spawn("iron_guard", 1)
+		var boss := battle._spawn("obsidian_warden", -1)
+		tank.x = 500.0
+		tank.damage = 0.0
+		tank.attack_timer = 100.0
+		tank.speed = 0.0
+		boss.x = 550.0
+		boss.hp = 10000.0
+		boss.max_hp = 10000.0
+		boss.damage = 200.0
+		boss.speed = 0.0
+		boss.hit_delay = 0.75
+		boss.aoe_radius = 0.0
+		tanks.append(tank)
+		battle.advance(0.2)
+	_check(not countered._hits.is_empty(), "Boss重击在0.75秒预警中有可打断待命中")
+	_check(countered.try_pulse(), "在重击命中前发动反制脉冲")
+	baseline.advance(1.0)
+	countered.advance(1.0)
+	var saved := float(tanks[1].hp) - float(tanks[0].hp)
+	_check(saved > 0.0, "脉冲时机实际阻止Boss伤害并保留前排生命")
+	report.pulse_benefit = {"boss_warning_seconds": 0.75, "pulse_at_seconds": 0.2, "prevented_damage": saved,
+		"baseline_tank_hp": tanks[0].hp, "countered_tank_hp": tanks[1].hp, "pulse_energy_cost": 80}
+	baseline.free()
+	countered.free()
+	report.cases.append("pulse_interrupt_has_actual_benefit")
+
+func _test_new_roles() -> void:
+	var battle := _empty_battle()
+	var gunner := battle._spawn("rivet_gunner", 1)
+	battle._enemy_hp = 10000.0
+	var base_before := battle._enemy_hp
+	battle._begin_attack(gunner, {"base": true, "team": -1, "x": battle.enemy_x}, false)
+	battle._elapsed = 10.0
+	battle._resolve_hits()
+	_check(_near(base_before - battle._enemy_hp, float(gunner.damage) * 1.8), "绞弩炮手对基地使用1.8倍攻城倍率")
+	var mage := battle._spawn("moon_mage", 1)
+	var target_a := battle._spawn("obsidian_guard", -1)
+	var target_b := battle._spawn("obsidian_guard", -1)
+	var outside := battle._spawn("obsidian_guard", -1)
+	target_a.x = 800.0
+	target_b.x = 850.0
+	outside.x = 920.0
+	for target: Dictionary in [target_a, target_b, outside]:
+		target.hp = 10000.0
+		target.max_hp = 10000.0
+	battle._begin_attack(mage, target_a, false)
+	battle._elapsed = 20.0
+	battle._resolve_hits()
+	_check(_near(float(target_a.slow_ratio), 0.42) and _near(float(target_b.slow_ratio), 0.42) and _near(float(outside.slow_ratio), 1.0), "月灯术士对每个范围命中者施加减速，不波及半径外")
+	var shield := UnitStats.calculate(Catalog.unit("star_hammer"), 2)
+	var light_guard := UnitStats.calculate(Catalog.unit("iron_guard"), 2)
+	_check(float(shield.hp) > float(light_guard.hp) and float(Catalog.unit("star_hammer").armor) > float(Catalog.unit("iron_guard").armor), "星槌卫士提供更强生命与护甲守线")
+	var beast := UnitStats.calculate(Catalog.unit("spirit_beast"), 1)
+	_check(float(beast.speed) > float(light_guard.speed) and float(Catalog.unit("spirit_beast").aoe_radius) > 0.0, "灵契兽卫提供快移范围补线身份")
+	battle.free()
+	report.cases.append("four_new_roles")
+
+func _test_visual_rate_budget() -> void:
+	var battle := _empty_battle()
+	_check(battle.seed_performance_units(64) and battle.active_count() == 64, "战斗压力fixture可生成64活单位")
+	for actor: Dictionary in battle.units:
+		var mock := Node2D.new()
+		battle.add_child(mock)
+		actor.visual = mock
+	battle._update_visual_rates()
+	var high_rate := 0
+	for actor: Dictionary in battle.units:
+		if int(actor.visual_update_rate) == 60:
+			high_rate += 1
+	_check(high_rate == 12, "关键骨架更新策略最多12实例为60Hz，其余30Hz")
+	_check(not battle.seed_performance_units(65), "压力fixture遵守64人数上限")
+	battle.free()
+	report.cases.append("visual_priority_budget_logic_only")
+
+func _simulate_stage(stage_id: String, summon: bool, core_only: bool = false) -> void:
+	var stage := Catalog.stage(stage_id)
+	var level := int(stage.get("recommended_level", 1))
+	var levels: Dictionary = {}
+	for id: String in Catalog.playable_roster():
+		levels[id] = level if not core_only or ["iron_guard", "ember_archer", "rune_medic", "guanyu"].has(id) else 1
+	var battle := _battle(stage_id, _stage_roster(stage_id), levels)
 	var count_summoned := 0
 	var max_active := 0
 	for tick: int in 3000:
@@ -275,13 +454,27 @@ func _simulate_stage(stage_id: String, summon: bool) -> void:
 		battle.advance(0.2)
 		max_active = maxi(max_active, battle.active_count())
 	var snapshot := battle.get_snapshot()
-	report.stages.append({"id": stage_id, "strategy": "mixed_line" if summon else "no_summon",
+	var strategy := "core_growth" if core_only else ("mixed_line" if summon else "no_summon")
+	report.stages.append({"id": stage_id, "strategy": strategy,
+		"recommended_level": level, "roster": battle._roster.duplicate(), "levels": levels,
+		"balance_revision": str(stage.get("balance_revision", "baseline")),
 		"outcome": snapshot.outcome, "elapsed": snapshot.elapsed, "player_hp": snapshot.player_hp,
 		"enemy_hp": snapshot.enemy_hp, "summons": count_summoned, "max_active": max_active})
 	_check(str(snapshot.outcome) == ("victory" if summon else "defeat"), "%s %s应%s；实际%s t=%.1f" % [stage_id, "混合召唤" if summon else "不召唤", "获胜" if summon else "失败", str(snapshot.outcome), float(snapshot.elapsed)])
 	_check(max_active <= SiegeBattle.MAX_UNITS, "%s全局人数不超预算" % stage_id)
-	print("STAGE %s %s %s t=%.1f hp=%.0f/%.0f summons=%d" % [stage_id, "auto" if summon else "none", snapshot.outcome, float(snapshot.elapsed), float(snapshot.player_hp), float(snapshot.enemy_hp), count_summoned])
+	print("STAGE %s Lv%d %s %s t=%.1f hp=%.0f/%.0f summons=%d" % [stage_id, level, strategy, snapshot.outcome, float(snapshot.elapsed), float(snapshot.player_hp), float(snapshot.enemy_hp), count_summoned])
 	battle.free()
+
+func _stage_roster(stage_id: String) -> Array:
+	var number := int(stage_id.trim_prefix("stage_"))
+	if number <= 3:
+		return Catalog.initial_roster()
+	var roster := ["iron_guard", "rune_medic", "ember_archer", "zhugeliang", "guanyu", "zhaoyun", "lubu", "star_hammer"]
+	if number >= 5:
+		roster[5] = "rivet_gunner"
+	if number >= 7:
+		roster[3] = "moon_mage"
+	return roster
 
 func _autoplay(battle: SiegeBattle) -> int:
 	var counts: Dictionary = {}
@@ -298,10 +491,16 @@ func _autoplay(battle: SiegeBattle) -> int:
 		choices.append("iron_guard")
 	if army >= 4 and int(counts.get("rune_medic", 0)) < 1:
 		choices.append("rune_medic")
+	if frontline < 3 and int(counts.get("star_hammer", 0)) < 1:
+		choices.append("star_hammer")
 	if int(counts.get("ember_archer", 0)) < 3:
 		choices.append("ember_archer")
 	if int(counts.get("zhugeliang", 0)) < 2:
 		choices.append("zhugeliang")
+	if int(counts.get("moon_mage", 0)) < 2:
+		choices.append("moon_mage")
+	if int(counts.get("rivet_gunner", 0)) < 2:
+		choices.append("rivet_gunner")
 	if frontline < 4:
 		choices.append("guanyu")
 	choices.append_array(["lubu", "zhaoyun", "diaochan", "ember_archer"])

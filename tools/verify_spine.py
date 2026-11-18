@@ -8,7 +8,7 @@ DEFAULT_GODOT = Path('F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--godot', type=Path, default=DEFAULT_GODOT)
-    parser.add_argument('--ids', default='097,312,314,072,163,084,018,168,253,254,046,285,271')
+    parser.add_argument('--ids', default='097,312,314,072,163,084,018,168,253,254,046,285,271,110,023,147,069,057,059,036,094')
     args = parser.parse_args()
     results = []
     previous_path = ROOT/'reports/spine_verify.json'

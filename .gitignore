@@ -16,4 +16,5 @@ exports/
 reports/*_local.json
 reports/runtime/
 reports/spine_visuals/
+reports/native_texture_staging/
 *.err

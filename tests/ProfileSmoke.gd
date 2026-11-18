@@ -54,11 +54,12 @@ func run() -> void:
 	check(recovered.credits() == int(expected_backup.credits), "valid backup restores corrupt primary")
 	check(recovered.upgrade("zhaoyun"), "commit after recovery")
 	check(JSON.parse_string(FileAccess.get_file_as_string(path + ".bak")) is Dictionary, "recovery preserves valid backup")
-	var future := {"schema": 2, "new_fields": ["unknown-layout"]}
+	var future := {"schema": SiegeProfile.SCHEMA + 1, "new_fields": ["unknown-layout"]}
 	write_json(path, future)
 	var future_bytes := FileAccess.get_file_as_string(path)
 	recovered.load_profile()
 	check(not recovered.upgrade("guanyu"), "future schema blocks mutation")
+	check(not recovered.can_modify() and recovered.begin_run(stage_id).is_empty(), "future schema only browses and cannot start battle")
 	check(FileAccess.get_file_as_string(path) == future_bytes, "future bytes remain unchanged")
 	var failed := SiegeProfile.new()
 	failed.configure_path(directory + "/does_not_exist/profile.json")

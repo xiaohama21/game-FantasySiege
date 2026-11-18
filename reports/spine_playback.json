@@ -1,9 +1,14 @@
 {
-	"action_pause_resume": true,
+	"action_pause_resume": "real engine frame timers",
 	"failures": [],
-	"native_visuals": 13,
+	"native_visuals": 21,
 	"passed": true,
 	"reconfigure_and_free": true,
+	"speed_clock": "deterministic 4x1/60 input delta with real native skeleton update",
+	"tested_sample_rates": [
+		30,
+		60
+	],
 	"tested_speeds": [
 		0,
 		1,

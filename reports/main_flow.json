@@ -1,0 +1,7 @@
+{
+	"failures": [],
+	"isolation": "res://tests/.user/main_flow",
+	"passed": true,
+	"real_spine": true,
+	"screenshots": 5
+}

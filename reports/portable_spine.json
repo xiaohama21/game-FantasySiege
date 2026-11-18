@@ -1,0 +1,73 @@
+{
+  "program_version": "0.1.1.2",
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.1.2",
+  "passed": true,
+  "results": [
+    {
+      "visual_id": "d69_097",
+      "passed": true,
+      "animations": 12
+    },
+    {
+      "visual_id": "d69_312",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_314",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_072",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_163",
+      "passed": true,
+      "animations": 11
+    },
+    {
+      "visual_id": "d69_084",
+      "passed": true,
+      "animations": 11
+    },
+    {
+      "visual_id": "d69_018",
+      "passed": true,
+      "animations": 11
+    },
+    {
+      "visual_id": "d69_168",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_253",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_254",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_046",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_285",
+      "passed": true,
+      "animations": 10
+    },
+    {
+      "visual_id": "d69_271",
+      "passed": true,
+      "animations": 10
+    }
+  ],
+  "original_animation_count": 135
+}

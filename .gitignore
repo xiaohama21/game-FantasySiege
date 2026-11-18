@@ -7,3 +7,13 @@ tests/.user/
 docs/reviews/runtime/
 Thumbs.db
 .DS_Store
+assets/source/
+assets/actors/
+bin/
+exports/
+*.log
+*.import
+reports/*_local.json
+reports/runtime/
+reports/spine_visuals/
+*.err

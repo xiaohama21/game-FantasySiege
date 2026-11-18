@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "program_version": "0.1.1.2",
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.1.2",
+  "runtime": "bundled Godot Windows executable",
+  "main_flow": {
+    "failures": [],
+    "isolation": "res://tests/.user/main_flow",
+    "passed": true,
+    "real_spine": true,
+    "screenshots": 5
+  },
+  "all_13_native": true,
+  "original_animations": 135,
+  "stderr_empty": true,
+  "visual_review": "all battlefield bodies visible, no fallback; source import metadata filtered"
+}

@@ -1,0 +1,15 @@
+{
+  "case": "art_review",
+  "passed": false,
+  "error": "[Errno 2] No such file or directory: 'F:\\\\godotProject\\\\FantasySiege\\\\reports\\\\art_review_local.json'",
+  "started_utc": "2026-11-19T07:36:35.940165+00:00",
+  "log": "reports\\package_art_review.log",
+  "hidden_render": true,
+  "command_line": [
+    "F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64.exe",
+    "--path",
+    "F:\\godotProject\\FantasySiege",
+    "--script",
+    "res://tests/ArtReview.gd"
+  ]
+}

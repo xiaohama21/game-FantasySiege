@@ -1,0 +1,1580 @@
+{
+	"audio_playback_verified": false,
+	"audio_shutdowns": [
+		{
+			"phase": "fresh_complete",
+			"process_id": 24696.0,
+			"shutdown_clean": true,
+			"wait_seconds": 0.044
+		},
+		{
+			"phase": "complete",
+			"process_id": 29144,
+			"shutdown_clean": true,
+			"wait_seconds": 0.044
+		}
+	],
+	"battle_sha256": "e4ffd4890913167d019501a4bea3bb811e94ec68bad457aaf1c76ac4fa6cc2b9",
+	"battle_step_seconds": 0.2,
+	"checks": 992,
+	"economy": {
+		"earned_credits": 3500,
+		"final_credits": 2840,
+		"initial_credits": 300,
+		"training_spend": 960
+	},
+	"failures": [],
+	"final_profile": {
+		"cleared": [
+			"stage_01",
+			"stage_02",
+			"stage_03",
+			"stage_04",
+			"stage_05",
+			"stage_06",
+			"stage_07",
+			"stage_08"
+		],
+		"credits": 2840,
+		"levels": {
+			"diaochan": 1.0,
+			"ember_archer": 4.0,
+			"guanyu": 4.0,
+			"iron_guard": 4.0,
+			"lubu": 1.0,
+			"moon_mage": 1.0,
+			"rivet_gunner": 1.0,
+			"rune_medic": 4.0,
+			"spirit_beast": 1.0,
+			"star_hammer": 1.0,
+			"zhaoyun": 1.0,
+			"zhugeliang": 1.0
+		},
+		"owned": [
+			"guanyu",
+			"zhaoyun",
+			"zhugeliang",
+			"diaochan",
+			"lubu",
+			"iron_guard",
+			"ember_archer",
+			"rune_medic",
+			"star_hammer",
+			"rivet_gunner",
+			"moon_mage",
+			"spirit_beast"
+		],
+		"roster": [
+			"guanyu",
+			"iron_guard",
+			"ember_archer",
+			"rune_medic",
+			"star_hammer",
+			"rivet_gunner",
+			"moon_mage",
+			"spirit_beast"
+		],
+		"schema": 3,
+		"study_routes": {},
+		"transactions": [
+			"stage_01-814373-2489518512",
+			"stage_02-5841445-2112477907",
+			"stage_03-14246578-555793436",
+			"stage_04-25175031-2458180873",
+			"stage_05-33037546-1386192850",
+			"stage_06-41411496-7516925",
+			"stage_07-48862338-3797299553",
+			"stage_08-62978823-29912651",
+			"stage_08-1288079-594927498"
+		]
+	},
+	"forbidden_shortcuts_used": [],
+	"fresh_process_id": 24696.0,
+	"gdd_header": "> 文档 v0.5.1 · 2026-11-19 · 目标程序 0.1.3.0",
+	"gdd_sha256": "a581fec3dbb524627a24cc6fd3bdf2453088b1d2e082c83202f26d0a85eda188",
+	"gdd_version": "0.5.1",
+	"initial_profile": {
+		"cleared": [],
+		"credits": 300.0,
+		"levels": {
+			"diaochan": 1.0,
+			"ember_archer": 1.0,
+			"guanyu": 1.0,
+			"iron_guard": 1.0,
+			"lubu": 1.0,
+			"rune_medic": 1.0,
+			"zhaoyun": 1.0,
+			"zhugeliang": 1.0
+		},
+		"owned": [
+			"guanyu",
+			"zhaoyun",
+			"zhugeliang",
+			"diaochan",
+			"lubu",
+			"iron_guard",
+			"ember_archer",
+			"rune_medic"
+		],
+		"roster": [
+			"guanyu",
+			"zhaoyun",
+			"zhugeliang",
+			"diaochan",
+			"lubu",
+			"iron_guard",
+			"ember_archer",
+			"rune_medic"
+		],
+		"schema": 3.0,
+		"study_routes": {},
+		"transactions": []
+	},
+	"interfaces": [
+		"Main.start_stage",
+		"Main._train",
+		"Main._toggle_roster",
+		"Main._summon",
+		"Main._pulse",
+		"SiegeBattle.advance",
+		"SiegeBattle.battle_finished → Main reward handler"
+	],
+	"isolation": {
+		"preferences": "res://tests/.user/campaign_journey/preferences.json",
+		"profile": "res://tests/.user/campaign_journey/profile.json"
+	},
+	"journey_sha256": "51d8f22727c4c30ddba5a1b75f9173b9027b7cd09cad603057cd49c7d694186a",
+	"logic_step_seconds": 0.0166666666666667,
+	"main_sha256": "c4f434731aa15b87b2f1a422dabb819e192139f36ec42cb30cf0ab53b8abee77",
+	"manual_input_verified": false,
+	"native_acceptance": "Rendered native Spine, actual audio, clean portable package, and full-scene performance are verified separately.",
+	"native_spine_verified": false,
+	"passed": true,
+	"performance_verified": false,
+	"phase": "complete",
+	"presentation": {
+		"battle_render_visuals": false,
+		"damage_numbers": false,
+		"headless": true,
+		"main_auto_process": false,
+		"master_volume": 0.0,
+		"tutorial_seen": true
+	},
+	"restart": {
+		"profile_checkpoint": {
+			"cleared": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits": 2580.0,
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 4.0,
+				"guanyu": 4.0,
+				"iron_guard": 4.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"spirit_beast": 1.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"owned": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"roster": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"schema": 3.0,
+			"study_routes": {},
+			"transactions": [
+				"stage_01-814373-2489518512",
+				"stage_02-5841445-2112477907",
+				"stage_03-14246578-555793436",
+				"stage_04-25175031-2458180873",
+				"stage_05-33037546-1386192850",
+				"stage_06-41411496-7516925",
+				"stage_07-48862338-3797299553",
+				"stage_08-62978823-29912651"
+			]
+		},
+		"profile_reloaded": {
+			"cleared": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits": 2580.0,
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 4.0,
+				"guanyu": 4.0,
+				"iron_guard": 4.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"spirit_beast": 1.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"owned": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"roster": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"schema": 3,
+			"study_routes": {},
+			"transactions": [
+				"stage_01-814373-2489518512",
+				"stage_02-5841445-2112477907",
+				"stage_03-14246578-555793436",
+				"stage_04-25175031-2458180873",
+				"stage_05-33037546-1386192850",
+				"stage_06-41411496-7516925",
+				"stage_07-48862338-3797299553",
+				"stage_08-62978823-29912651"
+			]
+		},
+		"profile_sha256": "4a71b3c7cd313d9da5c81b63f17af4a790f4afa6510f67bf07fae7707cc908c5",
+		"resume_process_id": 29144
+	},
+	"roster_changes": [
+		{
+			"added": "star_hammer",
+			"after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer"
+			],
+			"before": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"removed": "diaochan"
+		},
+		{
+			"added": "rivet_gunner",
+			"after": [
+				"guanyu",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"before": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer"
+			],
+			"removed": "zhaoyun"
+		},
+		{
+			"added": "moon_mage",
+			"after": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"before": [
+				"guanyu",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"removed": "zhugeliang"
+		},
+		{
+			"added": "spirit_beast",
+			"after": [
+				"guanyu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"before": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"removed": "lubu"
+		}
+	],
+	"scope": "accelerated Main UI transactions and actual fixed-step battle; separate process persistence readback",
+	"stages": [
+		{
+			"actual_award": {
+				"base_credits": 90.0,
+				"bonus_credits": 120.0,
+				"credits": 210.0,
+				"first_clear": true,
+				"stage_id": "stage_01",
+				"unlock_units": []
+			},
+			"cleared_after": [
+				"stage_01"
+			],
+			"credits_after": 510.0,
+			"credits_before": 300.0,
+			"elapsed": 126.666666666661,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 248.0,
+				"base_hit": 39.0,
+				"cast": 10.0,
+				"death": 20.0,
+				"heal": 10.0,
+				"hit": 192.0,
+				"spawn": 47.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 0.0,
+			"id": "stage_01",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"guanyu": 1.0,
+				"iron_guard": 1.0,
+				"lubu": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 27.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"player_hp": 1100.0,
+			"pulses": [],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 90.0,
+				"bonus_credits": 120.0,
+				"credits": 210.0,
+				"first_clear": true,
+				"stage_id": "stage_01",
+				"unlock_units": []
+			},
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"diaochan": 10.0,
+				"ember_archer": 3.0,
+				"iron_guard": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 12.0
+			},
+			"summons": 27.0,
+			"verified_levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"iron_guard": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 1.0
+			},
+			"wall_ms": 4682.904
+		},
+		{
+			"actual_award": {
+				"base_credits": 130.0,
+				"bonus_credits": 150.0,
+				"credits": 280.0,
+				"first_clear": true,
+				"stage_id": "stage_02",
+				"unlock_units": [
+					"star_hammer"
+				]
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02"
+			],
+			"credits_after": 790.0,
+			"credits_before": 510.0,
+			"elapsed": 225.450000000072,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 358.0,
+				"base_hit": 57.0,
+				"cast": 41.0,
+				"death": 37.0,
+				"heal": 40.0,
+				"hit": 368.0,
+				"spawn": 73.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 0.0,
+			"id": "stage_02",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"guanyu": 1.0,
+				"iron_guard": 1.0,
+				"lubu": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 36.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer"
+			],
+			"player_hp": 1200.0,
+			"pulses": [],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 130.0,
+				"bonus_credits": 150.0,
+				"credits": 280.0,
+				"first_clear": true,
+				"stage_id": "stage_02",
+				"unlock_units": [
+					"star_hammer"
+				]
+			},
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"diaochan": 17.0,
+				"ember_archer": 6.0,
+				"iron_guard": 1.0,
+				"rune_medic": 2.0,
+				"zhaoyun": 21.0
+			},
+			"summons": 47.0,
+			"verified_levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"iron_guard": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 1.0
+			},
+			"wall_ms": 8344.726
+		},
+		{
+			"actual_award": {
+				"base_credits": 180.0,
+				"bonus_credits": 180.0,
+				"credits": 360.0,
+				"first_clear": true,
+				"stage_id": "stage_03",
+				"unlock_units": []
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03"
+			],
+			"credits_after": 1150.0,
+			"credits_before": 790.0,
+			"elapsed": 199.766666666718,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 323.0,
+				"base_hit": 30.0,
+				"cast": 54.0,
+				"death": 39.0,
+				"heal": 54.0,
+				"hit": 397.0,
+				"phase": 1.0,
+				"pulse": 1.0,
+				"spawn": 70.0,
+				"stun": 5.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 10.0,
+			"id": "stage_03",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"guanyu": 1.0,
+				"iron_guard": 1.0,
+				"lubu": 1.0,
+				"rune_medic": 1.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 31.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer"
+			],
+			"player_hp": 1400.0,
+			"pulses": [
+				{
+					"elapsed": 83.7999999999965,
+					"energy_after": 0.999999999999034,
+					"energy_before": 80.999999999999,
+					"reaction_seconds": 0.316666666666649,
+					"warning_elapsed": 83.4833333333299
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 180.0,
+				"bonus_credits": 180.0,
+				"credits": 360.0,
+				"first_clear": true,
+				"stage_id": "stage_03",
+				"unlock_units": []
+			},
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"diaochan": 14.0,
+				"ember_archer": 6.0,
+				"iron_guard": 1.0,
+				"rune_medic": 2.0,
+				"zhaoyun": 20.0,
+				"zhugeliang": 2.0
+			},
+			"summons": 45.0,
+			"verified_levels": {
+				"diaochan": 1.0,
+				"ember_archer": 1.0,
+				"iron_guard": 1.0,
+				"rune_medic": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"wall_ms": 9372.178
+		},
+		{
+			"actual_award": {
+				"base_credits": 180.0,
+				"bonus_credits": 220.0,
+				"credits": 400.0,
+				"first_clear": true,
+				"stage_id": "stage_04",
+				"unlock_units": [
+					"rivet_gunner"
+				]
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04"
+			],
+			"credits_after": 1310.0,
+			"credits_before": 910.0,
+			"elapsed": 209.933333333393,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 397.0,
+				"base_hit": 39.0,
+				"cast": 46.0,
+				"death": 48.0,
+				"heal": 44.0,
+				"hit": 489.0,
+				"phase": 1.0,
+				"pulse": 2.0,
+				"spawn": 71.0,
+				"stun": 7.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 18.0,
+			"id": "stage_04",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 2.0,
+				"guanyu": 2.0,
+				"iron_guard": 2.0,
+				"lubu": 1.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 27.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"player_hp": 1500.0,
+			"pulses": [
+				{
+					"elapsed": 78.1999999999968,
+					"energy_after": 117.199999999988,
+					"energy_before": 197.199999999988,
+					"reaction_seconds": 0.366666666666646,
+					"warning_elapsed": 77.8333333333302
+				},
+				{
+					"elapsed": 125.799999999994,
+					"energy_after": 1.79999999999727,
+					"energy_before": 81.7999999999973,
+					"reaction_seconds": 0.34999999999998,
+					"warning_elapsed": 125.449999999994
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 180.0,
+				"bonus_credits": 220.0,
+				"credits": 400.0,
+				"first_clear": true,
+				"stage_id": "stage_04",
+				"unlock_units": [
+					"rivet_gunner"
+				]
+			},
+			"roster": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 6.0,
+				"iron_guard": 1.0,
+				"lubu": 5.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 24.0,
+				"zhugeliang": 4.0
+			},
+			"summons": 43.0,
+			"verified_levels": {
+				"ember_archer": 2.0,
+				"iron_guard": 2.0,
+				"lubu": 1.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"wall_ms": 7581.353
+		},
+		{
+			"actual_award": {
+				"base_credits": 190.0,
+				"bonus_credits": 240.0,
+				"credits": 430.0,
+				"first_clear": true,
+				"stage_id": "stage_05",
+				"unlock_units": []
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05"
+			],
+			"credits_after": 1740.0,
+			"credits_before": 1310.0,
+			"elapsed": 228.283333333407,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 400.0,
+				"base_hit": 62.0,
+				"cast": 7.0,
+				"death": 26.0,
+				"heal": 7.0,
+				"hit": 361.0,
+				"pulse": 3.0,
+				"spawn": 46.0,
+				"stun": 20.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 54.0,
+			"id": "stage_05",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 2.0,
+				"guanyu": 2.0,
+				"iron_guard": 2.0,
+				"lubu": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 29.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"player_hp": 1500.0,
+			"pulses": [
+				{
+					"elapsed": 41.7999999999989,
+					"energy_after": 2.79999999999565,
+					"energy_before": 82.7999999999956,
+					"reaction_seconds": 0.533333333333303,
+					"warning_elapsed": 41.2666666666656
+				},
+				{
+					"elapsed": 83.3999999999966,
+					"energy_after": 211.399999999989,
+					"energy_before": 291.399999999989,
+					"reaction_seconds": 0.23333333333332,
+					"warning_elapsed": 83.1666666666632
+				},
+				{
+					"elapsed": 120.799999999994,
+					"energy_after": 380.0,
+					"energy_before": 460.0,
+					"reaction_seconds": 0.249999999999986,
+					"warning_elapsed": 120.549999999994
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 190.0,
+				"bonus_credits": 240.0,
+				"credits": 430.0,
+				"first_clear": true,
+				"stage_id": "stage_05",
+				"unlock_units": []
+			},
+			"roster": [
+				"guanyu",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 3.0,
+				"guanyu": 3.0,
+				"iron_guard": 1.0,
+				"lubu": 9.0,
+				"rivet_gunner": 2.0,
+				"rune_medic": 1.0,
+				"star_hammer": 1.0,
+				"zhugeliang": 2.0
+			},
+			"summons": 22.0,
+			"verified_levels": {
+				"ember_archer": 2.0,
+				"guanyu": 2.0,
+				"iron_guard": 2.0,
+				"lubu": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0,
+				"zhugeliang": 1.0
+			},
+			"wall_ms": 7974.682
+		},
+		{
+			"actual_award": {
+				"base_credits": 210.0,
+				"bonus_credits": 260.0,
+				"credits": 470.0,
+				"first_clear": true,
+				"stage_id": "stage_06",
+				"unlock_units": [
+					"moon_mage"
+				]
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06"
+			],
+			"credits_after": 1890.0,
+			"credits_before": 1420.0,
+			"elapsed": 206.666666666723,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 396.0,
+				"base_hit": 45.0,
+				"cast": 54.0,
+				"death": 31.0,
+				"heal": 53.0,
+				"hit": 437.0,
+				"pulse": 3.0,
+				"spawn": 50.0,
+				"stun": 7.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 36.0,
+			"id": "stage_06",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 3.0,
+				"guanyu": 3.0,
+				"iron_guard": 3.0,
+				"lubu": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 3.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 25.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"player_hp": 1600.0,
+			"pulses": [
+				{
+					"elapsed": 40.399999999999,
+					"energy_after": 23.7999999999947,
+					"energy_before": 103.799999999995,
+					"reaction_seconds": 0.23333333333332,
+					"warning_elapsed": 40.1666666666657
+				},
+				{
+					"elapsed": 91.3999999999961,
+					"energy_after": 295.8,
+					"energy_before": 375.8,
+					"reaction_seconds": 0.333333333333314,
+					"warning_elapsed": 91.0666666666628
+				},
+				{
+					"elapsed": 127.999999999994,
+					"energy_after": 391.000000000004,
+					"energy_before": 471.000000000004,
+					"reaction_seconds": 0.249999999999986,
+					"warning_elapsed": 127.749999999994
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 210.0,
+				"bonus_credits": 260.0,
+				"credits": 470.0,
+				"first_clear": true,
+				"stage_id": "stage_06",
+				"unlock_units": [
+					"moon_mage"
+				]
+			},
+			"roster": [
+				"guanyu",
+				"zhugeliang",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 5.0,
+				"guanyu": 3.0,
+				"iron_guard": 1.0,
+				"lubu": 8.0,
+				"rivet_gunner": 2.0,
+				"rune_medic": 1.0,
+				"star_hammer": 1.0,
+				"zhugeliang": 2.0
+			},
+			"summons": 23.0,
+			"verified_levels": {
+				"ember_archer": 3.0,
+				"guanyu": 3.0,
+				"iron_guard": 3.0,
+				"lubu": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 3.0,
+				"star_hammer": 1.0,
+				"zhugeliang": 1.0
+			},
+			"wall_ms": 7162.397
+		},
+		{
+			"actual_award": {
+				"base_credits": 230.0,
+				"bonus_credits": 280.0,
+				"credits": 510.0,
+				"first_clear": true,
+				"stage_id": "stage_07",
+				"unlock_units": []
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07"
+			],
+			"credits_after": 2400.0,
+			"credits_before": 1890.0,
+			"elapsed": 261.933333333424,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 458.0,
+				"base_hit": 68.0,
+				"cast": 66.0,
+				"death": 36.0,
+				"heal": 66.0,
+				"hit": 496.0,
+				"pulse": 3.0,
+				"spawn": 57.0,
+				"stun": 7.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 30.0,
+			"id": "stage_07",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 3.0,
+				"guanyu": 3.0,
+				"iron_guard": 3.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 3.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 29.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"player_hp": 1700.0,
+			"pulses": [
+				{
+					"elapsed": 46.5999999999986,
+					"energy_after": 31.8000000000051,
+					"energy_before": 111.800000000005,
+					"reaction_seconds": 0.283333333333317,
+					"warning_elapsed": 46.3166666666653
+				},
+				{
+					"elapsed": 104.999999999995,
+					"energy_after": 242.799999999998,
+					"energy_before": 322.799999999998,
+					"reaction_seconds": 0.266666666666652,
+					"warning_elapsed": 104.733333333329
+				},
+				{
+					"elapsed": 141.400000000005,
+					"energy_after": 326.999999999998,
+					"energy_before": 406.999999999998,
+					"reaction_seconds": 0.316666666666919,
+					"warning_elapsed": 141.083333333338
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 230.0,
+				"bonus_credits": 280.0,
+				"credits": 510.0,
+				"first_clear": true,
+				"stage_id": "stage_07",
+				"unlock_units": []
+			},
+			"roster": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 5.0,
+				"guanyu": 2.0,
+				"iron_guard": 1.0,
+				"lubu": 12.0,
+				"moon_mage": 2.0,
+				"rivet_gunner": 2.0,
+				"rune_medic": 1.0,
+				"star_hammer": 1.0
+			},
+			"summons": 26.0,
+			"verified_levels": {
+				"ember_archer": 3.0,
+				"guanyu": 3.0,
+				"iron_guard": 3.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 3.0,
+				"star_hammer": 1.0
+			},
+			"wall_ms": 12531.969
+		},
+		{
+			"actual_award": {
+				"base_credits": 260.0,
+				"bonus_credits": 320.0,
+				"credits": 580.0,
+				"first_clear": true,
+				"stage_id": "stage_08",
+				"unlock_units": [
+					"spirit_beast"
+				]
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits_after": 2580.0,
+			"credits_before": 2000.0,
+			"elapsed": 257.433333333428,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 494.0,
+				"base_hit": 44.0,
+				"cast": 90.0,
+				"death": 38.0,
+				"heal": 90.0,
+				"hit": 644.0,
+				"phase": 1.0,
+				"pulse": 4.0,
+				"spawn": 57.0,
+				"stun": 16.0
+			},
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 34.0,
+			"id": "stage_08",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 4.0,
+				"guanyu": 4.0,
+				"iron_guard": 4.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 31.0,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"player_hp": 1800.0,
+			"pulses": [
+				{
+					"elapsed": 44.7999999999987,
+					"energy_after": 45.2000000000061,
+					"energy_before": 125.200000000006,
+					"reaction_seconds": 0.283333333333317,
+					"warning_elapsed": 44.5166666666654
+				},
+				{
+					"elapsed": 82.3999999999966,
+					"energy_after": 222.599999999999,
+					"energy_before": 302.599999999999,
+					"reaction_seconds": 0.316666666666649,
+					"warning_elapsed": 82.08333333333
+				},
+				{
+					"elapsed": 119.799999999994,
+					"energy_after": 3.399999999998,
+					"energy_before": 83.399999999998,
+					"reaction_seconds": 0.649999999999963,
+					"warning_elapsed": 119.149999999995
+				},
+				{
+					"elapsed": 171.400000000029,
+					"energy_after": 278.999999999999,
+					"energy_before": 358.999999999999,
+					"reaction_seconds": 0.366666666666958,
+					"warning_elapsed": 171.033333333362
+				}
+			],
+			"rendered_actor_count": 0.0,
+			"revisit": false,
+			"reward_preview": {
+				"base_credits": 260.0,
+				"bonus_credits": 320.0,
+				"credits": 580.0,
+				"first_clear": true,
+				"stage_id": "stage_08",
+				"unlock_units": [
+					"spirit_beast"
+				]
+			},
+			"roster": [
+				"guanyu",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 6.0,
+				"guanyu": 2.0,
+				"iron_guard": 1.0,
+				"lubu": 12.0,
+				"moon_mage": 3.0,
+				"rivet_gunner": 3.0,
+				"rune_medic": 2.0,
+				"star_hammer": 1.0
+			},
+			"summons": 30.0,
+			"verified_levels": {
+				"ember_archer": 4.0,
+				"guanyu": 4.0,
+				"iron_guard": 4.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"star_hammer": 1.0
+			},
+			"wall_ms": 13061.514
+		},
+		{
+			"actual_award": {
+				"base_credits": 260,
+				"bonus_credits": 0,
+				"credits": 260,
+				"first_clear": false,
+				"stage_id": "stage_08",
+				"unlock_units": []
+			},
+			"cleared_after": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits_after": 2840,
+			"credits_before": 2580,
+			"elapsed": 295.516666666727,
+			"enemy_hp": 0.0,
+			"events": {
+				"attack": 522,
+				"base_hit": 74,
+				"cast": 82,
+				"death": 47,
+				"heal": 79,
+				"hit": 710,
+				"phase": 1,
+				"pulse": 4,
+				"spawn": 74,
+				"stun": 16
+			},
+			"finished_signals": 1,
+			"heavy_attack_warnings": 37,
+			"id": "stage_08",
+			"levels": {
+				"diaochan": 1.0,
+				"ember_archer": 4.0,
+				"guanyu": 4.0,
+				"iron_guard": 4.0,
+				"lubu": 1.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"spirit_beast": 1.0,
+				"star_hammer": 1.0,
+				"zhaoyun": 1.0,
+				"zhugeliang": 1.0
+			},
+			"max_active": 30,
+			"outcome": "victory",
+			"owned_after": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"player_hp": 1800.0,
+			"pulses": [
+				{
+					"elapsed": 47.1999999999986,
+					"energy_after": 2.80000000000487,
+					"energy_before": 82.8000000000049,
+					"reaction_seconds": 0.566666666666634,
+					"warning_elapsed": 46.633333333332
+				},
+				{
+					"elapsed": 100.399999999996,
+					"energy_after": 440.0,
+					"energy_before": 520.0,
+					"reaction_seconds": 0.316666666666649,
+					"warning_elapsed": 100.083333333329
+				},
+				{
+					"elapsed": 135.8,
+					"energy_after": 224.599999999961,
+					"energy_before": 304.599999999961,
+					"reaction_seconds": 0.216666666666839,
+					"warning_elapsed": 135.583333333333
+				},
+				{
+					"elapsed": 171.200000000028,
+					"energy_after": 419.199999999942,
+					"energy_before": 499.199999999942,
+					"reaction_seconds": 0.383333333333638,
+					"warning_elapsed": 170.816666666695
+				}
+			],
+			"rendered_actor_count": 0,
+			"revisit": true,
+			"reward_preview": {
+				"base_credits": 260,
+				"bonus_credits": 0,
+				"credits": 260,
+				"first_clear": false,
+				"stage_id": "stage_08",
+				"unlock_units": []
+			},
+			"roster": [
+				"guanyu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"signal_victory": true,
+			"summon_by_id": {
+				"ember_archer": 6,
+				"iron_guard": 1,
+				"moon_mage": 4,
+				"rivet_gunner": 4,
+				"rune_medic": 2,
+				"spirit_beast": 29,
+				"star_hammer": 1
+			},
+			"summons": 47,
+			"verified_levels": {
+				"ember_archer": 4,
+				"iron_guard": 4,
+				"moon_mage": 1,
+				"rivet_gunner": 1,
+				"rune_medic": 4,
+				"spirit_beast": 1,
+				"star_hammer": 1
+			},
+			"wall_ms": 13529.287
+		}
+	],
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"training": [
+		{
+			"cost": 60.0,
+			"credits_after": 1090.0,
+			"from": 1.0,
+			"to": 2.0,
+			"unit_id": "iron_guard"
+		},
+		{
+			"cost": 60.0,
+			"credits_after": 1030.0,
+			"from": 1.0,
+			"to": 2.0,
+			"unit_id": "ember_archer"
+		},
+		{
+			"cost": 60.0,
+			"credits_after": 970.0,
+			"from": 1.0,
+			"to": 2.0,
+			"unit_id": "rune_medic"
+		},
+		{
+			"cost": 60.0,
+			"credits_after": 910.0,
+			"from": 1.0,
+			"to": 2.0,
+			"unit_id": "guanyu"
+		},
+		{
+			"cost": 80.0,
+			"credits_after": 1660.0,
+			"from": 2.0,
+			"to": 3.0,
+			"unit_id": "iron_guard"
+		},
+		{
+			"cost": 80.0,
+			"credits_after": 1580.0,
+			"from": 2.0,
+			"to": 3.0,
+			"unit_id": "ember_archer"
+		},
+		{
+			"cost": 80.0,
+			"credits_after": 1500.0,
+			"from": 2.0,
+			"to": 3.0,
+			"unit_id": "rune_medic"
+		},
+		{
+			"cost": 80.0,
+			"credits_after": 1420.0,
+			"from": 2.0,
+			"to": 3.0,
+			"unit_id": "guanyu"
+		},
+		{
+			"cost": 100.0,
+			"credits_after": 2300.0,
+			"from": 3.0,
+			"to": 4.0,
+			"unit_id": "iron_guard"
+		},
+		{
+			"cost": 100.0,
+			"credits_after": 2200.0,
+			"from": 3.0,
+			"to": 4.0,
+			"unit_id": "ember_archer"
+		},
+		{
+			"cost": 100.0,
+			"credits_after": 2100.0,
+			"from": 3.0,
+			"to": 4.0,
+			"unit_id": "rune_medic"
+		},
+		{
+			"cost": 100.0,
+			"credits_after": 2000.0,
+			"from": 3.0,
+			"to": 4.0,
+			"unit_id": "guanyu"
+		}
+	],
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"version": "0.1.3.0",
+	"visuals": false
+}

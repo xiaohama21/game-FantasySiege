@@ -1,0 +1,7 @@
+{
+  "render_thread": "safe",
+  "before_launch_godot_processes": [],
+  "coordinated_exclusive": true,
+  "launched_process_id": 25800,
+  "rendering_method": "gl_compatibility"
+}

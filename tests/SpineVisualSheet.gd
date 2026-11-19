@@ -16,6 +16,7 @@ func label(text: String, point: Vector2, size: int = 18) -> void:
 
 func _run() -> void:
 	root.size = Vector2i(2900, 1560)
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	var title := Label.new()
 	title.position = Vector2(32, 28)
 	title.add_theme_font_size_override("font_size", 28)

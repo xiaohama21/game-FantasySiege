@@ -78,7 +78,7 @@ func run() -> void:
 	check(legacy.owns(new_unit), "legacy clears derive new contract")
 	check(FileAccess.get_file_as_string(legacy.save_path) == legacy_bytes, "load migration does not write disk")
 	check(legacy.set_roster(["guanyu", new_unit]), "migration can save owned roster")
-	check(int(JSON.parse_string(FileAccess.get_file_as_string(legacy.save_path)).schema) == SiegeProfile.SCHEMA, "next transaction stores schema2")
+	check(int(JSON.parse_string(FileAccess.get_file_as_string(legacy.save_path)).schema) == SiegeProfile.SCHEMA, "next transaction stores current schema")
 	check(int(JSON.parse_string(FileAccess.get_file_as_string(legacy.save_path + ".bak")).schema) == 1, "legacy backup remains recoverable")
 	var failing := create_profile("missing/profile.json")
 	failing.data.cleared = ["stage_01"]

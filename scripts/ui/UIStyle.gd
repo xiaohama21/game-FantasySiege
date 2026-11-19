@@ -28,6 +28,8 @@ static func make_theme() -> Theme:
 	result.set_color("font_color", "Button", INK)
 	result.set_color("font_hover_color", "Button", NIGHT)
 	result.set_color("font_pressed_color", "Button", NIGHT)
+	for type: String in ["Button", "CheckButton", "CheckBox", "OptionButton"]:
+		result.set_color("font_focus_color", type, INK)
 	result.set_color("font_disabled_color", "Button", Color("969e9c"))
 	result.set_stylebox("normal", "Button", box(PAPER, 10, Color("d5cfbe")))
 	result.set_stylebox("hover", "Button", box(Color("fffaed"), 10, GOLD))

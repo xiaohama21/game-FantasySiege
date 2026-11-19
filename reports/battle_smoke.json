@@ -18,11 +18,11 @@
 	"failures": [],
 	"logic_performance": {
 		"active_count": 64,
-		"ms_per_step": 0.965306666666667,
-		"realtime_factor": 17.2656703223846,
+		"ms_per_step": 1.44258,
+		"realtime_factor": 11.5533742784918,
 		"simulated_seconds": 5.0,
 		"visuals": false,
-		"wall_ms": 289.592
+		"wall_ms": 432.774
 	},
 	"passed": true,
 	"pulse_benefit": {
@@ -719,8 +719,8 @@
 			"summons": 67
 		}
 	],
-	"stages_sha256": "a8fe332baebd9918e14ce87368e306ae8539a5b67d66ddcac40dcbdd84608b92",
-	"units_sha256": "86de1b1cdfbd369efb37d42584a5080be0015c3e10f11ab8a7dfedcd671defe4",
-	"version": "0.1.2.0",
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"version": "0.1.3.0",
 	"visuals": false
 }

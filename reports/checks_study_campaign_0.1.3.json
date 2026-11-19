@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "state": "complete",
+  "suite": "single",
+  "selected_cases": [
+    "CampaignJourney"
+  ],
+  "cases": [
+    {
+      "case": "CampaignJourney",
+      "passed": true,
+      "errors": [],
+      "exit_code": 0,
+      "started_at": "2026-11-19T07:42:20.599+00:00",
+      "started_ns": 1795074140599466500,
+      "report": "reports/campaign_journey.json",
+      "program_version": "0.1.3.0",
+      "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "launch_mode": "headless_verbose",
+      "command_line": [
+        "F:\\Godot\\Godot_v4.7.1-stable_win64.exe\\Godot_v4.7.1-stable_win64_console.exe",
+        "--path",
+        "F:\\godotProject\\FantasySiege",
+        "--verbose",
+        "--headless",
+        "--script",
+        "res://tests/CampaignJourney.gd"
+      ],
+      "artifact_sha256": {},
+      "finished_ns": 1795074232093722800,
+      "finished_at": "2026-11-19T07:43:52.093+00:00",
+      "duration_seconds": 91.4942563,
+      "fatal_log_lines": [],
+      "diagnostic_log_lines": [],
+      "report_mtime_ns": 1795074231869587000,
+      "report_sha256": "22b426e231cf8373ceff9529f621b1643515708add7fa535b816a30f007ebaf9",
+      "checks": 992
+    }
+  ],
+  "errors": [],
+  "started_at": "2026-11-19T07:42:20.595+00:00",
+  "project_root": "F:\\godotProject\\FantasySiege",
+  "reject_script_errors": true,
+  "reject_object_leaks": true,
+  "require_fresh_report": true,
+  "require_current_project_version": true,
+  "verbose_render_diagnostics": false,
+  "rendered_launch_scope": "production startup logging",
+  "program_version": "0.1.3.0",
+  "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+  "finished_at": "2026-11-19T07:43:52.099+00:00"
+}

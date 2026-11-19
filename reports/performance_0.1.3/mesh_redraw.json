@@ -1,0 +1,532 @@
+{
+	"actual_rendering_driver": "vulkan",
+	"actual_rendering_method": "mobile",
+	"allowed_empty_alternate_skin_frames": 216,
+	"background": true,
+	"background_host_valid_captures": 2624,
+	"capture_method": "two process frames then force_draw(false); offscreen SubViewport images",
+	"comparisons": 2624,
+	"display_window_mode": 1,
+	"expected_comparisons": 2624,
+	"failures": [],
+	"max_pixel_difference": 0,
+	"models": [
+		{
+			"comparisons": 120,
+			"id": "d69_097",
+			"meshes": 62,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X",
+				"XX"
+			],
+			"raw_actions": 12,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_312",
+			"meshes": 47,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_314",
+			"meshes": 30,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_072",
+			"meshes": 48,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_163",
+			"meshes": 121,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 220,
+			"id": "d69_084",
+			"meshes": 30,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default",
+				"A"
+			]
+		},
+		{
+			"comparisons": 220,
+			"id": "d69_018",
+			"meshes": 29,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default",
+				"A"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_168",
+			"meshes": 28,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 200,
+			"id": "d69_253",
+			"meshes": 20,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default",
+				"A"
+			]
+		},
+		{
+			"comparisons": 200,
+			"id": "d69_254",
+			"meshes": 10,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default",
+				"A"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_046",
+			"meshes": 24,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_285",
+			"meshes": 34,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_271",
+			"meshes": 18,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_110",
+			"meshes": 24,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_023",
+			"meshes": 20,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_147",
+			"meshes": 38,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_069",
+			"meshes": 12,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"X"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_057",
+			"meshes": 21,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"roll"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_059",
+			"meshes": 21,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death",
+				"roll"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 100,
+			"id": "d69_036",
+			"meshes": 25,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 10,
+			"skins": [
+				"default"
+			]
+		},
+		{
+			"comparisons": 110,
+			"id": "d69_094",
+			"meshes": 30,
+			"raw_action_names": [
+				"Active_A",
+				"Appear",
+				"Attack_A",
+				"Critical",
+				"Death",
+				"Idle",
+				"Move",
+				"Move2",
+				"Stiff",
+				"Stun",
+				"UI_Death"
+			],
+			"raw_actions": 11,
+			"skins": [
+				"default"
+			]
+		}
+	],
+	"native_visual_ids": [
+		"d69_097",
+		"d69_312",
+		"d69_314",
+		"d69_072",
+		"d69_163",
+		"d69_084",
+		"d69_018",
+		"d69_168",
+		"d69_253",
+		"d69_254",
+		"d69_046",
+		"d69_285",
+		"d69_271",
+		"d69_110",
+		"d69_023",
+		"d69_147",
+		"d69_069",
+		"d69_057",
+		"d69_059",
+		"d69_036",
+		"d69_094"
+	],
+	"native_visuals": 21,
+	"passed": true,
+	"performance_measured": false,
+	"production_renderer": "mobile",
+	"program_version": "0.1.3.0",
+	"raw_animation_count": 220,
+	"real_renderer": true,
+	"render_thread_model": "safe",
+	"rendering_adapter": "GeForce GTX 1050",
+	"resource_count": 21,
+	"root_focused": true,
+	"root_visible": true,
+	"root_window_mode": 1,
+	"scope": "Exact RGBA comparison of native and managed redraw at matching raw track poses; all skins, both facings, tint/alpha, parent transform without native evaluation, first/end frames, reconfigure/toggle/pause",
+	"unique_raw_animations": 220,
+	"viewport_size": [
+		1000,
+		760
+	],
+	"viewports": [
+		{
+			"disable_3d": true,
+			"size": [
+				1000,
+				760
+			],
+			"transparent_bg": true,
+			"update_mode": 4
+		},
+		{
+			"disable_3d": true,
+			"size": [
+				1000,
+				760
+			],
+			"transparent_bg": true,
+			"update_mode": 4
+		}
+	]
+}

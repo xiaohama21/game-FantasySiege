@@ -1,0 +1,12 @@
+{
+	"failures": [
+		"manual measure gate timed out after 120 seconds"
+	],
+	"gate_path": "F:/godotProject/FantasySiege/tests/.user/main64managed/measure.ready",
+	"gate_wait_ms": 120115,
+	"manual_gate": true,
+	"mode": "main64managed",
+	"passed": false,
+	"program_version": "0.1.3.0",
+	"ready_path": "F:/godotProject/FantasySiege/tests/.user/main64managed/performance_ready.json"
+}

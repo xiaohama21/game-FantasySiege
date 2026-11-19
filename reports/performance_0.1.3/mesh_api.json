@@ -1,0 +1,433 @@
+{
+	"attachment_api": {
+		"SpineSkeleton": [
+			{
+				"args": [
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "slot_name",
+						"type": 4,
+						"usage": 6
+					},
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "attachment_name",
+						"type": 4,
+						"usage": 6
+					}
+				],
+				"name": "get_attachment_by_slot_name",
+				"return": {
+					"class_name": "SpineAttachment",
+					"hint": 17,
+					"hint_string": "SpineAttachment",
+					"name": "",
+					"type": 24,
+					"usage": 6
+				}
+			},
+			{
+				"args": [
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "slot_index",
+						"type": 2,
+						"usage": 6
+					},
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "attachment_name",
+						"type": 4,
+						"usage": 6
+					}
+				],
+				"name": "get_attachment_by_slot_index",
+				"return": {
+					"class_name": "SpineAttachment",
+					"hint": 17,
+					"hint_string": "SpineAttachment",
+					"name": "",
+					"type": 24,
+					"usage": 6
+				}
+			},
+			{
+				"args": [
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "slot_name",
+						"type": 4,
+						"usage": 6
+					},
+					{
+						"class_name": "",
+						"hint": 0,
+						"hint_string": "",
+						"name": "attachment_name",
+						"type": 4,
+						"usage": 6
+					}
+				],
+				"name": "set_attachment",
+				"return": {
+					"class_name": "",
+					"hint": 0,
+					"hint_string": "",
+					"name": "",
+					"type": 0,
+					"usage": 6
+				}
+			},
+			{
+				"args": [],
+				"name": "get_draw_order",
+				"return": {
+					"class_name": "",
+					"hint": 0,
+					"hint_string": "",
+					"name": "",
+					"type": 28,
+					"usage": 6
+				}
+			}
+		],
+		"SpineSlot": []
+	},
+	"mesh2d_methods": [],
+	"mesh2d_properties": [],
+	"models": [
+		{
+			"child_count": 62,
+			"children": [
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@3",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				},
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@4",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				}
+			],
+			"id": "d69_097",
+			"native": true,
+			"signals": [
+				"before_world_transforms_change",
+				"world_transforms_changed"
+			]
+		},
+		{
+			"child_count": 38,
+			"children": [
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@67",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				},
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@68",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				}
+			],
+			"id": "d69_147",
+			"native": true,
+			"signals": [
+				"before_world_transforms_change",
+				"world_transforms_changed"
+			]
+		},
+		{
+			"child_count": 30,
+			"children": [
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@107",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				},
+				{
+					"class": "SpineMesh2D",
+					"mesh_surfaces": [],
+					"name": "@SpineMesh2D@108",
+					"properties": [
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Nearest,Linear,Nearest Mipmap,Linear Mipmap,Nearest Mipmap Anisotropic,Linear Mipmap Anisotropic",
+							"name": "texture_filter",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 2,
+							"hint_string": "Inherit,Disabled,Enabled,Mirror",
+							"name": "texture_repeat",
+							"type": 2,
+							"usage": 6
+						},
+						{
+							"class_name": "CanvasItemMaterial,ShaderMaterial",
+							"hint": 17,
+							"hint_string": "CanvasItemMaterial,ShaderMaterial",
+							"name": "material",
+							"type": 24,
+							"usage": 6
+						},
+						{
+							"class_name": "",
+							"hint": 0,
+							"hint_string": "",
+							"name": "use_parent_material",
+							"type": 1,
+							"usage": 6
+						}
+					]
+				}
+			],
+			"id": "d69_094",
+			"native": true,
+			"signals": [
+				"before_world_transforms_change",
+				"world_transforms_changed"
+			]
+		}
+	],
+	"program_version": "0.1.3.0",
+	"spine_classes": [
+		"SpineAnimation",
+		"SpineAnimationMix",
+		"SpineAnimationState",
+		"SpineAtlasResource",
+		"SpineAtlasResourceFormatLoader",
+		"SpineAtlasResourceFormatSaver",
+		"SpineAtlasResourceImportPlugin",
+		"SpineAttachment",
+		"SpineBinaryResourceImportPlugin",
+		"SpineBone",
+		"SpineBoneData",
+		"SpineBoneLocal",
+		"SpineBoneNode",
+		"SpineBonePose",
+		"SpineConstant",
+		"SpineConstraintData",
+		"SpineEditorPlugin",
+		"SpineEditorPropertyAnimationMixes",
+		"SpineEvent",
+		"SpineEventData",
+		"SpineIkConstraint",
+		"SpineIkConstraintData",
+		"SpineIkConstraintPose",
+		"SpineJsonResourceImportPlugin",
+		"SpineMesh2D",
+		"SpineObjectWrapper",
+		"SpinePathConstraint",
+		"SpinePathConstraintData",
+		"SpinePathConstraintPose",
+		"SpinePhysicsConstraint",
+		"SpinePhysicsConstraintData",
+		"SpinePhysicsConstraintPose",
+		"SpineSkeleton",
+		"SpineSkeletonDataResource",
+		"SpineSkeletonDataResourceInspectorPlugin",
+		"SpineSkeletonFileResource",
+		"SpineSkeletonFileResourceFormatLoader",
+		"SpineSkeletonFileResourceFormatSaver",
+		"SpineSkin",
+		"SpineSkinEntry",
+		"SpineSlider",
+		"SpineSliderData",
+		"SpineSliderPose",
+		"SpineSlot",
+		"SpineSlotData",
+		"SpineSlotNode",
+		"SpineSlotPose",
+		"SpineSprite",
+		"SpineTimeline",
+		"SpineTrackEntry",
+		"SpineTransformConstraint",
+		"SpineTransformConstraintData",
+		"SpineTransformConstraintPose"
+	]
+}

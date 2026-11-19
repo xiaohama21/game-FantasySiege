@@ -9,6 +9,7 @@ Thumbs.db
 .DS_Store
 assets/source/
 assets/actors/
+assets/portraits/
 bin/
 exports/
 *.log
@@ -16,5 +17,6 @@ exports/
 reports/*_local.json
 reports/runtime/
 reports/spine_visuals/
+reports/art_environment/
 reports/native_texture_staging/
 *.err

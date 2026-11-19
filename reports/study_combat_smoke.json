@@ -1,0 +1,24 @@
+{
+	"cases": [
+		"frozen_21_units_and_36_player_timings",
+		"all_whitelisted_modifiers_and_copy_boundaries",
+		"start_snapshot_enemy_isolation_and_restart",
+		"configured_108_battle_spawn_matrix",
+		"actual_research_combat_effects",
+		"FS030_independent_refresh_expiry_death_and_pause",
+		"AoE_slow_source_isolation"
+	],
+	"checks": 1873,
+	"failures": [],
+	"isolation": "res://tests/.user/study_combat",
+	"matrix_cases": 108,
+	"passed": true,
+	"phase": "complete",
+	"program_version": "0.1.3.0",
+	"scope": "Central research stat outputs, 108 configured player/level/route battle-spawn cases, isolated battle snapshots and independent-source slow expiry; headless logic only, no Spine, window or performance claim",
+	"siege_battle_sha256": "e4ffd4890913167d019501a4bea3bb811e94ec68bad457aaf1c76ac4fa6cc2b9",
+	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+	"unit_stats_sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"visuals": false
+}

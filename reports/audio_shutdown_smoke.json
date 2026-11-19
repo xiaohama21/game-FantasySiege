@@ -1,0 +1,8 @@
+{
+	"checks": 6,
+	"mixer_drain_seconds": 0.083,
+	"passed": true,
+	"playback_references_released": true,
+	"players_after_shutdown": 0,
+	"verbose_log_must_reject_leaks": true
+}

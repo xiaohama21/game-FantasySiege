@@ -1,0 +1,550 @@
+{
+	"audio_shutdown_clean": true,
+	"captures": [
+		{
+			"name": "art_camp",
+			"path": "res://reports/runtime/art_camp.png",
+			"sampled_colors": 155,
+			"sha256": "bc8431bb4a8726d45be572d5e11f4c92e14e598b72fa4a212944365695425cff",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "远征",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_guanyu",
+			"path": "res://reports/runtime/art_hero_guanyu.png",
+			"sampled_colors": 156,
+			"sha256": "d9263e67a7f61368cc0efc55384756649ef6ed725f0efc2c5bfed42eb69de6ed",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_zhaoyun",
+			"path": "res://reports/runtime/art_hero_zhaoyun.png",
+			"sampled_colors": 156,
+			"sha256": "87535e06f93a0ef8d9c4ffb97572d0e153619d51d540cba4767e13a53a4eef66",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_zhugeliang",
+			"path": "res://reports/runtime/art_hero_zhugeliang.png",
+			"sampled_colors": 165,
+			"sha256": "ca435aa57d827b03119b97f6ca78d92aaa5c400ddaa13e5aec1d8bb29b69ff4d",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_diaochan",
+			"path": "res://reports/runtime/art_hero_diaochan.png",
+			"sampled_colors": 157,
+			"sha256": "3a1c8160848944034050dfda4e55dcb4c4147932be76e97fe15a295d0fbbface",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_lubu",
+			"path": "res://reports/runtime/art_hero_lubu.png",
+			"sampled_colors": 155,
+			"sha256": "f5bb83ef80b988e07e74a908ee3017a4c55631a5a3d186997faeced5c1151488",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_iron_guard",
+			"path": "res://reports/runtime/art_hero_iron_guard.png",
+			"sampled_colors": 155,
+			"sha256": "b029c1feaad45a374ef27d5dc600d669868229b0126c79133d0e3855b2b32807",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_ember_archer",
+			"path": "res://reports/runtime/art_hero_ember_archer.png",
+			"sampled_colors": 151,
+			"sha256": "550bb08fc2257e0adabe96bce91d02c73f9d8128de7a33e542aec3ce38e5d521",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_rune_medic",
+			"path": "res://reports/runtime/art_hero_rune_medic.png",
+			"sampled_colors": 155,
+			"sha256": "17f53e7bcd14cae5e863efc23c4f7381b95192f6b4db376e40ce46489151093d",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_star_hammer",
+			"path": "res://reports/runtime/art_hero_star_hammer.png",
+			"sampled_colors": 159,
+			"sha256": "61c3ae573d53b197091c52b4af25ffdbce9111654328eef6cecaa3704f1610d0",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_rivet_gunner",
+			"path": "res://reports/runtime/art_hero_rivet_gunner.png",
+			"sampled_colors": 155,
+			"sha256": "0bc1b991ec7d13e4934de613789b6329bbe5bf7dcd47429468ccb9f82f0d5637",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_moon_mage",
+			"path": "res://reports/runtime/art_hero_moon_mage.png",
+			"sampled_colors": 159,
+			"sha256": "3de9d5d388310e1d63c949e2c45dcbd8d35ff269783a39b7c507029f2ca45596",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_spirit_beast",
+			"path": "res://reports/runtime/art_hero_spirit_beast.png",
+			"sampled_colors": 157,
+			"sha256": "2720d759ca3a71c05895b1f83f5606cba0eb908a81c8092398b567c7b686b181",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_hero_collection_lower",
+			"path": "res://reports/runtime/art_hero_collection_lower.png",
+			"sampled_colors": 155,
+			"sha256": "84994e927d9193b907a2de65d2ca4d2ab39e3c2838ddff6dfe05e51cd8db02c6",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "英魂",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_locked",
+			"path": "res://reports/runtime/art_study_locked.png",
+			"sampled_colors": 144,
+			"sha256": "cee7eb1d3ba2590443d23bb093590a96d003b8898421f3442d180148d36bb1e5",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_unowned",
+			"path": "res://reports/runtime/art_study_unowned.png",
+			"sampled_colors": 150,
+			"sha256": "6ce6926b7e60248daaf91e77f12b03c95367a9536068c663d33a160d2ceb196e",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_ready",
+			"path": "res://reports/runtime/art_study_ready.png",
+			"sampled_colors": 145,
+			"sha256": "49ef9045a3fba815cedb7ebdbdfd80bf737714a10f47e14090b219427dfb8fb2",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_base",
+			"path": "res://reports/runtime/art_study_base.png",
+			"sampled_colors": 145,
+			"sha256": "f2f586d5b788c91d66398bbb982cf4abc562e909ff30f988a089071e372e3339",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_sweep",
+			"path": "res://reports/runtime/art_study_sweep.png",
+			"sampled_colors": 146,
+			"sha256": "f8991f3b01cdf74f9cb17af7323dacc3c07f052f94fb8f3b59bd2398a5a73c7b",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_heal",
+			"path": "res://reports/runtime/art_study_heal.png",
+			"sampled_colors": 149,
+			"sha256": "dbf50b6aa1c1b8ed2b245ef3b2e2d02c058dadae2752541ccd12f6f3956722eb",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_siege",
+			"path": "res://reports/runtime/art_study_siege.png",
+			"sampled_colors": 149,
+			"sha256": "5a1ca2003e9a66e1e58612450ab1a222404f940905eeff44048ec2633a2f9208",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_study_slow",
+			"path": "res://reports/runtime/art_study_slow.png",
+			"sampled_colors": 150,
+			"sha256": "cf1dfb6914bb7e35c19e1e6e1295c327b81f136bcebf383d7821198281ad763b",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "研修",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_squad",
+			"path": "res://reports/runtime/art_squad.png",
+			"sampled_colors": 170,
+			"sha256": "93503d02fde17be3bd0588152d4a1dc5a7a890fc8647cc61ec4ebc6ab8ac174b",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "编队",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_squad_lower",
+			"path": "res://reports/runtime/art_squad_lower.png",
+			"sampled_colors": 181,
+			"sha256": "59511c1bb38d18ac7b68a3fe7d3e74646e28179793d75d039bba9ab6a29ee05f",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "编队",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_chapter_1_left",
+			"path": "res://reports/runtime/art_chapter_1_left.png",
+			"sampled_colors": 158,
+			"sha256": "d73b4c2bec238d6be5ca8561649fb8d0c739af0f09f3fec45e22ab4c78742f7b",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "stage_01",
+			"tab": "编队",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_chapter_1_right",
+			"path": "res://reports/runtime/art_chapter_1_right.png",
+			"sampled_colors": 247,
+			"sha256": "09196aabf31a3fc6585b258d2dda6a5778d849b3f6a1213ea912a1f988eda253",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "stage_01",
+			"tab": "编队",
+			"view_x": 1280.0
+		},
+		{
+			"name": "art_chapter_2_left",
+			"path": "res://reports/runtime/art_chapter_2_left.png",
+			"sampled_colors": 172,
+			"sha256": "a4b566ef2fd9a4a89327ffe281c9588c0c59f2a91ae6ac493c5f0fcad264f821",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "stage_05",
+			"tab": "编队",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_chapter_2_right",
+			"path": "res://reports/runtime/art_chapter_2_right.png",
+			"sampled_colors": 249,
+			"sha256": "c19ec5d4a058771b33967c61cb3ed3d547c848877d4e236ae9516d078092adf4",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "stage_05",
+			"tab": "编队",
+			"view_x": 1280.0
+		},
+		{
+			"name": "art_gallery_hero",
+			"path": "res://reports/runtime/art_gallery_hero.png",
+			"sampled_colors": 151,
+			"sha256": "1ee42dacfd7ff213ebab909b648d831386b8ccb46798793e1b08726e3add2383",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "图鉴",
+			"view_x": 0.0
+		},
+		{
+			"name": "art_gallery_boss",
+			"path": "res://reports/runtime/art_gallery_boss.png",
+			"sampled_colors": 186,
+			"sha256": "75eddbfaeda17f0b51fcea2879efa32d8a756de2cda42f338689499babbb4efc",
+			"size": [
+				1280,
+				720
+			],
+			"stage": "",
+			"tab": "图鉴",
+			"view_x": 0.0
+		}
+	],
+	"checks": 3666,
+	"failures": [],
+	"isolation": "res://tests/.user/art_review",
+	"native_battle_instances_audited": 32,
+	"native_gallery_previews": 2,
+	"passed": true,
+	"portrait_count": 12,
+	"portraits": [
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/guanyu.png",
+			"sha256": "0a4f065ebc9c3baa7d0672197286fcf9929aa0731a6e245bbfc7b05ad8110370",
+			"size": [
+				1021,
+				1085
+			],
+			"unit_id": "guanyu",
+			"visual_id": "d69_097"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/zhaoyun.png",
+			"sha256": "3308c1e923a05ceed8e7961c6408e016974730350bca7e0a9119b672b1fbfb9b",
+			"size": [
+				1026,
+				800
+			],
+			"unit_id": "zhaoyun",
+			"visual_id": "d69_312"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/zhugeliang.png",
+			"sha256": "998994be6a05e99a86fd0ccf7fd0313938492e4a19676ac6352bc89e4ba61a65",
+			"size": [
+				1026,
+				910
+			],
+			"unit_id": "zhugeliang",
+			"visual_id": "d69_314"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/diaochan.png",
+			"sha256": "981fa5bc4dd6f5a772120398cccda0ced8885811641d48c639c99526a4a6eba6",
+			"size": [
+				1026,
+				975
+			],
+			"unit_id": "diaochan",
+			"visual_id": "d69_072"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/lubu.png",
+			"sha256": "a30c7b50aefa7bbe2357467f8d59f75ecd993bb4f38bb03a22483667e1f7fc88",
+			"size": [
+				1025,
+				1233
+			],
+			"unit_id": "lubu",
+			"visual_id": "d69_163"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/iron_guard.png",
+			"sha256": "c8fdd4d551f956d0d638978d2e99186dcd26eae6259a59c857cd5f6cab2e39c7",
+			"size": [
+				1024,
+				829
+			],
+			"unit_id": "iron_guard",
+			"visual_id": "d69_084"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/ember_archer.png",
+			"sha256": "fc3a6dfe86817b41c7c71cfe37e859a996a3906cb90c74f1985832eb02d90f6b",
+			"size": [
+				992,
+				1281
+			],
+			"unit_id": "ember_archer",
+			"visual_id": "d69_018"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/rune_medic.png",
+			"sha256": "8b063ead0c4a2afab32001f5ab98db8549cb6601d29fcea970a6455bb7971d79",
+			"size": [
+				1024,
+				1103
+			],
+			"unit_id": "rune_medic",
+			"visual_id": "d69_168"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/star_hammer.png",
+			"sha256": "27c5f8f6b6d9dc484edef851fb6a6b9065c7f53d4296c6a84533a5e4b0f5e95e",
+			"size": [
+				1025,
+				769
+			],
+			"unit_id": "star_hammer",
+			"visual_id": "d69_110"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/rivet_gunner.png",
+			"sha256": "b0e724f9daa8c0a40877399ab7ec30f91c76ecdba0a6d81a3080689ea6fd8917",
+			"size": [
+				1026,
+				1136
+			],
+			"unit_id": "rivet_gunner",
+			"visual_id": "d69_023"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/moon_mage.png",
+			"sha256": "30ab54f27d48027d97ac3f95e3b4bc8f17fd118310131f3b337f0c71b3a807e9",
+			"size": [
+				925,
+				1281
+			],
+			"unit_id": "moon_mage",
+			"visual_id": "d69_147"
+		},
+		{
+			"nonempty": true,
+			"path": "res://assets/portraits/spirit_beast.png",
+			"sha256": "6aece9402931b98797fc33dec8592b3c2565a2874d0870d0a91909e499e956dc",
+			"size": [
+				1026,
+				778
+			],
+			"unit_id": "spirit_beast",
+			"visual_id": "d69_069"
+		}
+	],
+	"program_version": "0.1.3.0",
+	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+	"rendering_adapter": "GeForce GTX 1050",
+	"root_focused": true,
+	"root_visible": true,
+	"root_window_mode": 1,
+	"scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, summon cards, both chapter edges and native gallery. Uses an isolated all-unlocked visual fixture; does not verify progression, foreground interaction, frame rate or performance.",
+	"screenshots": 30,
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+	"text_labels_audited": 1828,
+	"text_overflows": [],
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"visuals_sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9"
+}

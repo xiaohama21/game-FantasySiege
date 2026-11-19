@@ -1,0 +1,8 @@
+{
+  "launched_process_id": 21436,
+  "render_thread": "safe",
+  "coordinated_exclusive": true,
+  "before_launch_godot_processes": [],
+  "launch_window_style": "Normal",
+  "rendering_method": "mobile"
+}

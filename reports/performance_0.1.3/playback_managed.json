@@ -1,0 +1,29 @@
+{
+	"action_pause_resume": "real engine frame timers",
+	"failures": [],
+	"group_switch_keeps_pending_delta": true,
+	"managed_mesh_redraw": true,
+	"native_visuals": 21,
+	"passed": true,
+	"program_version": "0.1.3.0",
+	"reconfigure_and_free": true,
+	"speed_clock": "deterministic four input deltas with real native skeleton update",
+	"tested_frame_groups": [
+		2,
+		3,
+		4
+	],
+	"tested_input_deltas": [
+		0.0166666666666667,
+		0.05
+	],
+	"tested_sample_rates": [
+		30,
+		60
+	],
+	"tested_speeds": [
+		0,
+		1,
+		2
+	]
+}

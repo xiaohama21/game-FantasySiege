@@ -2,7 +2,7 @@ class_name SiegeProfile
 extends Node
 
 signal changed
-const SCHEMA := 2
+const SCHEMA := 3
 var data: Dictionary = {}
 var last_award: Dictionary = {}
 var save_path := "user://profile.json"
@@ -16,7 +16,7 @@ func _ready() -> void:
 func _fresh() -> Dictionary:
 	var levels: Dictionary = {}
 	for id: String in Catalog.initial_roster(): levels[id] = 1
-	return {"schema": SCHEMA, "credits": 300, "levels": levels, "cleared": [], "roster": Catalog.initial_roster(), "owned": Catalog.initial_roster(), "transactions": []}
+	return {"schema": SCHEMA, "credits": 300, "levels": levels, "cleared": [], "roster": Catalog.initial_roster(), "owned": Catalog.initial_roster(), "transactions": [], "study_routes": {}}
 
 func configure_path(path: String) -> void:
 	save_path = path
@@ -34,7 +34,11 @@ func _read(path: String) -> Dictionary:
 	if not (parsed.get("credits") is int or parsed.get("credits") is float): return {}
 	if float(parsed.credits) != int(parsed.credits) or int(parsed.credits) < 0: return {}
 	if not (parsed.get("schema") is int or parsed.get("schema") is float): return {}
-	if int(parsed.schema) == SCHEMA and not parsed.get("owned") is Array: return {}
+	if int(parsed.schema) in [2, SCHEMA] and not parsed.get("owned") is Array: return {}
+	if int(parsed.schema) == SCHEMA:
+		if not parsed.get("study_routes") is Dictionary: return {}
+		for id: Variant in parsed.study_routes:
+			if not id is String or Catalog.study(id).is_empty() or not parsed.study_routes[id] is String: return {}
 	for id: Variant in parsed.get("owned", []):
 		if not id is String or not Catalog.playable_roster().has(id): return {}
 	for id: Variant in parsed.roster:
@@ -68,6 +72,10 @@ func _sync_owned(candidate: Dictionary) -> void:
 	for id: Variant in candidate.get("roster", []):
 		if owned.has(id) and not roster.has(id): roster.append(id)
 	candidate.roster = roster if not roster.is_empty() else Catalog.initial_roster()
+	var routes: Dictionary = candidate.get("study_routes", {}) if int(candidate.get("schema", 0)) == SCHEMA else {}
+	for id: String in routes:
+		if Catalog.study_route(id, str(routes[id])).is_empty(): routes[id] = "base"
+	candidate.study_routes = routes
 	candidate.schema = SCHEMA
 
 func load_profile() -> void:
@@ -78,8 +86,8 @@ func load_profile() -> void:
 		data = _fresh()
 		error_message = "存档版本较新，当前版本仅可浏览"
 		return
-	data = primary if int(primary.get("schema", 0)) in [1, SCHEMA] else _read(save_path + ".bak")
-	if data.is_empty() or not (int(data.get("schema", 0)) in [1, SCHEMA]): data = _fresh()
+	data = primary if int(primary.get("schema", 0)) in [1, 2, SCHEMA] else _read(save_path + ".bak")
+	if data.is_empty() or not (int(data.get("schema", 0)) in [1, 2, SCHEMA]): data = _fresh()
 	_sync_owned(data)
 	error_message = ""
 	changed.emit()
@@ -103,7 +111,7 @@ func _commit(candidate: Dictionary) -> bool:
 	var backup := primary + ".bak"
 	var tmp_abs := ProjectSettings.globalize_path(temp)
 	if FileAccess.file_exists(save_path):
-		if not _read(save_path).is_empty() and DirAccess.copy_absolute(primary, backup) != OK:
+		if not _read(save_path).is_empty() and (DirAccess.dir_exists_absolute(backup) or DirAccess.copy_absolute(primary, backup) != OK):
 			error_message = "备份失败，资源未扣除"
 			return false
 		if DirAccess.remove_absolute(primary) != OK:
@@ -150,6 +158,42 @@ func reward_preview(id: String) -> Dictionary:
 
 func training_cost(id: String) -> int:
 	return 40 + level(id) * 20
+
+func study_unlock_cost() -> int:
+	return int(Catalog.studies().get("unlock_cost", 180))
+
+func study_unlocked(id: String) -> bool:
+	return owns(id) and not Catalog.study(id).is_empty() and data.get("study_routes", {}).has(id)
+
+func study_route(id: String) -> String:
+	if not study_unlocked(id): return "base"
+	var route := str(data.get("study_routes", {}).get(id, "base"))
+	return route if not Catalog.study_route(id, route).is_empty() else "base"
+
+func unlock_study(id: String) -> bool:
+	var definition := Catalog.study(id)
+	if not can_modify() or not owns(id) or definition.is_empty() or study_unlocked(id): return false
+	if level(id) < int(definition.get("min_level", 3)) or not data.get("cleared", []).has(str(definition.get("unlock_stage", "stage_04"))): return false
+	var cost := int(definition.get("unlock_cost", study_unlock_cost()))
+	if credits() < cost: return false
+	var candidate := data.duplicate(true)
+	candidate.credits = credits() - cost
+	candidate.study_routes[id] = "base"
+	return _commit(candidate)
+
+func set_study_route(id: String, route_id: String) -> bool:
+	if not can_modify() or not study_unlocked(id) or Catalog.study_route(id, route_id).is_empty(): return false
+	if study_route(id) == route_id: return true
+	var candidate := data.duplicate(true)
+	candidate.study_routes[id] = route_id
+	return _commit(candidate)
+
+func study_modifiers_snapshot() -> Dictionary:
+	var result: Dictionary = {}
+	for id: Variant in data.get("study_routes", {}):
+		if not id is String or not study_unlocked(id) or study_route(id) == "base": continue
+		result[id] = Catalog.study_modifiers(id, study_route(id))
+	return result.duplicate(true)
 
 func upgrade(id: String) -> bool:
 	if not owns(id) or level(id) >= 20 or credits() < training_cost(id): return false

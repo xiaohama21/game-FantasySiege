@@ -1,10 +1,14 @@
 {
-	"checks": 96,
+	"audio_shutdown_clean": true,
+	"checks": 233,
 	"failures": [],
 	"isolation": "res://tests/.user/main_flow",
+	"normal_window_close": true,
 	"passed": true,
+	"program_version": "0.1.3.0",
 	"real_spine": true,
-	"screenshots": 8,
-	"stages_sha256": "a8fe332baebd9918e14ce87368e306ae8539a5b67d66ddcac40dcbdd84608b92",
+	"screenshots": 15,
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
 	"world_width": 2560
 }

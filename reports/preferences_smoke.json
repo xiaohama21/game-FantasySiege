@@ -1,0 +1,7 @@
+{
+	"audio_driver": "headless dummy; real listening separate",
+	"checks": 76,
+	"failures": [],
+	"isolated_path": "res://tests/.user/preferences_smoke",
+	"passed": true
+}

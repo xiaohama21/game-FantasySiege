@@ -1,6 +1,10 @@
 # 核心规则与接口
 
-> v0.13 · 2026-11-18 · GDD v0.3.2 / 程序0.1.2.0
+> v0.17 · 2026-11-19 · GDD v0.5.3 / 程序0.1.3.0
+> v0.17：SiegeBattle.READY_EPSILON=0.00001统一战斗与HUD的冷却/能量就绪；仍保留固定步和浮点资源。
+> v0.16：英魂研修修正由UnitStats白名单中央结算；战斗接收玩家开局研修快照，治疗量/减速时长包含一次智力加成；减速按施法者uid独立期限，避免弱控制续期强控制（FS-030）。
+> v0.15：显式读取project.godot的两组/12关键/托管刷新配置，撤销高人数自动四组作为生产候选；逻辑和累计动画时间不变，最终以完整Main验收。
+> v0.14：活单位40以上四帧组预算，12关键60Hz；采样分组不改变逻辑时钟/状态/伤害。
 > v0.13：固定步保持世界坐标，视觉位置在advance末尾合并同步一次，静止位置不重复跨原生桥接；状态与命中仍按原固定步。
 > v0.12：最终wide-tail-1八关、四核心养成与脉冲收益通过120项验收；冻结平衡并如实记录较慢案例。
 > v0.11：同步schema2拥有/首通/重访接口与旧schema1解锁迁移，角色收集与八槽阵容职责明确。
@@ -16,6 +20,8 @@
 > v0.1：独立原型核心接口与数据边界。
 
 ## 数据
+
+表现预算配置统一位于project.godot：`fantasy_siege/visuals/managed_mesh_redraw=true`、`frame_group_count=2`、`critical_instance_limit=12`（完整键均在同一visuals前缀）。SpineActor初始化读取托管刷新和分组；SiegeBattle每次预算分配读取关键实例上限和分组，按现有优先级选择60Hz关键实例，其余30Hz。人数变化不再自动改成四组。渲染器Mobile及移动覆盖一致，`rendering/driver/threads/thread_model=1`为Safe。此配置先作为验收候选，未经24/64完整场景和全动作差图通过不写为完成。
 
 战斗位置为actor.x的世界坐标，不能依赖Node2D读回。每次advance可执行多个60Hz固定步；行军只改actor.x，末尾按缓存render_x一次同步实际变化的视觉位置。新实例、调试fixture和手动脉冲立即设置位置并更新缓存。状态、动画播放时点、逻辑命中和晕眩不延后；不丢固定步和时间。
 
@@ -33,13 +39,13 @@
 
 波次展开为`time + index * interval`，按时间稳定排序；存活人数已满时推迟入场，不丢掉波次。敌人生命/攻击同时接受该波次倍率，玩家等级不影响敌人。普通攻击锁定前方最近存活敌人；没有单位阻挡才选敌方基地，基地忽略护甲。攻击间隔从出手开始计时，命中在独立逻辑延迟后；命中时目标已死则本次取消，范围伤害也不借死目标转移。每次结算后立即检查胜负，终局取消全部待命中攻击、后续波次和收入，仅发送一次结算信号。
 
-`special`可为字符串或字典（`type`）：`heal`优先选择射程内己方缺血实例，按`amount`或基础攻击治疗，不治疗基地/敌人/死亡单位；没有伤员时可普攻。`cleave`采用`aoe_radius`范围命中；`slow`命中后按`ratio`（默认0.65）和`duration`（默认2秒）减速，重复只延长较长时长并保留更强减速，结束恢复。技能只改变逻辑数据；Spine动作状态不提供伤害回调。
+`special`可为字符串或字典（`type`）：`heal`优先选择射程内己方缺血实例，治疗量由UnitStats输出的最终`special.amount`直接读取，不治疗基地/敌人/死亡单位；没有伤员时可普攻。`cleave`采用最终`aoe_radius`范围命中；`slow`命中后直接读取最终`special.ratio/duration`，按施法者uid分别计时，同来源只刷新自身，仍有效的来源中取最强减速，全部结束才恢复。技能只改变逻辑数据；Spine动作状态不提供伤害回调。
 
 角色死亡立即从活单位计数、阻挡及索敌中剔除，随后保留0.8秒Death与淡出；手动测试可禁用视觉创建，战斗结果必须一致。基地被摧毁后的尸体视觉可在自动帧中完成回收，但不再推进战斗时间。`stop()`立即释放全部实例并清空波次/固定步余量；`start()`先执行stop，避免重开残留。
 
 ## 实现接口（协作边界）
 
-`SiegeBattle` Node2D：`start(stage_id:String, roster:Array, levels:Dictionary={})`；`try_summon(id:String)->bool`；`advance(delta:float)`；`get_snapshot()->Dictionary`；`stop()`；属性`auto_step=true`、`units:Array`。信号`battle_finished(victory:bool)`。snapshot包括elapsed/energy/capacity/player_hp/player_max_hp/enemy_hp/enemy_max_hp/cooldowns/active_count/outcome（running/victory/defeat）。
+`SiegeBattle` Node2D：`start(stage_id:String, roster:Array, levels:Dictionary={}, study_modifiers:Dictionary={})`；第四参为`{unit_id:{modifier_name:value}}`，开局独立深拷贝，仅team=1使用。`try_summon(id:String)->bool`；`advance(delta:float)`；`get_snapshot()->Dictionary`；`stop()`；属性`auto_step=true`、`units:Array`。信号`battle_finished(victory:bool)`。snapshot包括elapsed/energy/capacity/player_hp/player_max_hp/enemy_hp/enemy_max_hp/cooldowns/active_count/outcome（running/victory/defeat）。
 
 `SpineActor` Node2D：`configure(visual_id:String, facing:int=1)`；`play_state(state:String, duration:float=0.0)`；`using_spine()->bool`。动画状态idle/move/attack/skill/hurt/death。配置可在入树前或入树后；缺库/数据用可见占位，不影响战斗。`resources/visuals.json`字典含data/skin/scale/foot/native_facing/animations/durations/source_id/root_motion_*；共享Resource缓存，每实例独立骨架。
 
@@ -65,7 +71,21 @@ Boss 的 `special` 字典可包含 `phase_threshold`（生命比例，默认不�
 
 每个单位配置 `attributes` 字典（strength/agility/intelligence），`primary_attribute` 为其中恰好一个键，`attribute_growth` 为三个键的每级增量。缺失属性默认0，缺失成长默认主属性+2/级、副属性+1/级；等级夹紧1–20。最终属性 `stats=attributes+(level-1)*growth`。主属性标签由`UnitStats.primary_label()`返回“力量/敏捷/智力”。
 
-`UnitStats.calculate(unit, level)`为唯一计算出口，返回stats/hp/damage/attack_interval/speed/magic_armor/heal_multiplier/level/primary。HP=baseHP×[1+0.06×(lv−1)]×(1+0.015×力量)；攻击=baseDMG×[1+0.05×(lv−1)]×(1+0.012×主属性)；攻击间隔=baseInterval÷(1+0.004×敏捷)；移速=baseSpeed×(1+0.003×敏捷)。物理有效护甲=基础护甲，魔法有效护甲=基础护甲×0.5+智力×0.6，真实伤害忽略。治疗量和减速时长额外乘(1+0.01×智力)。数据中的hp/damage/attack_interval/speed均为属性计算前基础值，界面展示最终值。
+`UnitStats.calculate(unit, level, modifiers={})`为唯一计算出口，返回stats/hp/damage/armor/range/attack_interval/hit_delay/aoe_radius/speed/damage_type/magic_armor/special/level/primary，旧heal_multiplier保留为诊断兼容字段。HP=baseHP×[1+0.06×(lv−1)]×(1+0.015×力量)；攻击=baseDMG×[1+0.05×(lv−1)]×(1+0.012×主属性)；攻击间隔=baseInterval÷(1+0.004×敏捷)；移速=baseSpeed×(1+0.003×敏捷)。先完成原等级与三属性，再施加白名单研修修正，最后魔法有效护甲=最终armor×0.5+智力×0.6，真实伤害忽略。数据中的hp/damage/attack_interval/speed均为属性计算前基础值，界面展示中央最终值。
+
+### 英魂研修的中央修正与开局快照
+
+modifier仅允许`hp_mult/damage_mult/armor_add/speed_mult/range_mult/attack_interval_mult/hit_delay_mult/aoe_radius_mult/heal_amount_mult/slow_ratio/slow_duration_mult/base_damage_multiplier`。未知键、非数值和非有限值不参与计算；生命倍率下限0.01、攻击间隔倍率下限0.01，其余乘数非负，护甲加值可负但最终护甲不得负，生命至少1、射程至少16、减速倍率夹在0.1–1。最终命中前摇必须非负且严格小于最终攻击间隔，异常高前摇夹到间隔前0.0001秒（间隔更短时取0），避免一次攻击跨越下一次出手。慢速/伤害类型与Boss阶段等行为仍来自内容配置，研究不能通过额外键注入任意逻辑。不存在modifier时维持原21角色等级、三属性与技能数值。
+
+`special`在中央计算时深拷贝，连同嵌套参数均独立于Catalog和其他实例。heal最终amount=`配置amount（缺省为最终damage）×智力系数×heal_amount_mult`；slow最终duration=`配置duration×智力系数×slow_duration_mult`，ratio可由slow_ratio显式覆盖；攻城倍率可由base_damage_multiplier显式覆盖。智力系数为`1+0.01×最终智力`，只在中央应用一次。UI、详情与战斗均读取最终special，不能再乘heal_multiplier或自行展开第二份公式。普通伤害、费用、召唤冷却与角色主属性不会被未知修正覆盖。
+
+start深拷贝levels和每英魂研修modifier映射，后续保存研究选择或外部修改传入Dictionary不改变运行中的实例，也不改变本局后续重复召唤。玩家使用对应id的快照，敌军研究输入为空；波次hp_mult/damage_mult仍作为中央计算的倍率输入，保留旧关卡平衡。地图行军倍率继续是关卡移动规则。stop与下一次start清空旧研究快照及全部减速来源，不能沿用上一场选择。
+
+每个受击单位含`slow_sources={attacker_uid:{ratio,remaining}}`。实际命中且目标仍存活时登记来源；同uid只刷新该条，不能延长其他uid的期限。每个60Hz固定步分别递减来源remaining，过期删除；当前slow_ratio为所有有效来源ratio最小值，slow_timer为有效remaining最大值，两汇总字段继续供外部读取。较强短减速到期后立即回退到仍有效的较弱长减速；施法者死亡不提前移除已命中的控制，来源自然到期。暂停未advance时所有期限冻结。AoE每个被命中敌军分别建立相同施法者来源，不共享受击对象的Dictionary（FS-030）。
+
+纯后台StudyCombatSmoke独立验证白名单全部最终字段、零研修旧值、深拷贝与输入隔离、开局/重开/敌军快照、真实治疗/射程/范围/前摇/攻城命中及FS-030多来源期限。另对十二英魂×Lv1/3/20×基础/两条真实路线做108场开局快照与spawn联接矩阵，实际生命/最大生命、伤害、护甲/魔抗、射程、速度（含关卡行军倍率）、攻击间隔、前摇、范围、伤害类型和独立special逐项同中央结果；报告记录matrix_cases及studies.json真实SHA。该报告不声称Spine画面或前台性能验收；八关BattleSmoke仍作为原战斗与无研修平衡回归。
+
+2026-11-19后台验收：StudyCombatSmoke1873项、108矩阵全部通过；BattleSmoke原120项全部通过，八关推荐队胜利/空阵败局及第4/6/8四核心养成结果保持。两份当前日志零ERROR/泄漏；Study报告记录UnitStats、SiegeBattle、units与studies的真实SHA，实际画面及前台性能仍独立验收。
 
 所有玩家出战实例从本局等级快照计算；敌人默认等级1并经过同一计算，再应用波次hp_mult/damage_mult，不乘玩家等级、不叠加旧10%成长。属性培养当前随等级自动成长，主属性由角色身份固定，首版没有属性洗点或自由加点。
 
@@ -117,3 +137,5 @@ ProfileStore.owns(id)校验playable且在owned中；upgrade和set_roster都拒�
 推荐等级下8关混合队伍均胜利（秒）：126.7、129.7、174.2、204.6、241.5、246.6、267.9、208.3；所有空阵线均失败。仅四核心（铁卫/烬羽射手/符文医师/关羽）升至推荐等级、其他角色等级1时，第4/6/8关仍分别204.2、219.2、298.9秒胜利。第8低投入队伍约4分59秒，较慢但无需刷取硬门槛；可选培养绞弩提高攻城效率，不虚称所有阵容都2–4分钟。
 
 0.75秒Boss重击在0.2秒发动脉冲可实际避免128.2前排伤害；64活单位无视觉逻辑测量5秒模拟377.7ms、每步约1.26ms。视觉优先级测试使用Mock Node2D只证明最多12关键实例，不能替代Spine原生调用验收。真实HUD/世界/64骨架的帧率与尾帧由独立完整战斗性能脚本测量并单独报告。
+
+0.1.3：_update_visual_rates为所有原生视觉设置采样组数（active_count>=40用4，否则2），最多12关键60Hz不受组限制；其他30Hz为上限，帧组实际采样次数随渲染帧率变化。

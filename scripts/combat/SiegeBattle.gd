@@ -5,6 +5,7 @@ signal battle_finished(victory: bool)
 signal combat_event(kind: String, position: Vector2, amount: float, team: int)
 
 const FIXED_STEP := 1.0 / 60.0
+const READY_EPSILON := 0.00001
 const PLAYER_X := 100.0
 const ENEMY_X := 1180.0
 const GROUND_Y := 510.0
@@ -28,6 +29,7 @@ var _move_speed_multiplier := 1.35
 var _stage: Dictionary = {}
 var _roster: Array = []
 var _levels: Dictionary = {}
+var _study_modifiers: Dictionary = {}
 var _waves: Array = []
 var _hits: Array = []
 var _cooldowns: Dictionary = {}
@@ -65,7 +67,7 @@ func set_visual_playback(multiplier: float) -> void:
 		if is_instance_valid(visual) and visual.has_method("set_playback_speed"):
 			visual.call("set_playback_speed", _visual_playback_multiplier)
 
-func start(stage_id: String, roster: Array, levels: Dictionary = {}) -> void:
+func start(stage_id: String, roster: Array, levels: Dictionary = {}, study_modifiers: Dictionary = {}) -> void:
 	stop()
 	_stage = Catalog.stage(stage_id)
 	if _stage.is_empty():
@@ -80,6 +82,7 @@ func start(stage_id: String, roster: Array, levels: Dictionary = {}) -> void:
 		if Catalog.playable_roster().has(id) and not _roster.has(id) and not Catalog.unit(str(id)).is_empty():
 			_roster.append(str(id))
 	_levels = levels.duplicate(true)
+	_study_modifiers = study_modifiers.duplicate(true)
 	_capacity = maxf(1.0, float(_stage.get("capacity", 400.0)))
 	_energy = clampf(float(_stage.get("initial_energy", 160.0)), 0.0, _capacity)
 	_income = maxf(0.0, float(_stage.get("income", 18.0)))
@@ -108,6 +111,9 @@ func start(stage_id: String, roster: Array, levels: Dictionary = {}) -> void:
 
 func stop() -> void:
 	for unit: Dictionary in units:
+		if unit.has("slow_sources"): unit.slow_sources.clear()
+		unit.slow_ratio = 1.0
+		unit.slow_timer = 0.0
 		var visual: Variant = unit.get("visual")
 		if is_instance_valid(visual):
 			visual.free()
@@ -120,6 +126,7 @@ func stop() -> void:
 	_stage.clear()
 	_roster.clear()
 	_levels.clear()
+	_study_modifiers.clear()
 	_waves.clear()
 	_hits.clear()
 	_cooldowns.clear()
@@ -137,10 +144,10 @@ func try_summon(id: String) -> bool:
 	if _outcome != "running" or not _roster.has(id) or active_count() >= MAX_UNITS:
 		return false
 	var definition := Catalog.unit(id)
-	if definition.is_empty() or float(_cooldowns.get(id, 0.0)) > 0.00001:
+	if definition.is_empty() or float(_cooldowns.get(id, 0.0)) > READY_EPSILON:
 		return false
 	var cost := maxf(0.0, float(definition.get("cost", 0.0)))
-	if _energy + 0.00001 < cost:
+	if _energy + READY_EPSILON < cost:
 		return false
 	var spawned := _spawn(id, 1)
 	if spawned.is_empty():
@@ -150,7 +157,7 @@ func try_summon(id: String) -> bool:
 	return true
 
 func try_pulse() -> bool:
-	if _outcome != "running" or _pulse_cooldown > 0.00001 or _energy + 0.00001 < PULSE_COST:
+	if _outcome != "running" or _pulse_cooldown > READY_EPSILON or _energy + READY_EPSILON < PULSE_COST:
 		return false
 	var center_x := INF
 	for actor: Dictionary in units:
@@ -299,10 +306,8 @@ func _step(delta: float) -> void:
 			continue
 		actor.attack_timer = maxf(0.0, float(actor.attack_timer) - delta)
 		actor.action_timer = maxf(0.0, float(actor.action_timer) - delta)
-		actor.slow_timer = maxf(0.0, float(actor.slow_timer) - delta)
+		_tick_slows(actor, delta)
 		actor.stun_timer = maxf(0.0, float(actor.stun_timer) - delta)
-		if float(actor.slow_timer) <= 0.0:
-			actor.slow_ratio = 1.0
 		_check_phase(actor)
 		if float(actor.stun_timer) > 0.00001:
 			continue
@@ -336,9 +341,18 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 	if definition.is_empty() or active_count() >= MAX_UNITS:
 		return {}
 	var level := clampi(int(_levels.get(id, 1)), 1, 20) if team == 1 else 1
-	var calculated := UnitStats.calculate(definition, level)
-	var hp := maxf(1.0, float(calculated.hp) * maxf(0.01, float(wave.get("hp_mult", 1.0))))
-	var damage := maxf(0.0, float(calculated.damage) * maxf(0.0, float(wave.get("damage_mult", 1.0))))
+	var modifiers: Dictionary = {}
+	var study_value: Variant = _study_modifiers.get(id, {}) if team == 1 else {}
+	if study_value is Dictionary: modifiers = study_value.duplicate(true)
+	# Wave HP/damage are input multipliers too. Final unit values remain owned
+	# by UnitStats; enemies never consume the player's study map.
+	if wave.has("hp_mult"):
+		modifiers.hp_mult = maxf(0.01, UnitStats.modifier_value(modifiers, "hp_mult")) * maxf(0.01, UnitStats.modifier_value(wave, "hp_mult"))
+	if wave.has("damage_mult"):
+		modifiers.damage_mult = maxf(0.0, UnitStats.modifier_value(modifiers, "damage_mult")) * maxf(0.0, UnitStats.modifier_value(wave, "damage_mult"))
+	var calculated := UnitStats.calculate(definition, level, modifiers)
+	var hp := float(calculated.hp)
+	var damage := float(calculated.damage)
 	var spawn_x := player_x + 32.0 if team == 1 else enemy_x - 32.0
 	for other: Dictionary in units:
 		if bool(other.alive) and int(other.team) == team:
@@ -346,24 +360,18 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 				spawn_x = minf(spawn_x, float(other.x) - SPACING)
 			else:
 				spawn_x = maxf(spawn_x, float(other.x) + SPACING)
-	var special: Dictionary = {}
-	var special_value: Variant = definition.get("special", "")
-	if special_value is Dictionary:
-		special = special_value.duplicate(true)
-	else:
-		special.type = str(special_value)
 	var actor := {"uid": _next_uid, "id": id, "name": str(definition.get("name", id)), "team": team,
 		"x": spawn_x, "render_x": spawn_x, "hp": hp, "max_hp": hp, "damage": damage,
-		"armor": maxf(0.0, float(definition.get("armor", 0.0))),
-		"range": maxf(SPACING, float(definition.get("range", 40.0))),
+		"armor": float(calculated.armor),
+		"range": float(calculated.range),
 		"speed": float(calculated.speed) * _move_speed_multiplier, "stats": calculated.stats,
 		"magic_armor": float(calculated.magic_armor), "heal_multiplier": float(calculated.heal_multiplier),
 		"attack_interval": float(calculated.attack_interval),
-		"hit_delay": maxf(0.0, float(definition.get("hit_delay", 0.25))),
-		"damage_type": str(definition.get("damage_type", "physical")),
-		"aoe_radius": maxf(0.0, float(definition.get("aoe_radius", 0.0))),
-		"special": special, "attack_timer": 0.0, "action_timer": 0.0,
-		"slow_timer": 0.0, "slow_ratio": 1.0, "stun_timer": 0.0, "alive": true, "phase": false,
+		"hit_delay": float(calculated.hit_delay),
+		"damage_type": str(calculated.damage_type),
+		"aoe_radius": float(calculated.aoe_radius),
+		"special": calculated.special, "attack_timer": 0.0, "action_timer": 0.0,
+		"slow_timer": 0.0, "slow_ratio": 1.0, "slow_sources": {}, "stun_timer": 0.0, "alive": true, "phase": false,
 		"visual_update_rate": 30,
 		"corpse_timer": CORPSE_DURATION, "visual": null, "state": "", "level": level,
 		"color": Color(str(definition.get("color", "#6be2d0" if team == 1 else "#ed8274")))}
@@ -488,7 +496,7 @@ func _resolve_hits() -> void:
 		if bool(hit.heal):
 			if int(target.team) != int(attacker.team):
 				continue
-			var amount := maxf(0.0, float(attacker.special.get("amount", attacker.damage))) * float(attacker.heal_multiplier)
+			var amount := maxf(0.0, float(attacker.special.get("amount", attacker.damage)))
 			var restored := minf(amount, float(target.max_hp) - float(target.hp))
 			target.hp = minf(float(target.max_hp), float(target.hp) + amount)
 			combat_event.emit("heal", Vector2(float(target.x), GROUND_Y - 70.0), restored, int(attacker.team))
@@ -503,8 +511,33 @@ func _resolve_hits() -> void:
 		for victim: Dictionary in targets:
 			_damage_unit(victim, float(attacker.damage), str(attacker.damage_type), int(attacker.team))
 			if bool(victim.alive) and str(attacker.special.get("type", "")) == "slow":
-				victim.slow_timer = maxf(float(victim.slow_timer), maxf(0.0, float(attacker.special.get("duration", 2.0))) * float(attacker.heal_multiplier))
-				victim.slow_ratio = minf(float(victim.slow_ratio), clampf(float(attacker.special.get("ratio", 0.65)), 0.1, 1.0))
+				_apply_slow(victim, attacker)
+
+func _apply_slow(target: Dictionary, attacker: Dictionary) -> void:
+	var duration := maxf(0.0, float(attacker.special.get("duration", 0.0)))
+	var ratio := clampf(float(attacker.special.get("ratio", 1.0)), 0.1, 1.0)
+	if not bool(target.alive) or duration<=0.0 or ratio>=1.0: return
+	var sources: Dictionary = target.slow_sources
+	sources[int(attacker.uid)] = {"ratio": ratio, "remaining": duration}
+	_refresh_slow_summary(target)
+
+func _tick_slows(actor: Dictionary, delta: float) -> void:
+	var sources: Dictionary = actor.slow_sources
+	for source: Variant in sources.keys():
+		var remaining := maxf(0.0, float(sources[source].remaining) - delta)
+		if remaining<=0.0000001: sources.erase(source)
+		else: sources[source].remaining = remaining
+	_refresh_slow_summary(actor)
+
+func _refresh_slow_summary(actor: Dictionary) -> void:
+	var ratio := 1.0
+	var remaining := 0.0
+	for effect: Dictionary in actor.slow_sources.values():
+		if float(effect.remaining)<=0.0: continue
+		ratio = minf(ratio, float(effect.ratio))
+		remaining = maxf(remaining, float(effect.remaining))
+	actor.slow_ratio = ratio
+	actor.slow_timer = remaining
 
 func _damage_unit(target: Dictionary, raw: float, damage_type: String, attacker_team: int) -> float:
 	if not bool(target.get("alive", false)):
@@ -572,14 +605,19 @@ func _update_visual_rates() -> void:
 			return int(a.actor.uid) < int(b.actor.uid)
 		return float(a.priority) > float(b.priority))
 	var critical: Dictionary = {}
-	for index: int in mini(12, candidates.size()):
+	var critical_limit := clampi(int(ProjectSettings.get_setting("fantasy_siege/visuals/critical_instance_limit", 12)), 1, 64)
+	for index: int in mini(critical_limit, candidates.size()):
 		critical[int(candidates[index].actor.uid)] = true
+	var frame_groups := clampi(int(ProjectSettings.get_setting("fantasy_siege/visuals/frame_group_count", 2)), 2, 4)
 	for actor: Dictionary in units:
+		var visual: Variant = actor.visual
+		if is_instance_valid(visual) and visual.has_method("set_frame_group_count") and visual.has_method("get_frame_group_count"):
+			if int(visual.call("get_frame_group_count")) != frame_groups:
+				visual.call("set_frame_group_count", frame_groups)
 		var rate := 60 if critical.has(int(actor.uid)) else 30
 		if int(actor.visual_update_rate) == rate:
 			continue
 		actor.visual_update_rate = rate
-		var visual: Variant = actor.visual
 		if is_instance_valid(visual) and visual.has_method("set_update_rate"):
 			visual.call("set_update_rate", rate)
 

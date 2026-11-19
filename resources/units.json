@@ -311,7 +311,10 @@
       "agility": 0,
       "intelligence": 0
     },
-    "playable": false
+    "playable": false,
+    "skill_name": "裂隙短刺",
+    "skill_description": "快速接近的低费群袭，普通攻击造成物理伤害。",
+    "counter_hint": "持续召唤低费前排，搭配范围攻击清理聚集。"
   },
   "ash_runner": {
     "name": "灰烬浮灵",
@@ -343,7 +346,10 @@
       "agility": 0,
       "intelligence": 0
     },
-    "playable": false
+    "playable": false,
+    "skill_name": "灰影疾袭",
+    "skill_description": "移动较快，短前摇物理攻击会持续压迫阵线。",
+    "counter_hint": "前排保持数量，用减速留住它。"
   },
   "obsidian_guard": {
     "name": "黑曜棒卫",
@@ -375,7 +381,10 @@
       "agility": 0,
       "intelligence": 0
     },
-    "playable": false
+    "playable": false,
+    "skill_name": "黑曜槌击",
+    "skill_description": "高护甲和较长攻击前摇，承受攻击后反击前排。",
+    "counter_hint": "用魔法或真实伤害破甲，持续补上低费前排。"
   },
   "ember_caster": {
     "name": "烬火咒师",
@@ -407,7 +416,10 @@
       "agility": 0,
       "intelligence": 0
     },
-    "playable": false
+    "playable": false,
+    "skill_name": "烬火散咒",
+    "skill_description": "远距离施放范围魔法攻击，打击聚集的英魂。",
+    "counter_hint": "前排推进压缩距离，治疗支援配合范围输出。"
   },
   "obsidian_warden": {
     "name": "黑曜守门者",
@@ -446,7 +458,10 @@
       "agility": 0,
       "intelligence": 0
     },
-    "playable": false
+    "playable": false,
+    "skill_name": "裂甲震斧",
+    "skill_description": "范围重击；半血进入裂甲狂潮，伤害和推进速度提高。",
+    "counter_hint": "看到重击预警时用P脉冲打断，补盾并保护后排。"
   },
   "star_hammer": {
     "name": "星槌卫士·赫洛",
@@ -627,7 +642,8 @@
     "color": "#a3b17c",
     "skill_name": "铁颚咬合",
     "skill_description": "自动：单体物理攻击。",
-    "playable": false
+    "playable": false,
+    "counter_hint": "用低费前排挡住机械群，范围攻击清理集群。"
   },
   "brass_guard": {
     "name": "黄铜甲卫",
@@ -661,7 +677,8 @@
     "color": "#e2ba6d",
     "skill_name": "黄铜重撞",
     "skill_description": "自动：0.7s重击前摇，高护甲。",
-    "playable": false
+    "playable": false,
+    "counter_hint": "绞弩真实伤害可穿过护甲，留前排吸收重击。"
   },
   "rail_stoker": {
     "name": "磁轨司炉",
@@ -695,7 +712,8 @@
     "color": "#c3a0d4",
     "skill_name": "磁焰流束",
     "skill_description": "自动：240px射程，75px范围魔法伤害。",
-    "playable": false
+    "playable": false,
+    "counter_hint": "治疗稳住后排，用范围控制缩短接近时间。"
   },
   "rail_colossus": {
     "name": "裂轨巨匠",
@@ -736,6 +754,7 @@
     "color": "#dd9a70",
     "skill_name": "裂轨锻击",
     "skill_description": "自动：145px范围重击，0.85s前摇；半血进入过热锻击。",
-    "playable": false
+    "playable": false,
+    "counter_hint": "半血过热后保留80能量，0.85秒重击预警时用P打断。"
   }
 }

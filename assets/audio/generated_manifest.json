@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "original_work": "FantasySiege / 星灯远征",
+  "generator": "tools/generate_audio.py",
+  "seed": 20261118,
+  "third_party_audio": [],
+  "format": {
+    "encoding": "PCM signed 16-bit little-endian",
+    "channels": 1,
+    "sample_rate": 22050
+  },
+  "files": [
+    {
+      "file": "click.wav",
+      "samples": 1874,
+      "duration_seconds": 0.08498866213151927,
+      "sha256": "438c57159d5126df1b4b0848a53ace6fb7eb0c0c83a23a681b19d3703b67bac6",
+      "peak": 0.5800042725913266,
+      "rms": 0.13286850136956654,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.25263222144230474
+    },
+    {
+      "file": "summon.wav",
+      "samples": 9261,
+      "duration_seconds": 0.42,
+      "sha256": "7385c9ba7750399f2f99ca4a3cfacf5787c8e6a5c9af3acbdac093c94557d59b",
+      "peak": 0.5800042725913266,
+      "rms": 0.15449873387760887,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.1031830805383465
+    },
+    {
+      "file": "hit.wav",
+      "samples": 2866,
+      "duration_seconds": 0.12997732426303854,
+      "sha256": "cab734c2f40fcb92b7830729e01cc41bd7fc93473a31138a9c66274ad8844475",
+      "peak": 0.5800042725913266,
+      "rms": 0.11458367348070612,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.20917386394848475
+    },
+    {
+      "file": "heal.wav",
+      "samples": 13671,
+      "duration_seconds": 0.62,
+      "sha256": "f382fa7f20a6893518981c76908fcc0364a430a7c1ba3c605ca641aaff480c8b",
+      "peak": 0.5800042725913266,
+      "rms": 0.1709302674656322,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.1553086947233497
+    },
+    {
+      "file": "pulse.wav",
+      "samples": 17199,
+      "duration_seconds": 0.78,
+      "sha256": "a2ea1e20bf4927a9a87c6ebd3bb38532eeeb13d7f5d9bda4b98f25e5fdd9f62e",
+      "peak": 0.5800042725913266,
+      "rms": 0.14227245431305083,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.13284707174901578
+    },
+    {
+      "file": "warning.wav",
+      "samples": 14112,
+      "duration_seconds": 0.64,
+      "sha256": "3d5489fc6a54d440a7b0f1a449ca3278be1fb644c0da2d50ac8c46af29936656",
+      "peak": 0.47999511703848385,
+      "rms": 0.10586913919338069,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.042664876247444077
+    },
+    {
+      "file": "victory.wav",
+      "samples": 35280,
+      "duration_seconds": 1.6,
+      "sha256": "ce2860e6155c4020253111ff93db58f678ecc2565ff6a4e1ff81ff2006d204da",
+      "peak": 0.5800042725913266,
+      "rms": 0.14071266851807465,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.14206366161076692
+    },
+    {
+      "file": "defeat.wav",
+      "samples": 30870,
+      "duration_seconds": 1.4,
+      "sha256": "018fecb462b7d110e1fd664b63a41f4ff1ae580189703580457a79d33518bdd0",
+      "peak": 0.5800042725913266,
+      "rms": 0.1611107276213797,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.06250190740684225
+    },
+    {
+      "file": "train.wav",
+      "samples": 18081,
+      "duration_seconds": 0.82,
+      "sha256": "82c0c31081abd5adae7aa5790642bf4c41c8ca14d1a461af83a580047a8a9761",
+      "peak": 0.5800042725913266,
+      "rms": 0.15636779763178502,
+      "loop_boundary_step": 0.0,
+      "largest_sample_step": 0.1444746238593707
+    },
+    {
+      "file": "ambient.wav",
+      "samples": 529200,
+      "duration_seconds": 24.0,
+      "sha256": "ccc35575e7ce36e4c88954e1b84dfd62cf20f6881d035d823b68d42c40424935",
+      "peak": 0.23999755851924193,
+      "rms": 0.0688577384334095,
+      "loop_boundary_step": 0.0031128879665517136,
+      "largest_sample_step": 0.016693624683370465
+    }
+  ]
+}

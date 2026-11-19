@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "program_version": "0.1.3.0",
+  "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+  "tests_run": 84,
+  "failures": [],
+  "failure_count": 0,
+  "error_count": 0,
+  "command_line": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_*.py"
+  ],
+  "scope": "All Python unit-test discovery: mocked process boundaries, original engine output preservation on verification exceptions, byte-preserving native verification, CPU8/full10 package coverage, Study input/report SHA and 108 actual-spawn matrix gates, Art32 capture gates and local asset-tool fixtures; no Godot, rendering or campaign execution",
+  "started_utc": "2026-11-19T07:41:54.5534517Z",
+  "finished_utc": "2026-11-19T07:42:00.8227521Z"
+}

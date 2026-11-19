@@ -21,7 +21,11 @@ var _update_rate := 60.0
 var _sample_elapsed := 0.0
 var _sample_until := 0.0
 var _sample_lane := 0
+var _sample_index := 0
+var _frame_group_count := 2
 var _root_motion_cache: Array = []
+var _managed_mesh_redraw := false
+var _native_meshes: Array[CanvasItem] = []
 var profile_native_updates := false
 var native_update_count := 0
 var native_update_usec := 0
@@ -29,7 +33,10 @@ var native_pose_update_count := 0
 var native_pose_update_usec := 0
 
 func _init() -> void:
-	_sample_lane = _next_sample_lane % 2
+	_frame_group_count = clampi(int(ProjectSettings.get_setting("fantasy_siege/visuals/frame_group_count", 2)), 2, 4)
+	_managed_mesh_redraw = bool(ProjectSettings.get_setting("fantasy_siege/visuals/managed_mesh_redraw", false))
+	_sample_index = _next_sample_lane
+	_sample_lane = _sample_index % _frame_group_count
 	_next_sample_lane += 1
 
 func _ready() -> void:
@@ -48,6 +55,7 @@ func configure(id: String, direction: int = 1) -> void:
 func _build() -> void:
 	_current_track = null
 	_root_motion_cache.clear()
+	_native_meshes.clear()
 	_sample_elapsed = 0.0
 	_sample_until = (float(get_instance_id() % 7) / 7.0) / _update_rate
 	if is_instance_valid(_sprite):
@@ -83,6 +91,8 @@ func _build() -> void:
 					_root_motion_cache.append({"pose":pose,"x":float(setup.call("get_x")),"y":float(setup.call("get_y"))})
 				if not _root_motion_cache.is_empty() and _sprite.has_signal("before_world_transforms_change"):
 					_sprite.connect("before_world_transforms_change", _limit_root_motion)
+				_cache_native_meshes(_sprite)
+				_apply_mesh_redraw_policy()
 	play_state("idle")
 	queue_redraw()
 
@@ -139,6 +149,7 @@ func play_state(state: String, duration: float = 0.0) -> void:
 	if not loop and state != "death": _remaining = duration if duration > 0 else maxf(natural, 0.1)
 	var started := Time.get_ticks_usec() if profile_native_updates else 0
 	_sprite.call("update_skeleton", 0.0)
+	refresh_native_meshes()
 	if profile_native_updates:
 		native_pose_update_count += 1
 		native_pose_update_usec += Time.get_ticks_usec() - started
@@ -147,7 +158,7 @@ func _process(delta: float) -> void:
 	if _spine_ok and _playback_speed > 0:
 		_sample_elapsed += delta
 		_sample_until -= delta
-		var eligible_frame := _update_rate > 30.0 or Engine.get_process_frames() % 2 == _sample_lane
+		var eligible_frame := _update_rate > 30.0 or Engine.get_process_frames() % _frame_group_count == _sample_lane
 		if _sample_until <= 0 and eligible_frame:
 			_flush_sample()
 			_sample_until += 1.0 / _update_rate
@@ -167,10 +178,44 @@ func set_update_rate(hz: float) -> void:
 	_update_rate = clampf(hz, 1.0, 60.0)
 	_sample_until = clampf(_sample_until * previous_rate / _update_rate, 0.0, 1.0 / _update_rate)
 
+func set_frame_group_count(groups: int) -> void:
+	_frame_group_count = clampi(groups, 2, 4)
+	_sample_lane = _sample_index % _frame_group_count
+
+func get_frame_group_count() -> int:
+	return _frame_group_count
+
+func set_managed_mesh_redraw(enabled: bool) -> void:
+	_managed_mesh_redraw = enabled
+	_apply_mesh_redraw_policy()
+
+func get_managed_mesh_redraw() -> bool:
+	return _managed_mesh_redraw
+
+func _cache_native_meshes(parent: Node) -> void:
+	for child: Node in parent.get_children():
+		if child.get_class() == "SpineMesh2D" and child is CanvasItem:
+			_native_meshes.append(child)
+		_cache_native_meshes(child)
+
+func _apply_mesh_redraw_policy() -> void:
+	for mesh: CanvasItem in _native_meshes:
+		if not is_instance_valid(mesh): continue
+		mesh.set_process_internal(not _managed_mesh_redraw)
+		mesh.queue_redraw()
+
+func refresh_native_meshes() -> void:
+	## Refresh every slot, including now-empty ones, so old triangles disappear.
+	## CanvasItem transforms remain independent of native geometry refreshes.
+	if not _managed_mesh_redraw: return
+	for mesh: CanvasItem in _native_meshes:
+		if is_instance_valid(mesh): mesh.queue_redraw()
+
 func _flush_sample() -> void:
 	if _spine_ok and _sample_elapsed > 0:
 		var started := Time.get_ticks_usec() if profile_native_updates else 0
 		_sprite.call("update_skeleton", _sample_elapsed)
+		refresh_native_meshes()
 		if profile_native_updates:
 			native_update_count += 1
 			native_update_usec += Time.get_ticks_usec() - started

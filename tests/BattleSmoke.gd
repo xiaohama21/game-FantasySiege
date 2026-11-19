@@ -2,7 +2,7 @@ extends SceneTree
 
 var failures: Array = []
 var checks := 0
-var report: Dictionary = {"version": "0.1.2.0", "visuals": false, "cases": [], "stages": []}
+var report: Dictionary = {"version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "visuals": false, "cases": [], "stages": []}
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -196,7 +196,9 @@ func _test_aoe_and_slow() -> void:
 	_check(_near(float(ally.hp), ally_hp), "范围攻击不伤同阵营")
 	var slower := battle._spawn("zhugeliang", 1)
 	var slow_target := battle._spawn("obsidian_guard", -1)
-	slower.special = {"type": "slow", "duration": 2.0, "ratio": 0.5}
+	var slow_definition := Catalog.unit("zhugeliang").duplicate(true)
+	slow_definition.special = {"type": "slow", "duration": 2.0, "ratio": 0.5}
+	slower.special = UnitStats.calculate(slow_definition, int(slower.level)).special
 	slower.aoe_radius = 0.0
 	slower.damage = 1.0
 	battle._begin_attack(slower, slow_target, false)

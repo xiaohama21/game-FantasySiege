@@ -1,0 +1,15 @@
+{
+	"checks": 748,
+	"failures": [],
+	"isolation": "res://tests/.user/study_ui",
+	"matrix_cases": 108,
+	"passed": true,
+	"program_version": "0.1.3.0",
+	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+	"scope": "Headless actual Main study/hero bindings, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.",
+	"scripts_sha256": {
+		"scripts/ui/Main.gd": "0d21fc541881efc77eccd72dfd5d4b927f13140b07407b644b26ec9c5be8ae16"
+	},
+	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c"
+}

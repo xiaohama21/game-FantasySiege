@@ -1,26 +1,59 @@
 {
   "passed": true,
+  "state": "complete",
+  "suite": "single",
+  "selected_cases": [
+    "StudyUISmoke"
+  ],
   "cases": [
     {
-      "case": "BattleSmoke",
+      "case": "StudyUISmoke",
       "passed": true,
-      "exit_code": 0
-    },
-    {
-      "case": "ProfileSmoke",
-      "passed": true,
-      "exit_code": 0
-    },
-    {
-      "case": "ProgressionSmoke",
-      "passed": true,
-      "exit_code": 0
-    },
-    {
-      "case": "MainFlow",
-      "passed": true,
-      "exit_code": 0
+      "errors": [],
+      "exit_code": 0,
+      "started_at": "2026-11-19T07:51:42.599+00:00",
+      "started_ns": 1795074702599406200,
+      "report": "reports/study_ui_smoke.json",
+      "program_version": "0.1.3.0",
+      "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "launch_mode": "headless_verbose",
+      "command_line": [
+        "F:\\Godot\\Godot_v4.7.1-stable_win64.exe\\Godot_v4.7.1-stable_win64_console.exe",
+        "--path",
+        "F:\\godotProject\\FantasySiege",
+        "--verbose",
+        "--headless",
+        "--script",
+        "res://tests/StudyUISmoke.gd"
+      ],
+      "artifact_sha256": {
+        "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+        "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+        "units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+        "scripts_sha256": {
+          "scripts/ui/Main.gd": "0d21fc541881efc77eccd72dfd5d4b927f13140b07407b644b26ec9c5be8ae16"
+        }
+      },
+      "finished_ns": 1795074718946620900,
+      "finished_at": "2026-11-19T07:51:58.946+00:00",
+      "duration_seconds": 16.3472147,
+      "fatal_log_lines": [],
+      "diagnostic_log_lines": [],
+      "report_mtime_ns": 1795074718826497200,
+      "report_sha256": "9c1e9308e39cc9d8c83104a8c44d947f45a03c66828f407e9dbed2b87ed6bfe3",
+      "checks": 748
     }
   ],
-  "reject_script_errors": true
+  "errors": [],
+  "started_at": "2026-11-19T07:51:42.595+00:00",
+  "project_root": "F:\\godotProject\\FantasySiege",
+  "reject_script_errors": true,
+  "reject_object_leaks": true,
+  "require_fresh_report": true,
+  "require_current_project_version": true,
+  "verbose_render_diagnostics": false,
+  "rendered_launch_scope": "production startup logging",
+  "program_version": "0.1.3.0",
+  "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+  "finished_at": "2026-11-19T07:51:58.950+00:00"
 }

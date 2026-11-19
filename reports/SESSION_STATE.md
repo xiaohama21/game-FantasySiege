@@ -1,6 +1,6 @@
 # 持续开发状态
 
-2026-11-18，开发目标0.1.2.0/GDDv0.3.0，当前分支0.1.2，0.1.1.2已交付。
+2026-11-18，开发目标0.1.3.0/GDDv0.4.4，当前分支0.1.3；0.1.2.0已交付，完整学习包仍在最终验收。以下保留历史断点，最新状态见文件末尾。
 
 用户授权自主设计持续完成新游戏，并指定三属性及一个主属性。源素材确认仅学习；本地学习版是本阶段交付范围，商业授权独立。新目录F:/godotProject/FantasySiege；旧项目只读且336哈希/Git状态验证不变。
 
@@ -42,3 +42,51 @@ Git远程origin=https://github.com/xiaohama21/game-FantasySiege.git，开始为�
 
 
 0.1.2.0交付断点：当前完整tools/run_checks.py --visual四项全部PASS；Battle120、Profile24、Progression34、MainFlow96与8截图。批量视觉位置同步正确、无新脚本错误。内容与宽图闭环交付，完整battle64 GL约30.8fps/p9546.04ms尚未达最终门槛，明确留给0.1.3继续，而不是项目完成。阶段将commit/push0.1.2，随后因正式开始0.1.3才merge --no-ff/main push/切0.1.3。
+
+
+0.1.3已正式开始：0.1.2交付commit5eb574f已推，因启动0.1.3才将其merge --no-ff到main（5340a0b）并通过用户恢复的7897代理推送。当前新分支0.1.3从该main创建，GDDv0.4.0/EXPERIENCEv0.1文档先行；程序目标0.1.3.0。0.1.3最终交付留在该分支，不再合并main。原直连再次TLS失败/超时后用户已恢复代理，当前已实际连通。
+
+## 2026-11-18 最终学习包验收进行中
+
+用户已明确继续及网络连通。root在新目录直连pull main成功，当前main5340a0b/版本分支0.1.3；代理7897目前无监听但直连可用，不请求重复恢复。旧项目source_guard复核336文件及Git状态全部不变。目标恢复后持续推进，尚未达到完成状态。
+
+GDDv0.4.4 / EXPERIENCEv0.5 / UI_ARTv0.6 / BUGSv0.9 / DELIVERYv0.3。原创音频、独立偏好、三页可跳过/重看指南、中文英魂/敌军/Boss百科均实现。FS016实际Playback弱引用排空修复已完成；AudioShutdown6、Preferences76均零泄漏。CampaignJourney全9场真实逻辑胜利、990项，独立进程重启后2840/12owned/8cleared，两个shutdown_clean=true（40/70ms），无渲染，日志零错误/泄漏。
+
+root新增FS019焦点栈/底层GUI动作保护、FS020F11和关闭的设置保存失败确认。MainFlow正常窗口158检查/15图/实际Main退出音频清理内部PASS，外层初轮仅因NVAPI既有profile的verbose code -167诊断误判FAIL。FS021只精确分类这条整行诊断并保留原文，其余错误/Leak仍失败；尚需以修正runner重新跑MainFlow和全量包。最终图尚待人工复核，不能把内部PASS写为完整包验收。
+
+tools/build_local.ps1已改干净目标守卫/全_payload过滤.import和.uid/复制三bootstrap依赖/包内两阶段导入/哈希清单/完整操作与许可说明，reports/.gdignore防截图误导入。tools/verify_package.py逐步fresh reports并串行跑全7case、21/220探针、两套Playback、MeshRedraw、实际Main24/64，强制日志/版本/文件哈希/完整suite；图形子进程SW_SHOWNORMAL。tests/test_verify_package.py新增边界，最近全Python38通过（后来又增精确NVAPI边界，需再跑）。包尚未实际构建，旧0.1.1.2仍是已交付基础包。
+
+性能：托管Mesh redraw双透明视口21/220、2624次RGBA对比差0（Safe GL）。minimized模式的好数全部撤销普通窗口效力；正常GUI/300焦点Stable GL novsync60的3/4组38.77/41.31fps，p9531.873/31.046 PASS；正常Safe Vulkan Mobile2/4组45.92/59.41fps，p9529.640/22.675 PASS。spine_pipeline正在独立复测Mobile2和24，生产默认暂未改，仍GL/managedfalse/高人数4组。不要直接当最终Main通过。root暂停全部其它CPU/GPU测试等独占窗口。
+
+下一步：Spine确认重复Mobile2/24→root先GDD/CORE写稳定backend/分组/托管候选→Spine改生产默认并测实际Main24/64/2x+Mobile2624像素回归→源MainFlow严格复验及15图→干净0.1.3.0包两阶段构建/完整verify_package→包内图像复核/源只读guard/最终docs与reports→commit/push0.1.3（不合并main）→实际全部完成后update_goal complete并报告启动路径。
+
+## 2026-11-18 美术补充与前台测量中止
+用户反馈已纳入0.1.3：GDDv0.4.6/UI_ARTv0.9/SPINEv0.17/BUGSv0.13/DELIVERYv0.6。十二真实透明Spine肖像、英魂/编队/八召唤卡和五原创环境SVG已实现；肖像验证12PASS，ArtReview2554检查/22图、零文字溢出和音频排空通过（隐藏离屏，只验画面）。candidate-2干净包已完成两阶段导入，尚未跑包内background/full验收；candidate-1后台5CPU和21/220探针通过。MainFlow已加肖像/背景门禁，最新前台完整流程仍需重跑；生产仍GL/managedfalse/高人数4组。用户桌面空闲授权后启动PID25768 Main64managed Mobile manual_gate，首次CUA窗口库存调用被物理Escape停止。已停止本轮CUA并终止该精确测试进程；没有本轮有效帧率结果。未commit/push，main冻结5340a0b，版本分支0.1.3；网络最近直连reset且7897未监听，未虚称同步。下一步包内后台验收/图像复核，再经用户恢复电脑操作后前台Main24/64、最终backend/差图、干净最终包、source_guard和分支交付。
+
+## 2026-11-18 下班暂停
+用户明确要求下班暂停，目标已由工具标记paused。测试PID23936已关闭，Spine只读代理已中断；等待用户明确继续。
+当前0.1.3未commit/push，main冻结5340a0b；candidate-2已完成两阶段导入，包内background/full仍待验。十二肖像、五背景SVG及ArtReview22图/2554检查通过。
+本轮Main64managed Mobile完成READY，但CUA对窗口657984持续报告minimized，getApp无法绑定；没有UI输入、没有写测量gate、没有有效300帧结果。生产仍GL/managedfalse/高人数4组。本次7897代理pull失败。
+恢复后先pull并刷新规范。继续解决可公开使用的窗口激活接口；补最终renderer/线程/managed/组数配置一致性、性能人数和预算门禁、MeshRedraw21/220/backend字段；然后新版MainFlow、包内全部检查与图片、source_guard、最终文档及0.1.3分支交付。开发未完成，不合并main。
+
+## 2026-11-19 接续新游戏开发
+用户明确查看旧会话并继续；已读取最终两个会话回合，确认昨日暂停与今日续开服务错误。继续0.1.3，不新开编号或合并main。开工git pull实际Empty reply失败；7897未监听；首次直连pull长时无响应已中止，仍在核实网络。GDDv0.4.7先登记Mobile/Safe/managed/2组/12关键配置候选与FS026叠层快捷键修复，再实施。最终性能、严格全量及干净包仍待本轮验收。
+
+## 2026-11-19 本轮电脑操作中止
+用户选择先完成本地交付，GitHub直连实测443连接失败且7897未监听，暂不推送。新computer-use技能sky.list_windows可发现Main64窗口984802；get_window/activate_window调用被物理Esc中止，按要求本轮不再调用电脑操作。精确测试PID30628已关闭，没有有效300帧或前台验收结果。
+已实施GDDv0.4.7/COREv0.15/UI_ARTv0.10/SPINEv0.18/DELIVERYv0.7/EXPERIENCEv0.6：project Mobile/Safe/managedtrue/groups2/limit12候选及生产读取；Main/Playback/Mesh与包工具逐帧人数/预算/21资源220动作2624比较门禁；FS026真实Esc/F11模态保护及Boss阶段名读取配置。Python44测试通过（package_validation）。未Godot复验、未构建最终包、未commit，0.1.3当前改动保留；main仍5340a0b，不合并。
+下一步先源解析和新版严格MainFlow/真实Esc回归，再sky正常窗口Main24/Main64/Main64_2x+Mobile Mesh2624差图及Playback；参数实测通过后干净FantasySiege-0.1.3.0构建，全量verify_package及15/22图视觉抽检，source_guard，再最终文档/本地0.1.3提交。网络同步遵循用户先本地选择，不能把待推送称完成。
+
+## 2026-11-19 持续目标与候选3后台验收
+用户明确按旧目标持续开发，当前会话已建立active持续目标：完成0.1.3.0本地学习版及本地提交，网络暂不推送。用户本轮选择先后台验收，不进行前台操作。源Godot解析/五CPU全PASS；Python59PASS；源Campaign990完整9场/重启/重访PASS；源Mobile/Vulkan managed生产Playback21全部倍率分组PASS，Mesh21/220/2624后台差图零差，均不证明前台性能。Main64自动测量因108/300focus和窗口minimized无效，保留main64_20261119_unfocused.json。
+候选3完整干净构建及两阶段导入成功，包内五CPU/native21/220均PASS；肖像与最终载荷SHA正确FAIL。根因FS029：verify_spine无条件重排visuals.json，内容不变但16522→17211bytes，违反配置只读并破坏portrait recipe SHA。GDD升v0.4.9先登记，正在修工具默认只读/独立报告/显式作者状态更新，不放宽哈希。候选3保留失败不改写。下一步buildcandidate4→background/offscreen/包内Campaign新版GDD元数据992检查→22图视觉抽检→文档证据更新。本地前台MainFlow普通日志和Main24/64/2x待桌面可用，目标仍进行中，不宣称最终包完成。
+
+## 2026-11-19 用户延期性能，继续英魂研修
+用户明确“后续再测试战斗性能，先进行后续的开发”。不抢占桌面、不再请求前台测试；在0.1.3分支内继续研修增量，不新开编号或合并main。此次开工7897代理pull再次实测连接失败；沿用用户先本地交付的授权，待推送不作成功。
+GDD v0.5.1；TRAINING v0.1、PROGRESSION v0.3、CORE v0.16、UI_ART v0.13、BUGS v0.19、DELIVERY v0.12。已实施十二人双路线、一次180星砂解锁与免费切/基础恢复、schema3旧档迁移、中央最终special/护甲/射程/前摇、玩家开局深拷贝/敌军隔离。FS030独立uid减速期限；FS031技能文字读最终值；FS032备份目录异常拒绝；FS033验收异常保留Godot原始日志。
+源八CPU严格runner通过；研修存档470/战斗1873及108实际spawn矩阵/UI108矩阵通过。源Art32/3826检查、零文字溢出、十二肖像与原生图鉴通过，人工复核研修/英魂/图鉴。Python84通过。candidate4/GDD0.4.9/schema2旧22图基线冻结；当前正构建candidate5并独立跑包内后台/离屏/新档完整旅程。MainFlow正常前台与Main24/64/2x用户延期，不能标最终delivery_ready，不标持续目标complete。
+
+## 2026-11-19 研修候选6后台里程碑
+程序0.1.3.0 / GDD0.5.3 / 分支0.1.3。用户延期前台战斗性能，后续开发已完成十二英魂双路线研修；补FS034一致取整及FS035统一冷却/能量就绪边界。新candidate6干净构建与两阶段导入PASS；包内八CPU3351项（120/24/34/76/6/470/1873/748），研修战斗/UI各108矩阵，21来源220动作原生probe及肖像/payload PASS；生产与非托管Playback、Mesh2624零差、Art32/3826无文字溢出PASS。独立包新档八关、重启和新阵容重访988项PASS，9场胜利、12角色、8关、GDD0.5.3 SHA一致；源992属于另一次包含已有隔离文件清理断言的运行，不混作包计数。
+候选路径 F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/开始游戏.cmd。包内checks_background_frozen.json/checks_campaign_frozen.json分别保存8CPU与独立旅程摘要；root reports/study_candidate_0.1.3.json聚合真实本包证据。candidate3完整性失败、candidate4研修前基线、candidate5取整修正前后台基线均保留不改。包内文档为构建快照，根README/TRAINING/DELIVERY仅追加验收结果。
+Python84项PASS；旧项目336文件/Git状态核验PASS。前台MainFlow、Main24/Main64/Main64_2x按用户反馈延期，delivery_ready=false；本轮不CUA/不前台性能。GitHub pull代理连接失败、直连既有失败，按先本地交付暂不推送。准备一次feat(0.1.3)本地提交，main5340a0b保持，不合并/不删版本分支。持续目标仍active，不把阶段后台完成称为整个项目或商业发行完成。

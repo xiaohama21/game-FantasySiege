@@ -1,0 +1,1076 @@
+{
+  "audit_passed": true,
+  "audit_failures": [],
+  "local_increment_verified": true,
+  "delivery_ready": false,
+  "program_version": "0.1.3.0",
+  "gdd_version": "0.5.3",
+  "profile_schema": 3,
+  "package": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6",
+  "candidate": 6,
+  "scope": "Read-only audit of this clean package CPU8/native probes, minimized offscreen rendering and a separately executed headless campaign. Foreground MainFlow and Main24/Main64/Main64_2x performance remain deferred by the user.",
+  "foreground_verification_pending": true,
+  "full_suite_completed": false,
+  "pending_acceptance": [
+    "Package MainFlow with real window and input",
+    "Package Main24 foreground performance",
+    "Package Main64 foreground performance",
+    "Package Main64 2x foreground performance",
+    "Full package verification"
+  ],
+  "publication_status_at_audit": "Pending local commit and push; this evidence does not claim final delivery completion",
+  "production_policy": {
+    "renderer": "mobile",
+    "render_thread_model": "safe",
+    "managed_mesh_redraw": true,
+    "frame_group_count": 2,
+    "critical_instance_limit": 12
+  },
+  "summary_evidence": {
+    "reports/package_background.json": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_background.json",
+      "sha256": "592f7e26d260b790d786331ad13b8e4912d35305263c60fc41d8c558a73652d9",
+      "bytes": 3327
+    },
+    "reports/package_offscreen.json": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_offscreen.json",
+      "sha256": "e9c3defd29e2d3760404c0876adcd947615c3e41014d28b31cc1ca8e2e70fd9c",
+      "bytes": 4314
+    },
+    "reports/checks_background_frozen.json": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/checks_background_frozen.json",
+      "sha256": "32cdf010e32fe57af4ade7051d052e95e85db68ef70ce75365e89096d9f439fd",
+      "bytes": 11371
+    },
+    "reports/checks_campaign_frozen.json": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/checks_campaign_frozen.json",
+      "sha256": "04142caa460171195753878b16b2a6620958fab49fb46e607da6a87eac07e05d",
+      "bytes": 1922
+    }
+  },
+  "payload_integrity": {
+    "passed": true,
+    "manifest_file_count": 219,
+    "manifest": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/build_manifest.json",
+      "sha256": "3e271e82caf88dab269c09623c95973bb00066541fa04c669e35ee0a86d28ba0",
+      "bytes": 37508
+    },
+    "source_import_metadata_copied": false
+  },
+  "portrait_integrity": {
+    "passed": true,
+    "portrait_count": 12
+  },
+  "source_package_code_and_rules_sha256": {
+    "project.godot": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+    "docs/GAME_DESIGN.md": "0c258eb553fe0655f1f86986742b7eef83ca89ca1fcdb269f7bf095a06626c17",
+    "docs/modules/CORE.md": "cb78ca51be429221264b0f859567318b8218cef3161f0f6af55494a804673da1",
+    "docs/modules/UI_ART.md": "1de08b0afe46a7991e940edb72ee447bdfd4179c48ed4777e193eba1a703dcf2",
+    "docs/modules/BUGS.md": "2d757bc386ad58305dbae0b77c1b8f21a4c85e3d1214b7016ab9ea44fca2c29f",
+    "resources/visuals.json": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+    "resources/studies.json": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+    "resources/units.json": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+    "resources/stages.json": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+    "scripts/core/Catalog.gd": "1c7abc8e8970e92b3bfccd739476418c9a026118aaea23ad06775b4345021f52",
+    "scripts/core/ProfileStore.gd": "5df67e772e9f1168ffbeb0e649e5728905e667d9c50c7cd67b4d4c7115557318",
+    "scripts/core/UnitStats.gd": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+    "scripts/combat/SiegeBattle.gd": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+    "scripts/ui/Main.gd": "0d21fc541881efc77eccd72dfd5d4b927f13140b07407b644b26ec9c5be8ae16",
+    "tests/StudyProfileSmoke.gd": "1fd463e9be27eec365af74fe70017531e97eb6c55a78023fa5d09a12203923e6",
+    "tests/StudyCombatSmoke.gd": "74fda1c828fb853f2f543f6c2c948b5fb66cfc6cc989b59b59eacd7ad09eea6e",
+    "tests/StudyUISmoke.gd": "4e90008e92052bc46123572490b486924354cdcdd08b66cbca4e9d8dd135ad8d",
+    "tests/ArtReview.gd": "f5397115519620f5da061f3181835e8f2bc8aae99f2c29e03959fa6e81cd23cb",
+    "tests/CampaignJourney.gd": "51d8f22727c4c30ddba5a1b75f9173b9027b7cd09cad603057cd49c7d694186a",
+    "tools/run_checks.py": "d0e696522ff06722e291e74cbd411bb631ee8cea021a3758768d95e91ca5421f",
+    "tools/verify_package.py": "22129675dd0c579aaad082390ed0643d2216bfd6222b939c861ff998dc5a09e9"
+  },
+  "post_build_status_document_updates": {
+    "README.md": {
+      "package_snapshot": {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/README.md",
+        "sha256": "55c316bc3247b65969d53b6e13e6dd44aa56b6f0cb44210e04674e8bd18c6a1f",
+        "bytes": 3950
+      },
+      "source_after_acceptance": {
+        "path": "F:/godotProject/FantasySiege/README.md",
+        "sha256": "53d1b7c7a9fe4bba6edd3d6bbe2c939411dee7e1d40afd02984de02572afbe90",
+        "bytes": 4070
+      },
+      "status_only_after_build": true
+    },
+    "docs/modules/TRAINING.md": {
+      "package_snapshot": {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/docs/modules/TRAINING.md",
+        "sha256": "16171d8494553d232442a1916e17e8e8f19a1d2f724be1c4c209ce04a8c1ba0c",
+        "bytes": 6627
+      },
+      "source_after_acceptance": {
+        "path": "F:/godotProject/FantasySiege/docs/modules/TRAINING.md",
+        "sha256": "fe7946c2c940e1f8da0a1df8201ef9e1ce169aac09b1d3270ad49251e2aed5b8",
+        "bytes": 6814
+      },
+      "status_only_after_build": true
+    },
+    "docs/modules/DELIVERY.md": {
+      "package_snapshot": {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/docs/modules/DELIVERY.md",
+        "sha256": "18c9f78384a1ec6a5df5b5d273268744d2504629d3ca84d4a63740f2afdf394e",
+        "bytes": 13857
+      },
+      "source_after_acceptance": {
+        "path": "F:/godotProject/FantasySiege/docs/modules/DELIVERY.md",
+        "sha256": "a28c27fea9932b09b42f75b01446ea478e9685ef6a068e326422b429fd86e6f7",
+        "bytes": 14082
+      },
+      "status_only_after_build": true
+    }
+  },
+  "background": {
+    "passed": true,
+    "cpu_case_count": 8,
+    "cpu_check_count": 3351,
+    "cpu_cases": [
+      {
+        "case": "BattleSmoke",
+        "checks": 120,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/battle_smoke.json",
+          "sha256": "a0c59e4d3bc3ca5000aa9ee0a7d52e646daea9312593c7dbb57880dc09c66284",
+          "bytes": 13951
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/BattleSmoke.log",
+          "sha256": "7392c6d8d5080913342200e5539c493e07c87d81a1ea2f33eac8b19621c633bd",
+          "bytes": 6419
+        },
+        "artifact_sha256": {}
+      },
+      {
+        "case": "ProfileSmoke",
+        "checks": 24,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/profile_smoke.json",
+          "sha256": "53aea591be25e9c7ab79d5cb39d3e03770562a29bc3f9d11792db7d6c30f433e",
+          "bytes": 91
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/ProfileSmoke.log",
+          "sha256": "4a253733582d775bd13516a02172a25778ce9f3854998af1c655ba4dc784d082",
+          "bytes": 4964
+        },
+        "artifact_sha256": {}
+      },
+      {
+        "case": "ProgressionSmoke",
+        "checks": 34,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/progression_smoke.json",
+          "sha256": "85ef6206a1671efa33475c7d8142c14abc2fc2af94f41ad797fd850ad79d0199",
+          "bytes": 52
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/ProgressionSmoke.log",
+          "sha256": "e3cc76c62b6efba1bb86eae710b3e9a033ef60093fcaaea032b9e66868d112e4",
+          "bytes": 4945
+        },
+        "artifact_sha256": {}
+      },
+      {
+        "case": "PreferencesSmoke",
+        "checks": 76,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/preferences_smoke.json",
+          "sha256": "e40d9c9bb402682c04cb8c2131c09928c0590922433c9eeb97106103a3f9781c",
+          "bytes": 168
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/PreferencesSmoke.log",
+          "sha256": "027ac4bdd26f2ddf713885b997c3a7e455c38a2851083619a3b1786ca7e47f6a",
+          "bytes": 5671
+        },
+        "artifact_sha256": {}
+      },
+      {
+        "case": "AudioShutdownSmoke",
+        "checks": 6,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/audio_shutdown_smoke.json",
+          "sha256": "e72f685599a0b25c866b5bbbe3da2ced9040ee0d04e8c1118791efcaf89b050b",
+          "bytes": 173
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/AudioShutdownSmoke.log",
+          "sha256": "73813cdbbcd1632f7c615b4c5ec987a5e052979c4bdaf4778635204cba3c383c",
+          "bytes": 5274
+        },
+        "artifact_sha256": {}
+      },
+      {
+        "case": "StudyProfileSmoke",
+        "checks": 470,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/study_profile_smoke.json",
+          "sha256": "a551c996357192321072d94883c31fb9dfb136c5fb861609dbe2a2ba6236d95a",
+          "bytes": 215
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyProfileSmoke.log",
+          "sha256": "00e87cf425f0484ab81ec4bd0f9a7fc0e1c2cbc38a8403085fd274e2ae0487f0",
+          "bytes": 5114
+        },
+        "artifact_sha256": {
+          "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e"
+        }
+      },
+      {
+        "case": "StudyCombatSmoke",
+        "checks": 1873,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/study_combat_smoke.json",
+          "sha256": "de7cd635408a39c9a239a579ac6cc4f07fe6aabc52f2f0edd1516a44b83f0b13",
+          "bytes": 1086
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyCombatSmoke.log",
+          "sha256": "0a592e67915e81fad2ba526d87ac62c234a185bf8d6d36eefea38b9ad6e56c5b",
+          "bytes": 6130
+        },
+        "artifact_sha256": {
+          "unit_stats_sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+          "siege_battle_sha256": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+          "units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+          "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e"
+        }
+      },
+      {
+        "case": "StudyUISmoke",
+        "checks": 748,
+        "report": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/study_ui_smoke.json",
+          "sha256": "9c1e9308e39cc9d8c83104a8c44d947f45a03c66828f407e9dbed2b87ed6bfe3",
+          "bytes": 689
+        },
+        "log": {
+          "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyUISmoke.log",
+          "sha256": "6942d9c8a788561420009982d83ab360f1ed0ce25539e962ccd30fcfa34bbff1",
+          "bytes": 13488
+        },
+        "artifact_sha256": {
+          "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+          "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+          "units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+          "scripts_sha256": {
+            "scripts/ui/Main.gd": "0d21fc541881efc77eccd72dfd5d4b927f13140b07407b644b26ec9c5be8ae16"
+          }
+        }
+      }
+    ],
+    "native_resources": 21,
+    "raw_animations": 220,
+    "native_report": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_verify.json",
+      "sha256": "8eb43ad21abad591cb941a28acaa8e7f782ba2398855f61bdbdc87a94683377a",
+      "bytes": 20338
+    },
+    "native_config_unchanged": true,
+    "visuals_sha256_before": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+    "visuals_sha256_after": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+    "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+    "study_combat_matrix_cases": 108,
+    "study_ui_matrix_cases": 108
+  },
+  "offscreen": {
+    "passed": true,
+    "performance_verified": false,
+    "native_probe_reused_from_background": true,
+    "playback_production": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_playback.json",
+      "sha256": "548267db413c223478b4ed0212cf25f85ec529f172c56cdf60ae730313cc75a6",
+      "bytes": 1323
+    },
+    "playback_unmanaged": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/performance_0.1.3/playback_unmanaged.json",
+      "sha256": "d2a26c6048dfb0bdd1df599bafb3741cfe75e0496c34c1c139da2f8d5e43375b",
+      "bytes": 1330
+    },
+    "mesh_report": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/performance_0.1.3/mesh_redraw.json",
+      "sha256": "3a3d7fe0e551af36f5bb81071d3cc5414e3a6c64c819ff2c77a755ccd2bbe1e0",
+      "bytes": 7926
+    },
+    "mesh_comparisons": 2624,
+    "mesh_max_pixel_difference": 0,
+    "art_report": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/art_review_local.json",
+      "sha256": "12b0352f8afd8e55e6ef0854c675ac69cd9065abc47ff2df8be714bb67527211",
+      "bytes": 13739
+    },
+    "art_checks": 3826,
+    "art_capture_count": 32,
+    "art_text_overflows": [],
+    "art_audio_shutdown_clean": true,
+    "required_study_capture_names": [
+      "art_study_locked",
+      "art_study_unowned",
+      "art_study_ready",
+      "art_study_base",
+      "art_study_sweep",
+      "art_study_heal",
+      "art_study_siege",
+      "art_study_slow",
+      "art_hero_studied",
+      "art_gallery_studied"
+    ],
+    "captures": [
+      {
+        "name": "art_camp",
+        "path": "res://reports/runtime/art_camp.png",
+        "sampled_colors": 155,
+        "sha256": "bcf92c72992bf0938a8fe3672db822621747327ec83dfd4be55af1b5575a3716",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "远征",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_guanyu",
+        "path": "res://reports/runtime/art_hero_guanyu.png",
+        "sampled_colors": 157,
+        "sha256": "2b834f719b407d8cd91f3d0872e118d0d249a95a4113834d07c0e2ed02b28485",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_zhaoyun",
+        "path": "res://reports/runtime/art_hero_zhaoyun.png",
+        "sampled_colors": 156,
+        "sha256": "08a081ee03593ce7a6b10db073b64c32a9c9a25267b436db5fdc11a3c4dfa98d",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_zhugeliang",
+        "path": "res://reports/runtime/art_hero_zhugeliang.png",
+        "sampled_colors": 165,
+        "sha256": "34cd050b40f13ea37541b20d38d46e0aeb235a3865e88d4a1a6b31db11d57fc8",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_diaochan",
+        "path": "res://reports/runtime/art_hero_diaochan.png",
+        "sampled_colors": 157,
+        "sha256": "cc3e1da32b551a995984c78316d3912b611effac90ca7da241347816cb32a0fe",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_lubu",
+        "path": "res://reports/runtime/art_hero_lubu.png",
+        "sampled_colors": 155,
+        "sha256": "59404c78049b66bf14ac3789a19ce5ab7141d6394a26452716809a9689eb988e",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_iron_guard",
+        "path": "res://reports/runtime/art_hero_iron_guard.png",
+        "sampled_colors": 152,
+        "sha256": "fae52ce0e5f41a7f9ab5cbc63284194185df2452549dc0b965c1dae31f270fff",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_ember_archer",
+        "path": "res://reports/runtime/art_hero_ember_archer.png",
+        "sampled_colors": 150,
+        "sha256": "e03fdf34d56a26ca5dfb23f46104d8df52b626c867625401747d1f1025059f40",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_rune_medic",
+        "path": "res://reports/runtime/art_hero_rune_medic.png",
+        "sampled_colors": 155,
+        "sha256": "a7966808bfe06c528fc1cfd7528e5dcff64b916480301f29e21e33cedceafb6f",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_star_hammer",
+        "path": "res://reports/runtime/art_hero_star_hammer.png",
+        "sampled_colors": 159,
+        "sha256": "79d987b6cae7f6dd434cc58aa8dcd945e5e376408a20e45441615520c54227d7",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_rivet_gunner",
+        "path": "res://reports/runtime/art_hero_rivet_gunner.png",
+        "sampled_colors": 154,
+        "sha256": "1b910a34477d3a54e9c3142f0435044e680b06afeb8c0514a685f918a0e8ec5a",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_moon_mage",
+        "path": "res://reports/runtime/art_hero_moon_mage.png",
+        "sampled_colors": 158,
+        "sha256": "5eb165c17a717fe40363286e88ff87d7a3a2b77020d1786cb05cbd9059c3c0b7",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_spirit_beast",
+        "path": "res://reports/runtime/art_hero_spirit_beast.png",
+        "sampled_colors": 157,
+        "sha256": "5530855e7f9339c00cb0c64759788b35a4022bc63000b5dac912e60316912ee3",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_collection_lower",
+        "path": "res://reports/runtime/art_hero_collection_lower.png",
+        "sampled_colors": 155,
+        "sha256": "28c84709498be6f5468eb1c3cf509289316976fcb9228c71c7fc07daaafca61d",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_locked",
+        "path": "res://reports/runtime/art_study_locked.png",
+        "sampled_colors": 144,
+        "sha256": "11899b07265f519178718c0fbb8e016d0019871c3498587e4c2e297cd323bb50",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_unowned",
+        "path": "res://reports/runtime/art_study_unowned.png",
+        "sampled_colors": 150,
+        "sha256": "83151cd3365809a6b995f91dcdadcfdf9b9d2e75f3d83ebefa08dd06fccb3c94",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_ready",
+        "path": "res://reports/runtime/art_study_ready.png",
+        "sampled_colors": 145,
+        "sha256": "606ece6c668aa371ed0cda6b41a150106c81441b3033cbdee1391fd07bb2c08b",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_base",
+        "path": "res://reports/runtime/art_study_base.png",
+        "sampled_colors": 145,
+        "sha256": "5d043759cf495e8d87600e0e0f3ef6111d5294c94813aef8b076551355de62e8",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_sweep",
+        "path": "res://reports/runtime/art_study_sweep.png",
+        "sampled_colors": 146,
+        "sha256": "e66b11b94b929ba0db0c609ffa34396b4acf60bf5f6dbc0543d02058afe8b32c",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_hero_studied",
+        "path": "res://reports/runtime/art_hero_studied.png",
+        "sampled_colors": 157,
+        "sha256": "756d4503c13d2e5888fafd1329a02c2c8e11a44de06f6f800f5ac3d54377ba48",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "英魂",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_heal",
+        "path": "res://reports/runtime/art_study_heal.png",
+        "sampled_colors": 149,
+        "sha256": "0d88136190c87130bbd88e0ddce625343c448272c69baeacd7e4ef181e0965ea",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_siege",
+        "path": "res://reports/runtime/art_study_siege.png",
+        "sampled_colors": 149,
+        "sha256": "d66f2dc0a64890ba4e9fdaae32062a819cda820ba909dca8d63b8f247650778a",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_study_slow",
+        "path": "res://reports/runtime/art_study_slow.png",
+        "sampled_colors": 150,
+        "sha256": "a070f70aef1041d4d429579ab1c3828789aaabadef462f9f2b720de46dd00360",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "研修",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_gallery_studied",
+        "path": "res://reports/runtime/art_gallery_studied.png",
+        "sampled_colors": 163,
+        "sha256": "8a9db554502173bb4f16b784d35c0fe0ba2c28e8c0bc0efdd62e33ddfb45f682",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "图鉴",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_squad",
+        "path": "res://reports/runtime/art_squad.png",
+        "sampled_colors": 170,
+        "sha256": "b44d63409f94792a2d86e7aaee2fa27448e784b7a66c295a7d10301d5ee0ea81",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "编队",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_squad_lower",
+        "path": "res://reports/runtime/art_squad_lower.png",
+        "sampled_colors": 181,
+        "sha256": "9a2b6e9a3e1b9cd1ba0ec559176c08db0d9d7dccd6332eef507489fb9fb73cd7",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "编队",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_chapter_1_left",
+        "path": "res://reports/runtime/art_chapter_1_left.png",
+        "sampled_colors": 158,
+        "sha256": "f136233dcf1a5b31687eec9eb98818b54cefd30df8101f152e7647fc439a6753",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "stage_01",
+        "tab": "编队",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_chapter_1_right",
+        "path": "res://reports/runtime/art_chapter_1_right.png",
+        "sampled_colors": 247,
+        "sha256": "02425c46c00b74c88fa7af8df81400b1274aef8ddbd0b53016864490d5335651",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "stage_01",
+        "tab": "编队",
+        "view_x": 1280.0
+      },
+      {
+        "name": "art_chapter_2_left",
+        "path": "res://reports/runtime/art_chapter_2_left.png",
+        "sampled_colors": 172,
+        "sha256": "414984f2061bfd1ddccf2dbbc3fccd6ddd89ac6759f83a9365c7ad219b3a0036",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "stage_05",
+        "tab": "编队",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_chapter_2_right",
+        "path": "res://reports/runtime/art_chapter_2_right.png",
+        "sampled_colors": 249,
+        "sha256": "bd7385de392838fcbf5d2ca07e1bcd683cb6c47069f223938c4737ed9ef379da",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "stage_05",
+        "tab": "编队",
+        "view_x": 1280.0
+      },
+      {
+        "name": "art_gallery_hero",
+        "path": "res://reports/runtime/art_gallery_hero.png",
+        "sampled_colors": 161,
+        "sha256": "0ef96697ffbfef7c7702b3d4bc0a323058ecac5fd1c7ce76e22122d23fe28178",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "图鉴",
+        "view_x": 0.0
+      },
+      {
+        "name": "art_gallery_boss",
+        "path": "res://reports/runtime/art_gallery_boss.png",
+        "sampled_colors": 187,
+        "sha256": "4c4fee79ad5e3d9bee9deece791480fff8813f4d6c9f6168d38dda1e38ee3512",
+        "size": [
+          1280,
+          720
+        ],
+        "stage": "",
+        "tab": "图鉴",
+        "view_x": 0.0
+      }
+    ]
+  },
+  "campaign": {
+    "passed": true,
+    "report": {
+      "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/campaign_journey.json",
+      "sha256": "5414a572273afdc0eb6657656be2aa9eb778b85bd47a1ae6d89731f662f8f944",
+      "bytes": 31874
+    },
+    "checks": 988,
+    "gdd_version": "0.5.3",
+    "gdd_sha256": "0c258eb553fe0655f1f86986742b7eef83ca89ca1fcdb269f7bf095a06626c17",
+    "victories": 9,
+    "final_owned": 12,
+    "final_cleared": 8,
+    "final_credits": 2840,
+    "fresh_process_id": 26828.0,
+    "resume_process_id": 18996,
+    "profile_readback_equal": true,
+    "manual_input_verified": false,
+    "native_spine_verified": false,
+    "performance_verified": false
+  },
+  "root_visual_review": {
+    "reported_by": "root",
+    "hero_studied_attack_integer": 84,
+    "siege_and_two_routes_and_chinese_rules_confirmed": true,
+    "does_not_replace_foreground_acceptance": true
+  },
+  "log_audit": {
+    "passed": true,
+    "log_count": 39,
+    "logs": [
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/AudioShutdownSmoke.log",
+        "sha256": "73813cdbbcd1632f7c615b4c5ec987a5e052979c4bdaf4778635204cba3c383c",
+        "bytes": 5274,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/BattleSmoke.log",
+        "sha256": "7392c6d8d5080913342200e5539c493e07c87d81a1ea2f33eac8b19621c633bd",
+        "bytes": 6419,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/bootstrap_native.log",
+        "sha256": "79975a41c16dc036ccb7a975f42091350afd447c27391ebf6270ea7ba3fe7c38",
+        "bytes": 10600,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/bootstrap_textures.log",
+        "sha256": "c46fb53b48d5b5b71b59b2c03cca27f6475e8b441667170e77d744566c25072c",
+        "bytes": 15226,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/CampaignJourney.log",
+        "sha256": "9aa371adcf4ff4e25afb4e521138c68607f218010a52ce61e15ab765e2a3829c",
+        "bytes": 14253,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_art_review.log",
+        "sha256": "e8cf25ba899f0329106222db09caac39dcbf5897ad7eebad9ab0b5edf81a4392",
+        "bytes": 16182,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_checks_background.log",
+        "sha256": "e34de812cdf0dab17800eed11e1b2de7fbc2a430d7c70aabea0818a196d8bcac",
+        "bytes": 174,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_mesh_redraw.log",
+        "sha256": "e3830879dd3c9ba926c61f7a61e2d6f072947917de213e67615240ea8a23b742",
+        "bytes": 10441,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_native.log",
+        "sha256": "9c163205f3441b7ddc65317fae38a27760754198528ce06ec15b57e95113b9a7",
+        "bytes": 294,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_playback.log",
+        "sha256": "685c90113c35a6d2599512f32b13a2474d3cbf49fe802bbc20d8fc3f913f5019",
+        "bytes": 1308,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_playback_unmanaged.log",
+        "sha256": "4160810467528e1d8cbebbe2648323500e57cf096f7897e297ac9cde4fd2a872",
+        "bytes": 1315,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/package_portraits.log",
+        "sha256": "736d97111435a1007da70dd445218889ee7dc30564e449abeff77051d9e15bb5",
+        "bytes": 203,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/PreferencesSmoke.log",
+        "sha256": "027ac4bdd26f2ddf713885b997c3a7e455c38a2851083619a3b1786ca7e47f6a",
+        "bytes": 5671,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/ProfileSmoke.log",
+        "sha256": "4a253733582d775bd13516a02172a25778ce9f3854998af1c655ba4dc784d082",
+        "bytes": 4964,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/ProgressionSmoke.log",
+        "sha256": "e3cc76c62b6efba1bb86eae710b3e9a033ef60093fcaaea032b9e66868d112e4",
+        "bytes": 4945,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_018.log",
+        "sha256": "4e8a396415773623fd16b05c70565a7e3b8b709dda5a273fe98447c24509527c",
+        "bytes": 1297,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_023.log",
+        "sha256": "12578b62853b12a925c875cc188eb401aae0a149d6e4ccec3d0d9806adad838d",
+        "bytes": 1201,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_036.log",
+        "sha256": "fa50ea2c25bad28263a22530f39f4c4e8e91c898760187d2ef831660237c6b65",
+        "bytes": 1202,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_046.log",
+        "sha256": "3060792d131d3f96da575ac39ef32eb01a4324fd37e65df532f607efa967dc1e",
+        "bytes": 1205,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_057.log",
+        "sha256": "a3bc9244962c0567cc277612da8cfef4ac349b3834cf2ca1ba6ad199dc180a9d",
+        "bytes": 1302,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_059.log",
+        "sha256": "d662d0adab11c37a8e7f6831da4ad62b9013366f7249306954ee0489ec86021b",
+        "bytes": 1303,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_069.log",
+        "sha256": "95b8091dc7524456b76824f1fc48cd664e72a85f169fe6b7ddb13cc0b11d5c28",
+        "bytes": 1302,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_072.log",
+        "sha256": "cd2bbdc14b9ef58c8134e72941aff6ee2042d897fa0bc145b2797d369f2adcca",
+        "bytes": 1194,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_084.log",
+        "sha256": "40bf451b68256bcd173b7c7204e62a58df0f7ee4790d83d36d5787ff7af19436",
+        "bytes": 1303,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_094.log",
+        "sha256": "2b2519621bfaeead650b1777dd7e7c0323f1cf664d1c8506fa59d30961ac3a58",
+        "bytes": 1302,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_097.log",
+        "sha256": "40bf5997324d60f53efa985e274b9217d2e885eb9406641ed705c62b6e99ffa4",
+        "bytes": 1397,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_110.log",
+        "sha256": "30a0bb650b397b3312d70517b8e454812e3a432bc7155af095c0e1f16a8488f1",
+        "bytes": 1200,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_147.log",
+        "sha256": "815f7698712db2cc9b46f0d7b81ae72456357499956b0f56f401aae772821085",
+        "bytes": 1297,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_163.log",
+        "sha256": "7f963f2687073616ceebefda6e54bcd4557f50f246ef610a919a6dbc4f51c7c3",
+        "bytes": 1303,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_168.log",
+        "sha256": "e3ebbec24aecc8ff1405f3a741ebcf3bfc9f4a687a379907ddf9ffcc0c462a5d",
+        "bytes": 1200,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_253.log",
+        "sha256": "3287fdaefc9073ca276a478dbd97cdc2bb9dba20e02b4cabc629d5590fba0f83",
+        "bytes": 1204,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_254.log",
+        "sha256": "8773633b41c301e38f102f3e69ef739655b47ba92e2e19d096f4a30d0a586294",
+        "bytes": 1200,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_271.log",
+        "sha256": "e9933e54cc33259441f4b7a1c50ed868a69e31b3eabe6256242b951b97d8e433",
+        "bytes": 1202,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_285.log",
+        "sha256": "4acc4e7305c99371fc47e5ccc9f8406327c9cd881af1b87baa4a9e4ef44edd06",
+        "bytes": 1206,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_312.log",
+        "sha256": "6bec5dcc5843180489204431d36ffa3907bfc55ea23295a797e3a20b09527e40",
+        "bytes": 1198,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/spine_probes/d69_314.log",
+        "sha256": "b91f4f3eff6cb07b47d110ed56f75548a88c0595c3155497a775e9f720d035cc",
+        "bytes": 1195,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyCombatSmoke.log",
+        "sha256": "0a592e67915e81fad2ba526d87ac62c234a185bf8d6d36eefea38b9ad6e56c5b",
+        "bytes": 6130,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyProfileSmoke.log",
+        "sha256": "00e87cf425f0484ab81ec4bd0f9a7fc0e1c2cbc38a8403085fd274e2ae0487f0",
+        "bytes": 5114,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      },
+      {
+        "path": "F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-6/reports/StudyUISmoke.log",
+        "sha256": "6942d9c8a788561420009982d83ab360f1ed0ce25539e962ccd30fcfa34bbff1",
+        "bytes": 13488,
+        "fatal_lines": [],
+        "diagnostic_lines": []
+      }
+    ]
+  },
+  "source_guard_reference": {
+    "path": "F:/godotProject/FantasySiege/docs/reviews/source_verification.json",
+    "sha256": "8340c704d59d9a1aaaa3f3e5a01f5bc992cb081577c43c3f0a102ec870f4a8a0",
+    "bytes": 167,
+    "reused_previously_passed_evidence": true,
+    "hashed_files": 336,
+    "passed": true
+  },
+  "historical_baseline_preserved": {
+    "path": "F:/godotProject/FantasySiege/reports/local_candidate_0.1.3.json",
+    "sha256": "c2e1aefddeb9fd386ea9dd35b2adb49ecf181185577e22b5e2caf05e065b9428",
+    "bytes": 41425
+  },
+  "audited_utc": "2026-11-19T08:06:55.788070+00:00",
+  "additional_summary_checks": {
+    "campaign_program_project_and_freshness_verified": true,
+    "phase_anchored_completion_markers": {
+      "checks_background": true,
+      "native": true,
+      "portraits": true,
+      "playback": true,
+      "playback_unmanaged": true,
+      "mesh_redraw": true,
+      "art_review": true
+    }
+  }
+}

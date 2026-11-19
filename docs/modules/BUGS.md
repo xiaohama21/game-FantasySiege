@@ -1,12 +1,79 @@
 # Bug 修复记录
 
-> v0.5 · 2026-11-18 · GDD v0.3.1 / 程序0.1.2.0
+> v0.21 · 2026-11-19 · GDD v0.5.3 / 程序0.1.3.0
+> v0.21：FS-035修复HUD在冷却最后0.05秒提前显示就绪及开放按钮。
+> v0.20：FS-034统一多个角色页面的整数显示取整，中央计算/战斗精度不变。
+> v0.19：FS-033修复包验收读取缺失报告时覆盖Godot原始错误输出；异常日志保留进程输出并追加报告失败说明。
+> v0.18：FS-031修复研修后普通技能仍显示基础射程/护甲；FS-032预检备份目标为目录的可预期保存失败。
+> v0.17：FS-030修复不同施法者减速共享最强倍率/最长期限，弱长控制会延长强短控制；每来源独立期限并保留汇总读数。
+> v0.16：FS-029修复原生验收无条件重写配方，导致本包清单与肖像SHA失效；默认验证只读，写状态为作者显式操作。
+> v0.15：FS-028明确渲染生产与verbose诊断启动范围；不扩大错误忽略，普通日志仍拒绝脚本错误和退出泄漏。
+> v0.14：FS-026修复退出确认叠在设置页时，底层设置抢先处理Esc/F11；以真实输入派发回归验证最上层模态与焦点栈。
+> 同轮FS-027：Boss阶段提示由已触发实例的配置读取，避免两个Boss均显示固定“裂隙狂潮”。
+> v0.13：FS-025修复离屏美术验收把Godot透明边缘RGB修复和最小化窗口内部焦点标记当成画面错误；核验标准导入后可见像素及实际窗口模式。
+> v0.12：FS-024修复后台生图工具设置主窗口visible=false导致Godot错误，以及隐藏时等待自然绘制信号卡住；维持最小化并强制离屏绘制。
+> v0.11：FS-023复核发现toast定时器下一帧重新启用可见性，隐藏时一并清零并验证绘制后的状态。
+> v0.10：实际图片发现焦点按钮文字对比不足和旧提示覆盖退出标题，追加视觉修复与复核。
+> v0.9：严格runner将非致命NVAPI既有配置诊断误判为脚本错误；精确区分并保留诊断原文。
+> v0.8：记录Tab/Space通过底层GUI焦点穿透模态，以及F11/窗口关闭漏报设置写盘失败。
+> v0.7：记录runner未拒绝泄漏日志、未校验本次JSON与版本导致的验收漏判。
+> v0.6：记录原创氛围音乐退出时播放器内部引用与混音停止队列未完成清理。
 > v0.5：记录新来源首次导入时纹理/原生atlas先后与低帧率骨架更新集体到期；新增战场结算与存档保护边界修复。
 > v0.4：便携包图片复核发现局部实例占位，原验证覆盖不足，追加全体原生检查。
 > v0.3：便携包必须等待图形版引擎进程并检查实际退出码和错误日志。
 > v0.2：记录接续初版时发现的存档恢复与未来版本保护边界。
 
 新项目初始记录。每个后续修复填写：问题、复现、根因、处理、GDD版本与程序版本。实现前设计迭代不是运行时bug；真正发现的运行/导入问题均在此登记。
+
+## FS-033：包验收报告缺失时丢失Godot原始诊断
+
+- 问题/复现：ArtReview32首轮脚本解析失败，进程未生成art_review_local.json；verify_package.execute读取该报告抛FileNotFoundError后，package_art_review.log只剩报告路径异常，真实SCRIPT ERROR及解析位置被覆盖，无法从验收日志直接定位首因。
+- 根因：正常进程已捕获stdout/stderr并组合为output，但通用异常分支无条件output=str(failure)，只有TimeoutExpired分支追加部分进程输出。
+- 修复设计：进入try前初始化output与run；已经完成的进程输出在任何后续报告/门禁异常时保留原文，再追加异常类型及报告读取失败说明。启动或准备失败时不存在run也能安全记录异常；超时继续保留stdout/stderr的partial输出。异常结果继续passed=false并保存退出码（可用时）、错误及诊断行，不放宽任何报告、标记、日志或版本门禁。
+- 验证：全84项Python单测通过，含非零退出SCRIPT ERROR且缺报告的原文/退出码保留、超时bytes/str输出及无run的启动失败；证据reports/runner_unit_tests.json。仅模拟子进程，真实Art32修复和重新运行由本轮独立登记，旧失败不伪写为通过。
+- 关联版本：GDD v0.5.1、DELIVERY v0.12、BUGS v0.19、程序0.1.3.0。
+
+## FS-030：弱长减速续期另一施法者的强短减速
+
+- 问题/复现：目标先受A的0.42倍率短减速，再受B的0.50倍率长减速；A原期限结束后仍以0.42移动直到B的期限结束。研究延长B的持续时间时，间接增强了A，导致显示的独立控制效果与实际战斗不一致。
+- 根因：受击单位只有slow_ratio/slow_timer，命中合并为min(ratio)与max(timer)，没有施法者来源和各自到期时间。
+- 修复设计：slow_sources以attacker.uid为键保存独立ratio/remaining；同来源只刷新自身，每固定步分别到期，汇总取仍有效的最小ratio和最大remaining。强短来源到期回退至弱长来源，施法者死亡后已命中的来源自然到期，暂停不推进。每个AoE受击单位独立持有来源表；stop清空实例与来源。
+- 文档与程序：UnitStats中央输出已经含智力与研修的最终slow.duration，战斗直接读取，避免为研修再乘第二次智力。默认单来源数值不变；多来源变化仅修正共享期限错误。
+- 验证：StudyCombatSmoke后台1873项/108实际spawn矩阵通过，覆盖强短/弱长先后命中、同来源刷新、独立AoE、施法者死亡并回收、真实场景帧中的暂停、全部到期与研究快照；原BattleSmoke120项通过，八关推荐队均胜/空阵均败和第4/6/8四核心养成保持。两份日志零错误/泄漏，证据为reports/study_combat_smoke.json、study_combat_smoke.log与battle_smoke_study.log；只证明中央逻辑与战斗，不替代画面或前台性能。
+- 关联版本：GDD v0.5.0、CORE v0.16、TRAINING v0.1、BUGS v0.17、程序0.1.3.0。
+
+## FS-029：原生探针验收重写素材配方导致包和肖像哈希失效
+
+- 问题/复现：candidate3的五CPU与21来源220动作均通过，随后portraits和最终payload失败；resources/visuals.json从源16522字节变为包17211字节，解析字典相同但SHA变化，与构建清单及肖像manifest不一致。
+- 根因：verify_spine每次探针后无条件json.dumps写回整份配置，即使所有status已经runtime_pass也重排格式；验收同时承担作者状态写入，并可能把已验证的视觉/性能级别降成runtime_pass。
+- 修复设计：默认成功/失败均不写配置，前后记录真实SHA与config_unchanged；显式--update-status仅供作者阶段，成功只升级运行等级而不降visual_checked/performance_checked。当前报告只包含本次资源选择，不合并旧PASS。原生日志使用统一严格ERROR/泄漏门禁，完成标记按完整行匹配。
+- 包内门禁：native_check要求config_unchanged=true、未请求写状态、前后SHA均等于当前包配置真实SHA，逐资源覆盖与220动作规则保持。candidate3保留真实失败，不就地修写包文件或历史报告；修复后创建新的干净候选。
+- 验证：全66项Python单测通过，其中7项新增mock覆盖21独立进程、非标准JSON格式、失败/泄漏/伪标记、超时和显式状态写入，证据见reports/runner_unit_tests.json；真实candidate4构建与包内验证待后续运行登记。
+- 关联版本：GDD v0.4.9、DELIVERY v0.10、BUGS v0.16、程序0.1.3.0。
+
+## FS-028：生产渲染验收默认启用verbose驱动诊断
+
+- 问题/复现：Safe Mobile真实MainFlow完成233项、15图并正常排空音频退出，但runner默认--verbose开启Vulkan调试消息，宿主两项失效Steam层登记报告loader_get_json找不到SteamOverlayVulkanLayer64.json和SteamFossilizeVulkanLayer64.json，严格runner按ERROR拒绝本轮。
+- 根因：渲染验收与玩家启动的日志模式不一致，默认开启了额外宿主驱动/加载器诊断。该次日志证明Mobile已成功建立GTX1050设备，但不代表所有ERROR可以忽略；原FAIL保持有效。
+- 修复设计：headless用例保留默认verbose；渲染用例默认生产普通日志，新增--verbose-render-diagnostics显式诊断入口，报告launch_mode及command_line。保持结束标记、最新JSON、版本/哈希、退出码、脚本ERROR与ObjectDB/Leaked instance门禁完全不变，不新增Steam错误豁免，也不修改系统层配置。
+- 验证：Python边界测试覆盖两种渲染命令、headless verbose保留、诊断选项范围和普通模式ERROR/泄漏拒绝；测试及生产MainFlow重跑结果待本轮登记。原verbose失败日志作为宿主诊断证据另保留。
+- 关联版本：GDD v0.4.8、DELIVERY v0.8、BUGS v0.15、程序0.1.3.0。
+
+## FS-026：叠层退出确认的快捷键被底层设置抢先处理
+
+- 问题/复现：战斗中打开设置，使设置写盘失败后关闭游戏；退出确认出现后按Esc，设置页的_input先调用close并吞掉事件。路径恢复后还可能移除底层设置，破坏焦点栈。F11也能穿透更改底层设置。
+- 根因：设置页独立全局_input没有检查Main拥有的最上层模态，原回归直接调用_dismiss_exit，未覆盖真实输入分发。
+- 修复设计：Main为设置页提供动作许可回调；设置仅在自己是当前最上层模态时处理快捷键。退出确认继续由Main消费Esc，F11在确认层保持原值。
+- 验证：MainFlow通过Input.parse_input_event发送真实F11/Esc，核对设置值、最上层窗口、暂停和两层焦点栈，结果待本轮运行登记。
+- 关联版本：GDD v0.4.7、BUGS v0.14、程序0.1.3.0。
+
+## FS-027：Boss阶段提示与角色规则配置不一致
+
+- 问题/复现：两个Boss进入半血阶段时，界面均固定提示“裂隙狂潮”，而百科配置分别为“裂甲狂潮”和“过热锻击”。
+- 根因：Main的phase事件处理使用固定文案，未读取触发该事件的Boss配置。
+- 修复：按事件世界位置和阵营匹配已phase=true的实例，读取special.phase_name；无匹配时使用“首领强化阶段”。不改变事件签名、阶段机制或战斗数值。
+- 验证：两套配置与提示读取静态核对正确，Godot主流程待本轮后续复验。
+- 关联版本：GDD v0.4.7、EXPERIENCE v0.6、BUGS v0.14、程序0.1.3.0。
 
 ## FS-001：损坏主档恢复后再次保存会覆盖好备份
 
@@ -131,3 +198,119 @@
 - 处理：公共can_modify接口，未来档禁用关卡/训练/编队按钮，begin_run直接拒绝生成run。
 - 验证：ProfileSmoke验证未来档cannot modify/begin_run为空且原始文件字节不变。
 - 关联版本：GDD v0.3.1、PROGRESSION v0.2、程序0.1.2.0。
+
+## FS-016：氛围音乐播放中退出留下音频对象
+
+- 问题：进入营地后正常退出，Godot报告2个ObjectDB实例未释放。
+- 复现：在新项目运行`--headless --verbose --quit-after 3`，启动营地氛围循环；退出日志列出AudioStreamWAV与AudioStreamPlaybackWAV各1。
+- 根因：AudioStreamPlayer除stream外还持有内部Playback引用，音频服务器需要消费停止/销毁队列；仅在_exit_tree里stop与清空stream/cache过晚，服务器已进入结束时序。单独stop/清空并等0.2秒仍保留播放器引用，固定等待也可能受CPU争用影响；不是界面Tween或角色存档对象。
+- 处理：公开异步GameAudio.shutdown，在场景树和混音器仍运行时停止音频、queue_free固定播放器、断开设置连接与清空缓存；以弱引用每20ms异步检查实际Playback是否已释放，上限1秒并记录超时。等待期间拒绝新播放。_exit_tree保留同步兜底。正常窗口关闭调用await shutdown后quit，游戏期间没有阻塞等待。
+- 验证：AudioShutdownSmoke真实WAV循环与短音效后await shutdown，6项通过、播放器0、实际排空56ms、verbose零Leak/ERROR；PreferencesSmoke76项回归及verbose同样通过。外层测试必须拒绝退出后Leaked instance/ObjectDB警告，不能只读内部passed。Engine的--quit-after绕过正常关闭流程，原始强制退出警告单列诊断，不作为正常关闭通过证据。
+- 关联版本：GDD v0.4.1、EXPERIENCE v0.1、程序0.1.3.0。
+
+## FS-017：低频骨架的原生Mesh仍每帧重复重建
+
+- 问题：64完整可见原生骨架与生命条的Safe GL战斗压力，四组骨架采样仍出现33.39fps/p95 51.253ms未通过；降低骨架更新频率未同步降低网格重提交。
+- 复现：独占运行SpinePerformance013 battle64phase4，保持64存活、64可见、12关键实例及完整生命条；查看原生SpineMesh2D内部处理标记与官方4.3 SpineSprite.cpp通知流程。
+- 根因：SpineMesh2D在READY开启internal processing，每次INTERNAL_PROCESS queue_redraw，DRAW clear/add triangles和update_mesh；manual骨架本帧未改变时仍重复提交旧姿态网格。当前原生API不公开mesh/vertices getter，无法在GDScript无损合批。
+- 处理：默认关闭候选开关set_managed_mesh_redraw；启用时缓存所有原生子Mesh并关internal processing，仅在实际骨架更新、零delta换动作和重配后全量queue_redraw，含空槽以清旧图元。恢复原模式时开启internal并立即刷新。材质、UV、颜色、裁切、deform和原顶点保留；不采用实验Separate线程。
+- 验证：Safe GL全21来源220原始动作2624次确定性RGBA比较零差异，body皮肤完整边界、全部备用skin清旧图元、双朝向/透明度/纯父变换、切换/暂停/重配通过；托管21套2/3/4组、30/60Hz、0/1/2倍率和慢帧时钟回归通过。正常Safe Mobile初轮2/4组通过，独立重复/24场受丢焦点/最小化干扰无效，不能宣称最终性能完成。仍待清晰连续前台条件下Mobile差图、实际Main24/64与2×诊断；候选开关默认关闭，未作为生产默认。
+- 关联版本：GDD v0.4.4、SPINE_PIPELINE v0.14、程序0.1.3.0。
+
+## FS-018：验收runner可被旧通过报告与退出泄漏漏判
+
+- 问题：旧runner只要求退出0、stdout含标记且没有ERROR冒号；退出ObjectDB泄漏仍会通过，脚本未生成本次JSON或JSON.passed=false也没有被检查。
+- 复现：保留旧passed=true报告，模拟Godot退出0并打印完成标记但不生成报告；或同样退出0并附Leaked instance/ObjectDB警告。旧runner都可能报告PASS。
+- 根因：未清理/读取对应结构化报告，未记录本次时间与项目版本；完成标记只按子串检查，日志只检查两种错误前缀。BattleSmoke报告另有旧程序版本硬编码。
+- 处理：每次清旧对应报告，验证新JSON.passed严格true、生成时戳、项目版本/哈希及正确完成标记；去除ANSI颜色再拒绝ERROR/Leaked instance/ObjectDB日志，并保持stdout/stderr边界。纳入偏好/音频与完整旅程，Campaign只接受父级完成及phase=complete；BattleSmoke版本读取当前ProjectSettings。保存本次范围和逐项失败原因，超时/启动失败不能留下旧全量通过汇总。
+- 验证：tests/test_run_checks.py独立Python26项通过，模拟过期/缺失/损坏/失败报告、旧版本、父子进程标记、彩色错误/泄漏、超时及启动失败；七项全量中缺一份新报告也必失败。测试只使用临时目录与模拟子进程，不启动Godot或完整旅程，报告见reports/runner_unit_tests.json。
+- 关联版本：GDD v0.4.2、EXPERIENCE v0.3、程序0.1.3.0。
+
+
+## FS-019：Tab与Space从模态激活底层界面
+
+- 问题/复现：打开设置或指南，反复Tab可移到底层暂停或进入关卡按钮；Space/Enter的GUI处理发生在_unhandled_key_input之前，弹窗仍在时底层动作可以执行。
+- 根因：只有输入回调和鼠标遮罩防护，未隔离Control焦点；通用Button.pressed直接执行action，暂停入口也未拒绝模态。
+- 处理：打开模态按栈暂存/禁用底层焦点并给弹窗控件焦点，关闭恢复；通用按钮检查是否属于最上层模态，暂停与倍速同时拒绝模态调用。
+- 验证：MainFlow遍历指南与设置焦点、直接发送底层pressed并验证屏幕/暂停/倍速不变，关闭后焦点模式与原暂停状态恢复；实际正常窗口截图复核。
+- 关联版本：GDD v0.4.3、UI_ART v0.6、EXPERIENCE v0.4、程序0.1.3.0。
+
+## FS-020：F11与窗口关闭忽略偏好写盘失败
+
+- 问题/复现：把隔离preferences路径指向不存在的父目录，F11修改全屏或修改音量后关闭窗口，原实现忽略flush返回，设置丢失而无可见提示。
+- 根因：SettingsPanel.close有保存失败提示，但Main快捷键与窗口关闭另有未检查返回值的保存路径。
+- 处理：F11失败常显error_message；正常退出尝试保存dirty设置，失败弹出重试/明确放弃确认并暂停战斗，叠在设置上的确认按栈恢复焦点。无变更的未来偏好档不写盘；同时待领奖时提示覆盖全部未保存内容。
+- 验证：MainFlow模拟写盘失败、阻止退出、提示与暂停可见、恢复路径后可重试；偏好主档在失败时未被覆盖，正常窗口退出音频实际排空并零泄漏。
+- 关联版本：GDD v0.4.3、EXPERIENCE v0.4、程序0.1.3.0。
+
+## FS-021：verbose驱动配置诊断导致正常界面验收误失败
+
+- 问题/复现：真实MainFlow158项与15截图、正常音频退出均通过，但严格runner在Godot4.7.1的verbose启动输出中发现NVAPI既有配置登记信息，误判整项失败。
+- 根因：通用ERROR词匹配无法区分驱动profile重复登记的非致命verbose诊断与Godot错误；该行精确为NVAPI_EXECUTABLE_ALREADY_IN_USE(code -167)，没有SCRIPT ERROR/ERROR冒号或泄漏。
+- 处理：只对上述完整整行、固定代码-167单独分类，记录diagnostic_log_lines并保留原日志；其他NVAPI错误和ERROR前缀仍拒绝。不改驱动配置，也不据此推断性能根因。
+- 验证：边界测试覆盖精确诊断、错误代码变更、ERROR前缀；正常窗口MainFlow与完整包需重新生成严格报告。
+- 关联版本：GDD v0.4.4、EXPERIENCE v0.5、程序0.1.3.0。
+
+## FS-022：焦点按钮使用白字配浅纸背景
+
+- 问题/复现：打开首关指南或设置，用键盘遍历按钮；实际11_guide_summon/10_settings图中“下一页”和全屏选项几乎不可读。
+- 根因：自定义主题未定义font_focus_color，Godot默认白色覆盖常态深字；强调按钮只覆盖常态样式，焦点/hover状态未保持一致。
+- 处理：Button/CheckButton/CheckBox/OptionButton焦点统一深字，青绿强调按钮的常态、悬停、按下与焦点都用暖白字和青绿底。
+- 验证：MainFlow真实键盘焦点与15图复核；主题修复不改变动作、资源和暂停语义。
+- 关联版本：GDD v0.4.5、UI_ART v0.7、程序0.1.3.0。
+
+## FS-023：旧错误toast遮住退出确认标题
+
+- 问题/复现：F11设置写盘失败后立即关闭窗口，15_unsaved_settings图中先前toast盖住“设置尚未保存”标题。
+- 根因：为使F11提示在设置上可见，toast提高至z800，退出确认z700且标题与提示位置重合。初次只设visible=false，_process按未结束的toast_time在下一帧重新显示，即时断言未覆盖真正绘制结果。
+- 处理：打开退出确认时隐藏旧toast并清零toast_time，错误原因由弹窗正文完整提供；重试失败的提示在关闭确认后再显示。
+- 验证：MainFlow断言退出确认打开及实际截图绘制后旧toast均不可见，完整标题/原因/两动作可读。
+- 关联版本：GDD v0.4.5、UI_ART v0.7、程序0.1.3.0。
+
+## FS-024：后台肖像/界面取景错误隐藏主窗口并等待不发生的绘制
+
+- 问题/复现：运行generate_portraits.py后台生图，Godot报告“Can't change visibility of main window”，一分钟后仍没有PNG；工具未完成，不计通过。
+- 根因：Godot4.7主Window不能设置visible=false；全部窗口隐藏/最小化时自然frame_post_draw可能不触发，UPDATE_ALWAYS子视口仍需明确请求绘制。
+- 处理：启动器保持SW_HIDE/CREATE_NO_WINDOW，测试主窗仅MODE_MINIMIZED、不改visible；process_frame后RenderingServer.force_draw(false)刷新独立SubViewport，再同步读图。ArtReview采用相同路径，不抓焦点、不移动鼠标，隐藏窗口数据不作性能验收。
+- 验证：check-only与重新生成十二透明原生肖像通过，映射/alpha/哈希均正确；ArtReview22张真实Main离屏图通过。失败首轮日志保留，普通前台性能另验。
+- 关联版本：GDD v0.4.6、SPINE_PIPELINE v0.17、UI_ART v0.9、程序0.1.3.0。
+
+## FS-025：美术检查误拒绝纹理导入的正常透明边缘修复
+
+- 问题/复现：ArtReview22张合成图和文字检查成功，但十二肖像的原始PNG与导入Texture2D全字节比较均失败，最小化主窗口has_focus也仍返回true。
+- 根因：默认process/fix_alpha_border=true会修补透明和半透明边缘RGB以避免缩小后的暗边，不能与未经该处理的PNG逐字节比较；Godot内部焦点标记不能单独证明最小化窗口占用真实前台。
+- 处理：参考PNG先执行同一Image.fix_alpha_edges，再核验相同尺寸、逐像素alpha及全部可见RGB；完全透明RGB不影响画面。主窗模式同时以Window和DisplayServer确认为MINIMIZED，内部焦点原样记录，不据此声称前台性能通过。
+- 验证：ArtReview2554检查/22张真实离屏图、十二身份与纹理、零文字溢出、原生战斗/图鉴和音频排空全部通过；历史两次失败报告/日志本地保留。
+- 关联版本：GDD v0.4.6、UI_ART v0.9、程序0.1.3.0。
+
+## FS-031：研修后普通技能显示基础数值
+
+- 问题/复现：烬羽选择定弦/连羽后实际射程为252/216，技能仍描述240；星槌选择星垒/碎岩后实际护甲为53/39，技能仍描述45。英魂、研修和百科共用此文字。
+- 根因：普通单体分支直接显示units.skill_description的静态基础数值，其他专门技能已读取中央结果；只比较UI元数据的测试漏掉了可见文字。
+- 修复：普通单体说明也从UnitStats最终伤害类型、射程、前摇和护甲生成；基础叙述保留在配置/来源文档。测试逐路线检查实际技能文字，画面增加研修后英魂及图鉴。
+- 验证：StudyUISmoke普通单体文本回归；ArtReview新增art_hero_studied/art_gallery_studied，当前共32图；通过结果按实际报告登记。
+- 关联版本：GDD v0.5.1、UI_ART v0.13、程序0.1.3.0。
+
+## FS-032：存档备份目标为目录时产生原生错误
+
+- 问题/复现：隔离测试把profile.json.bak位置建成目录，再执行已存在主档的研修事务，DirAccess.copy_absolute失败并输出Godot ERROR。
+- 根因：提交前没有识别目标文件路径已被目录占用，可预期的写盘失败直接交给引擎复制。
+- 修复：备份目标为目录时先拒绝事务，返回“备份失败，资源未扣除”；保持主档原始字节、星砂、等级和路线不变。
+- 验证：StudyProfileSmoke隔离目录冲突、失败解锁/切换和恢复重试通过，日志无ERROR或泄漏。
+- 关联版本：GDD v0.5.1、PROGRESSION v0.3、程序0.1.3.0。
+
+## FS-034：同一中央数值在角色页面显示成不同整数
+
+- 问题/复现：关羽Lv3横扫伤害83.868928，英魂详情显示83，研修和百科显示84；小数射程/生命也有同类风险。
+- 根因：英魂详情先用int截断，研修/百科使用%.0f取整。数据源相同但显示精度规则不一致，元数据相等测试不能发现。
+- 修复：英魂详情生命、伤害、射程及护甲、伤害/治疗飘字统一%.0f显示，攻城倍率统一两位小数；实际中央计算与战斗继续使用浮点。
+- 验证：StudyUISmoke的108组合比较真实生命/伤害/射程Label文字，Art32再次复核；候选5冻结，修正随候选6重新验收。
+- 关联版本：GDD v0.5.2、UI_ART v0.14、程序0.1.3.0。
+
+## FS-035：HUD在真实冷却结束前显示就绪
+
+- 问题/复现：召唤或脉冲剩余0.03秒且能量足够，HUD按≤0.05秒显示就绪并启用按钮，战斗按≤0.00001秒仍拒绝动作。
+- 根因：HUD与逻辑重复维护不同就绪阈值，界面没有读取同一精度；小数直接保留一位还可能显示0.0秒。
+- 修复：冷却/能量统一SiegeBattle.READY_EPSILON=0.00001；仍为正的冷却向上显示至0.1秒。实际逻辑固定步、资源和冷却不变。
+- 验证：StudyUISmoke真实Main在0.03秒边界保持按钮禁用且显示0.1秒，两动作被拒绝不扣资源；真实推进到零后就绪；治疗飘字取整同时回归。
+- 关联版本：GDD v0.5.3、CORE v0.17、UI_ART v0.15、程序0.1.3.0。

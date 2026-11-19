@@ -1,0 +1,30 @@
+{
+	"boss_ids": [
+		"obsidian_warden",
+		"rail_colossus"
+	],
+	"briefings_sha256": "b5f3d06c85fba205cfd01511a11247ad10f6ec3a9fc40a724980ac7d56d26cac",
+	"checks": 2945,
+	"enemy_recipe_cases": 28,
+	"failures": [],
+	"gdd_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
+	"gdd_version": "0.5.6",
+	"isolation": "res://tests/.user/briefing_smoke",
+	"matrix_cases": 108,
+	"passed": true,
+	"performance_verified": false,
+	"phase": "complete",
+	"program_version": "0.1.3.0",
+	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+	"scope": "Read-only briefing versus actual headless SiegeBattle waves and spawns; eight stages, enemy recipe boundaries, 108 player/level/research cases and owned squad recommendations. No rendered Spine, foreground input or performance acceptance.",
+	"scripts_sha256": {
+		"scripts/combat/SiegeBattle.gd": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+		"scripts/core/BattleBriefing.gd": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+		"scripts/core/UnitStats.gd": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e"
+	},
+	"stage_count": 8,
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"visuals": false
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>智力</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#63c5b7" d="M5 19L11 2L14 6L17 18Z"/>
+    <path fill="#efb65b" d="M3 19C8 17 16 17 21 19L20 22H4Z"/>
+    <path fill="#fff2d7" d="M11 7L12 10L15 11L12 12L11 15L10 12L8 11L10 10Z" stroke-width="1"/>
+  </g>
+</svg>

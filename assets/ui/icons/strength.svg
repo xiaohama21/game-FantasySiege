@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>力量</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#efb65b" d="M6 20L3 13L5 10V6C5 3 9 3 9 6V5C9 2 13 2 13 5V6C13 3 17 4 17 7V10C20 7 22 11 20 14L17 20Z"/>
+    <path d="M9 6V10M13 6V10M17 8V12L14 15"/>
+    <path fill="#63c5b7" d="M6 18H17V22H6Z"/>
+  </g>
+</svg>

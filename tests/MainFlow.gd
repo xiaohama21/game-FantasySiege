@@ -5,20 +5,48 @@ var failures: Array[String] = []
 var checks := 0
 var screenshots := 0
 var directory := "res://tests/.user/main_flow"
+var observe_host := false
+var host_observed_frames := 0
+var host_normal_window_frames := 0
+var host_focused_frames := 0
+var capture_states: Array[Dictionary] = []
 
 func check(condition: bool, message: String) -> void:
 	checks += 1
 	if not condition: failures.append(message); push_error(message)
 
 func _initialize() -> void:
+	process_frame.connect(_observe_host_frame)
 	call_deferred("run")
+
+func _observe_host_frame() -> void:
+	if not observe_host: return
+	host_observed_frames += 1
+	# F11 may legitimately select fullscreen during the input regression.
+	# Minimized or hidden hosts cannot satisfy the foreground flow contract.
+	if root.mode!=Window.MODE_MINIMIZED and DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_MINIMIZED and root.visible:
+		host_normal_window_frames += 1
+	if root.has_focus(): host_focused_frames += 1
+
+func _rendering_driver() -> String:
+	if RenderingServer.has_method("get_current_rendering_driver_name"): return str(RenderingServer.call("get_current_rendering_driver_name")).to_lower()
+	return "unknown"
 
 func capture(name: String) -> void:
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw
 	var pic := root.get_texture().get_image()
-	check(pic.save_png("res://reports/runtime/" + name + ".png") == OK, "save screenshot " + name)
+	var path := "res://reports/runtime/" + name + ".png"
+	var state := {"name": name, "path": path, "sha256": "", "size": [pic.get_width(), pic.get_height()], "window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode(), "window_visible": root.visible, "focused": root.has_focus(), "actual_rendering_driver": _rendering_driver()}
+	var saved := pic.save_png(path) == OK
+	check(saved, "save screenshot " + name)
+	if saved: state.sha256 = FileAccess.get_sha256(path)
+	capture_states.append(state)
+	check(state.window_mode == Window.MODE_WINDOWED and state.display_window_mode == DisplayServer.WINDOW_MODE_WINDOWED and state.window_visible, "screenshot uses a normal visible window: " + name)
+	check(state.focused, "screenshot uses a focused foreground window: " + name)
+	check(state.size == [1280, 720] and root.size == Vector2i(1280, 720) and DisplayServer.window_get_size() == Vector2i(1280, 720), "screenshot preserves the full 1280x720 window: " + name)
+	check(state.actual_rendering_driver == "vulkan", "screenshot uses the actual Vulkan driver: " + name)
 	screenshots += 1
 
 func controls(node: Node) -> Array:
@@ -64,6 +92,7 @@ func run() -> void:
 		quit(1)
 		return
 	root.mode = Window.MODE_WINDOWED
+	root.size = Vector2i(1280, 720)
 	root.visible = true
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(directory))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports/runtime"))
@@ -84,6 +113,7 @@ func run() -> void:
 	app = load("res://scenes/Main.tscn").instantiate()
 	root.add_child(app)
 	root.warp_mouse(Vector2(640, 400))
+	observe_host = true
 	await capture("01_campaign")
 	check(app.tab == "远征", "campaign opens")
 	check(is_instance_valid(app.world._landscape) and app.world._landscape.texture != null and app.world._home_beacon.texture != null and not app.world._rift_beacon.visible, "camp has illustrated route and friendly lighthouse")
@@ -315,9 +345,19 @@ func run() -> void:
 	check(profile.owns("star_hammer"), "collection survives reload")
 	app.show_home()
 	check(not is_instance_valid(app.battle) and app.view_x == 0, "return stops battle and resets view")
+	# Stop before graceful exit releases audio and may close the window.
+	observe_host = false
+	check(host_observed_frames > 0 and host_normal_window_frames == host_observed_frames, "flow stays visible and non-minimized in every observed frame")
+	check(host_focused_frames == host_observed_frames, "flow stays focused in every observed frame")
 	await app._request_quit()
 	check(app.quitting and bool(root.get_node("GameAudio").shutdown_clean), "normal Main window close waits for actual audio playback release")
 	var result := {"program_version":str(ProjectSettings.get_setting("application/config/version", "unknown")), "passed": failures.is_empty(), "checks": checks, "failures": failures, "screenshots": screenshots, "real_spine": true, "isolation": directory, "world_width": 2560, "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "normal_window_close": app.quitting, "audio_shutdown_clean": bool(root.get_node("GameAudio").shutdown_clean)}
+	result.host_observed_frames = host_observed_frames
+	result.host_normal_window_frames = host_normal_window_frames
+	result.host_focused_frames = host_focused_frames
+	result.capture_states = capture_states
+	result.engine_input_dispatch_verified = true
+	result.os_input_verified = false
 	var f := FileAccess.open("res://reports/main_flow.json", FileAccess.WRITE)
 	f.store_string(JSON.stringify(result, "\t"))
 	f.close()

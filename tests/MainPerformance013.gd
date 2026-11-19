@@ -103,6 +103,8 @@ func _run() -> void:
 	var hud_frames := 0
 	var maximum_live_motes := 0
 	var focused_frames := 0
+	var normal_window_frames := 0
+	var full_resolution_frames := 0
 	var budget_valid_frames := 0
 	var native_min := count
 	var native_max := 0
@@ -122,6 +124,10 @@ func _run() -> void:
 		previous = now
 		process_samples.append(Performance.get_monitor(Performance.TIME_PROCESS)*1000.0)
 		if root.has_focus(): focused_frames += 1
+		if root.mode==Window.MODE_WINDOWED and DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_WINDOWED and root.visible:
+			normal_window_frames += 1
+		if root.size==Vector2i(1280,720) and DisplayServer.window_get_size()==Vector2i(1280,720):
+			full_resolution_frames += 1
 		var budget := _visual_budget(actors,count,expected_managed,expected_groups,critical_limit)
 		visible_min=mini(visible_min,int(budget.visible))
 		visible_max=maxi(visible_max,int(budget.visible))
@@ -173,6 +179,9 @@ func _run() -> void:
 	if adapter.is_empty() or DisplayServer.get_name()=="headless": failures.append("real display and graphics adapter required")
 	if DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_WINDOWED or not root.visible: failures.append("normal visible window required; minimized results do not satisfy delivery")
 	if focused_frames!=samples.size(): failures.append("focused foreground window required for every measured frame")
+	if normal_window_frames!=samples.size(): failures.append("normal visible root and display window required for every measured frame")
+	if full_resolution_frames!=samples.size(): failures.append("full 1280x720 root and display window required for every measured frame")
+	if _rendering_driver()!="vulkan": failures.append("actual Vulkan rendering driver required for production performance")
 	if expected_groups<2 or expected_groups>4 or critical_limit<1: failures.append("invalid production animation budget")
 	if budget_valid_frames!=samples.size(): failures.append("native population, managed redraw or animation budget differed during measurement")
 	if _render_thread_model()!="safe": failures.append("Safe render thread required; experimental Separate cannot satisfy production gate")
@@ -196,6 +205,7 @@ func _run() -> void:
 	report.engine_max_fps = Engine.max_fps
 	report.playback_multiplier = app.speed
 	report.actual_rendering_method = _rendering_method()
+	report.actual_rendering_driver = _rendering_driver()
 	report.production_renderer = production_renderer
 	report.project_render_thread_model = project_thread_model
 	report.render_thread_model = _render_thread_model()
@@ -216,6 +226,8 @@ func _run() -> void:
 	report.frame_group_counts_max = group_counts_max
 	report.budget_valid_frames = budget_valid_frames
 	report.focused_frames = focused_frames
+	report.normal_window_frames = normal_window_frames
+	report.full_resolution_frames = full_resolution_frames
 	report.gpu_status_before_measurement = gpu_before
 	report.gpu_status_after_measurement = "not queried: manual measurement has no auxiliary processes" if manual_gate else _gpu_status()
 	report.manual_gate = manual_gate
@@ -253,7 +265,7 @@ func _visual_budget(actors: Array,count: int,managed_policy: bool,groups_policy:
 	return result
 
 func _wait_measure_gate(mode: String,version: String) -> bool:
-	var ready := {"program_version":version,"mode":mode,"phase":"ready","manual_gate":true,"process_id":OS.get_process_id(),"godot_window_id":root.get_window_id(),"window_title":root.title,"window_mode":DisplayServer.window_get_mode(),"window_visible":root.visible,"actual_rendering_method":_rendering_method(),"gate_path":ProjectSettings.globalize_path(gate_path),"ready_path":ProjectSettings.globalize_path(ready_path),"timeout_seconds":120}
+	var ready := {"program_version":version,"mode":mode,"phase":"ready","manual_gate":true,"process_id":OS.get_process_id(),"godot_window_id":root.get_window_id(),"window_title":root.title,"window_mode":DisplayServer.window_get_mode(),"window_visible":root.visible,"actual_rendering_method":_rendering_method(),"actual_rendering_driver":_rendering_driver(),"gate_path":ProjectSettings.globalize_path(gate_path),"ready_path":ProjectSettings.globalize_path(ready_path),"timeout_seconds":120}
 	var file := FileAccess.open(ready_path,FileAccess.WRITE)
 	if file==null:
 		failures.append("could not write manual-gate readiness report")
@@ -293,6 +305,10 @@ func _render_thread_model() -> String:
 		if command_line[index]=="--render-thread" and index+1<command_line.size(): return str(command_line[index+1])
 	var model := int(ProjectSettings.get_setting("rendering/driver/threads/thread_model",1))
 	return {0:"unsafe",1:"safe",2:"separate"}.get(model,"unknown")
+
+func _rendering_driver() -> String:
+	if RenderingServer.has_method("get_current_rendering_driver_name"): return str(RenderingServer.call("get_current_rendering_driver_name")).to_lower()
+	return "unknown"
 
 func _finish(folder: String,mode: String,report: Dictionary) -> void:
 	root.always_on_top = false

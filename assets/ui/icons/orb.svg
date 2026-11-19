@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>魔法伤害</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8" fill="#63c5b7"/>
+    <path fill="#fff2d7" d="M12 6L13.6 10.4L18 12L13.6 13.6L12 18L10.4 13.6L6 12L10.4 10.4Z"/>
+    <circle cx="19.5" cy="4" r="1.5" fill="#efb65b"/>
+  </g>
+</svg>

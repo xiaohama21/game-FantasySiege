@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>物理伤害</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#fff2d7" d="M8 14L16 3L21 3L21 8L10 16Z"/>
+    <path stroke="#63c5b7" d="M11 13L18 6"/>
+    <path fill="#efb65b" d="M5 12L12 19L10 21L3 14Z"/>
+    <path fill="#63c5b7" d="M6 17L8 19L5 22L2 19Z"/>
+  </g>
+</svg>

@@ -1,19 +1,30 @@
 """Exercise runner failure boundaries without launching Godot or rendering."""
 from contextlib import redirect_stdout
+from functools import lru_cache
 import io
 import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import time
 import unittest
+import zlib
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import run_checks
+
+
+@lru_cache(maxsize=None)
+def fixture_png(width=1280, height=720, color=6):
+    def chunk(kind, data):
+        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data))
+    pixels = (b'\0' + bytes(width * (4 if color == 6 else 3))) * height
+    return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, color, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(pixels)) + chunk(b'IEND', b'')
 
 
 class StrictRunnerBoundaries(unittest.TestCase):
@@ -44,7 +55,25 @@ class StrictRunnerBoundaries(unittest.TestCase):
             data["phase"] = case.final_phase
         data.update(run_checks.case_artifact_context(case))
         data.update(dict(case.required_report_values))
+        if case.name == 'MainFlow':
+            data.update(self.main_flow_fixture())
         return data
+
+    def main_flow_fixture(self):
+        (self.root / 'reports/runtime').mkdir(exist_ok=True)
+        context = {}
+        for key, relative in (('units_sha256', 'resources/units.json'), ('stages_sha256', 'resources/stages.json')):
+            path = self.root / relative
+            if not path.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('{}', encoding='utf-8')
+            context[key] = run_checks.hashlib.sha256(path.read_bytes()).hexdigest()
+        captures = []
+        for name in run_checks.MAIN_FLOW_CAPTURES:
+            path = self.root / 'reports/runtime' / (name + '.png')
+            path.write_bytes(fixture_png())
+            captures.append({'name': name, 'path': 'res://reports/runtime/' + name + '.png', 'sha256': run_checks.hashlib.sha256(path.read_bytes()).hexdigest(), 'size': [1280, 720], 'window_mode': 0, 'display_window_mode': 0, 'window_visible': True, 'focused': True, 'actual_rendering_driver': 'vulkan'})
+        return {'real_spine': True, 'audio_shutdown_clean': True, 'normal_window_close': True, 'screenshots': 15, 'host_observed_frames': 20, 'host_normal_window_frames': 20, 'host_focused_frames': 20, 'engine_input_dispatch_verified': True, 'os_input_verified': False, 'capture_states': captures, **context}
 
     def write_report(self, case, data):
         path = self.root / "reports" / case.report_file
@@ -202,8 +231,8 @@ class StrictRunnerBoundaries(unittest.TestCase):
         engine.assert_not_called()
         self.assertFalse(result["passed"])
 
-    def test_study_report_requires_each_current_input_hash(self):
-        for name in ("StudyProfileSmoke", "StudyCombatSmoke", "StudyUISmoke"):
+    def test_increment_report_requires_each_current_input_hash(self):
+        for name in ("StudyProfileSmoke", "StudyCombatSmoke", "StudyUISmoke", "BriefingSmoke", "BriefingUISmoke"):
             case = run_checks.CASES[name]
             for key in run_checks.case_artifact_context(case):
                 for missing in (True, False):
@@ -220,6 +249,55 @@ class StrictRunnerBoundaries(unittest.TestCase):
                         result = self.run_case(wrong_hash, name)
                         self.assertFalse(result["passed"])
                         self.assertIn("report_artifact_hash_mismatch: " + key, result["errors"])
+
+    def test_briefing_reports_require_eight_stages_current_design_and_complete_matrix(self):
+        for name in ("BriefingSmoke", "BriefingUISmoke"):
+            case = run_checks.CASES[name]
+            self.assertTrue(case.headless)
+            for key, expected in case.required_report_values:
+                values = (None, True, str(expected), expected + 1, float(expected)) if type(expected) is int else (None, True, "0.5.4", "0.5.5")
+                for value in values:
+                    with self.subTest(case=name, field=key, value=value):
+                        def wrong_scope(command, **kwargs):
+                            response = self.success(command, **kwargs)
+                            data = self.payload(case)
+                            data[key] = value
+                            self.write_report(case, data)
+                            return response
+                        result = self.run_case(wrong_scope, name)
+                        self.assertIn("report_required_value_mismatch: " + key, result["errors"])
+
+    def test_briefing_rejects_each_changed_design_configuration_and_script(self):
+        for name in ("BriefingSmoke", "BriefingUISmoke"):
+            case = run_checks.CASES[name]
+            for relative in [path for _, path in case.report_hashes] + list(case.script_hashes):
+                with self.subTest(case=name, input=relative):
+                    def changed(command, **kwargs):
+                        response = self.success(command, **kwargs)
+                        with (self.root / relative).open("a", encoding="utf-8") as file:
+                            file.write("concurrent briefing input change\n")
+                        return response
+                    result = self.run_case(changed, name)
+                    self.assertFalse(result["passed"])
+                    expected_error = "project_changed_during_case" if relative == "project.godot" else "artifact_changed_during_case"
+                    self.assertIn(expected_error, result["errors"])
+
+    def test_briefing_nested_script_hashes_require_all_exact_paths_and_values(self):
+        for name in ("BriefingSmoke", "BriefingUISmoke"):
+            case = run_checks.CASES[name]
+            expected = run_checks.case_artifact_context(case)["scripts_sha256"]
+            variants = [{}, {**expected, "unrelated.gd": "extra"}]
+            for path in expected:
+                variants.extend(({key: value for key, value in expected.items() if key != path}, {**expected, path: "forged"}))
+            for scripts in variants:
+                with self.subTest(case=name, scripts=scripts):
+                    def forged(command, **kwargs):
+                        response = self.success(command, **kwargs)
+                        data = self.payload(case)
+                        data["scripts_sha256"] = scripts
+                        self.write_report(case, data)
+                        return response
+                    self.assertIn("report_artifact_hash_mismatch: scripts_sha256", self.run_case(forged, name)["errors"])
 
     def test_study_combat_requires_all_108_actual_spawn_combinations(self):
         for matrix in (None, 0, 107, 109, "108", True):
@@ -267,6 +345,26 @@ class StrictRunnerBoundaries(unittest.TestCase):
                     return response
                 result = self.run_case(wrong_scripts, "StudyUISmoke")
                 self.assertIn("report_artifact_hash_mismatch: scripts_sha256", result["errors"])
+
+    def test_actual_ui_reports_cannot_omit_or_forge_shared_stat_widget(self):
+        for name in ("StudyUISmoke", "BriefingUISmoke"):
+            case = run_checks.CASES[name]
+            self.assertIn("scripts/ui/StatBadge.gd", case.script_hashes)
+            expected = run_checks.case_artifact_context(case)["scripts_sha256"]
+            for missing in (False, True):
+                with self.subTest(case=name, missing=missing):
+                    def old_widget(command, **kwargs):
+                        response = self.success(command, **kwargs)
+                        data = self.payload(case)
+                        scripts = expected.copy()
+                        if missing:
+                            scripts.pop("scripts/ui/StatBadge.gd")
+                        else:
+                            scripts["scripts/ui/StatBadge.gd"] = "old widget"
+                        data["scripts_sha256"] = scripts
+                        self.write_report(case, data)
+                        return response
+                    self.assertIn("report_artifact_hash_mismatch: scripts_sha256", self.run_case(old_widget, name)["errors"])
 
     def test_missing_study_input_skips_engine(self):
         (self.root / "resources/studies.json").unlink()
@@ -322,7 +420,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         self.assertFalse(summary["passed"])
         self.assertTrue(summary["errors"])
 
-    def test_default_suite_is_all_eight_cpu_cases_and_running_summary_is_not_passed(self):
+    def test_default_suite_is_all_ten_cpu_cases_and_running_summary_is_not_passed(self):
         names = []
         def inspect(command, **kwargs):
             case = self.case_for(command)
@@ -336,7 +434,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         code, summary = self.run_main([], inspect)
         self.assertEqual(code, 0, summary)
         self.assertEqual(tuple(names), run_checks.CPU_CASES)
-        self.assertEqual(len(names), 8)
+        self.assertEqual(len(names), 10)
         self.assertEqual(summary["suite"], "logic")
 
     def test_visual_suite_adds_mainflow_and_headless_campaign(self):
@@ -362,6 +460,65 @@ class StrictRunnerBoundaries(unittest.TestCase):
         self.assertTrue(result["passed"])
         self.assertEqual(result["launch_mode"], "rendered_production")
         self.assertEqual(result["command_line"], observed[0])
+
+    def test_mainflow_single_and_visual_suites_require_host_observation(self):
+        for arguments in (['--only', 'MainFlow'], ['--visual']):
+            with self.subTest(arguments=arguments):
+                def missing_host(command, **kwargs):
+                    response = self.success(command, **kwargs)
+                    case = self.case_for(command)
+                    if case.name == 'MainFlow':
+                        data = self.payload(case)
+                        data.pop('host_observed_frames')
+                        self.write_report(case, data)
+                    return response
+                code, summary = self.run_main(arguments, missing_host)
+                self.assertEqual(code, 1)
+                self.assertFalse(summary['passed'])
+
+    def test_mainflow_rejects_partial_focus_float_counts_and_manual_claim(self):
+        for key, value in (('host_observed_frames', 0), ('host_observed_frames', True), ('host_normal_window_frames', 19), ('host_normal_window_frames', 20.0), ('host_focused_frames', 19), ('engine_input_dispatch_verified', False), ('os_input_verified', True)):
+            with self.subTest(field=key, value=value):
+                def invalid_host(command, **kwargs):
+                    response = self.success(command, **kwargs)
+                    case = self.case_for(command)
+                    data = self.payload(case)
+                    data[key] = value
+                    self.write_report(case, data)
+                    return response
+                self.assertFalse(self.run_case(invalid_host, 'MainFlow')['passed'])
+
+    def test_mainflow_rejects_minimized_unfocused_or_false_capture_metadata(self):
+        for key, value in (('window_mode', 1), ('display_window_mode', 1), ('window_mode', False), ('window_visible', False), ('focused', False), ('actual_rendering_driver', 'opengl3'), ('path', 'res://reports/runtime/unrelated.png'), ('size', [640, 360]), ('sha256', 'forged'), ('name', [])):
+            with self.subTest(field=key, value=value):
+                def invalid_capture(command, **kwargs):
+                    response = self.success(command, **kwargs)
+                    case = self.case_for(command)
+                    data = self.payload(case)
+                    data['capture_states'][0][key] = value
+                    self.write_report(case, data)
+                    return response
+                self.assertFalse(self.run_case(invalid_capture, 'MainFlow')['passed'])
+
+    def test_mainflow_rejects_missing_truncated_and_wrong_actual_png(self):
+        for value in (None, b'\x89PNG\r\n\x1a\n', fixture_png()[:-1], fixture_png(640, 360)):
+            with self.subTest(png=None if value is None else len(value)):
+                def broken_png(command, **kwargs):
+                    response = self.success(command, **kwargs)
+                    path = self.root / 'reports/runtime/01_campaign.png'
+                    if value is None:
+                        path.unlink()
+                    else:
+                        path.write_bytes(value)
+                    return response
+                self.assertFalse(self.run_case(broken_png, 'MainFlow')['passed'])
+
+    def test_png_reader_accepts_real_rgb_and_rgba_headers(self):
+        for color in (2, 6):
+            with self.subTest(color=color):
+                path = self.root / 'fixture.png'
+                path.write_bytes(fixture_png(color=color))
+                self.assertEqual(run_checks.png_dimensions(path), (1280, 720))
 
     def test_verbose_render_diagnostics_is_explicit_and_keeps_headless_scope(self):
         observed = {}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>减速</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#fff2d7" d="M6 4H18V7C18 10 15 11 13 12C15 13 18 14 18 17V20H6V17C6 14 9 13 11 12C9 11 6 10 6 7Z"/>
+    <path fill="#63c5b7" stroke="none" d="M8 6H16C16 9 13 10 12 10.5C11 10 8 9 8 6Z"/>
+    <path fill="#efb65b" stroke="none" d="M8 18L12 14L16 18Z"/>
+    <path stroke="#efb65b" stroke-width="3" d="M5 3H19M5 21H19"/>
+  </g>
+</svg>

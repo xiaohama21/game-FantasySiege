@@ -227,7 +227,24 @@ func run() -> void:
 	var studied_gallery: Dictionary = app._hero_calculation("rune_medic")
 	for panel: Node in descendants(app.screen):
 		if panel.get_meta("unit_id", "") == "rune_medic": check(panel.get_meta("unit_stats", {}) == studied_gallery, "actual studied gallery uses the same central final values")
+	app._open_briefing("stage_08")
+	await capture("art_briefing_studied")
 	check(profile._commit(fixture), "restore original base-route art/battle fixture")
+	for stage: Dictionary in Catalog.stages():
+		app._open_briefing(str(stage.id))
+		check(app.tab == "敌情" and app.selected_briefing == str(stage.id), "real Main exposes the requested briefing " + str(stage.id))
+		await capture("art_briefing_" + str(stage.id))
+		for node: Node in descendants(app.screen):
+			if node is ScrollContainer: node.scroll_vertical = int(node.get_v_scroll_bar().max_value)
+		await capture("art_briefing_" + str(stage.id) + "_lower")
+	var locked_briefing_fixture: Dictionary = fixture.duplicate(true)
+	locked_briefing_fixture.cleared = []
+	locked_briefing_fixture.owned = Catalog.initial_roster()
+	locked_briefing_fixture.roster = ["iron_guard"]
+	check(profile._commit(locked_briefing_fixture), "save isolated locked briefing visual fixture")
+	app._open_briefing("stage_08")
+	await capture("art_briefing_locked")
+	check(profile._commit(fixture), "restore base-route fixture after read-only briefing art")
 	app.show_home("编队")
 	await capture("art_squad")
 	scroll_to_bottom()
@@ -268,7 +285,7 @@ func finish() -> void:
 	await audio.shutdown()
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
-	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, summon cards, both chapter edges and native gallery. Uses an isolated all-unlocked visual fixture; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
+	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges and native gallery. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	var file := FileAccess.open("res://reports/art_review_local.json", FileAccess.WRITE)
 	if file == null:
 		push_error("cannot write offscreen art review report")

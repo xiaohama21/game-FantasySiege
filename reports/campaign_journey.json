@@ -3,18 +3,18 @@
 	"audio_shutdowns": [
 		{
 			"phase": "fresh_complete",
-			"process_id": 24696.0,
+			"process_id": 29188.0,
 			"shutdown_clean": true,
-			"wait_seconds": 0.044
+			"wait_seconds": 0.112
 		},
 		{
 			"phase": "complete",
-			"process_id": 29144,
+			"process_id": 18968,
 			"shutdown_clean": true,
-			"wait_seconds": 0.044
+			"wait_seconds": 0.057
 		}
 	],
-	"battle_sha256": "e4ffd4890913167d019501a4bea3bb811e94ec68bad457aaf1c76ac4fa6cc2b9",
+	"battle_sha256": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
 	"battle_step_seconds": 0.2,
 	"checks": 992,
 	"economy": {
@@ -77,22 +77,22 @@
 		"schema": 3,
 		"study_routes": {},
 		"transactions": [
-			"stage_01-814373-2489518512",
-			"stage_02-5841445-2112477907",
-			"stage_03-14246578-555793436",
-			"stage_04-25175031-2458180873",
-			"stage_05-33037546-1386192850",
-			"stage_06-41411496-7516925",
-			"stage_07-48862338-3797299553",
-			"stage_08-62978823-29912651",
-			"stage_08-1288079-594927498"
+			"stage_01-1139861-2457961876",
+			"stage_02-7819970-2352167117",
+			"stage_03-16423705-3452129620",
+			"stage_04-24792920-1213455909",
+			"stage_05-32790054-1231026024",
+			"stage_06-43309717-1245540635",
+			"stage_07-52367577-1339510680",
+			"stage_08-69793645-3666185154",
+			"stage_08-3471788-2297096538"
 		]
 	},
 	"forbidden_shortcuts_used": [],
-	"fresh_process_id": 24696.0,
-	"gdd_header": "> 文档 v0.5.1 · 2026-11-19 · 目标程序 0.1.3.0",
-	"gdd_sha256": "a581fec3dbb524627a24cc6fd3bdf2453088b1d2e082c83202f26d0a85eda188",
-	"gdd_version": "0.5.1",
+	"fresh_process_id": 29188.0,
+	"gdd_header": "> 文档 v0.5.6 · 2026-11-19 · 目标程序 0.1.3.0",
+	"gdd_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
+	"gdd_version": "0.5.6",
 	"initial_profile": {
 		"cleared": [],
 		"credits": 300.0,
@@ -145,7 +145,7 @@
 	},
 	"journey_sha256": "51d8f22727c4c30ddba5a1b75f9173b9027b7cd09cad603057cd49c7d694186a",
 	"logic_step_seconds": 0.0166666666666667,
-	"main_sha256": "c4f434731aa15b87b2f1a422dabb819e192139f36ec42cb30cf0ab53b8abee77",
+	"main_sha256": "32a17d86aee9047c132224b2b7ace8371944afa505e832cae8101d9ac7a02a1f",
 	"manual_input_verified": false,
 	"native_acceptance": "Rendered native Spine, actual audio, clean portable package, and full-scene performance are verified separately.",
 	"native_spine_verified": false,
@@ -214,14 +214,14 @@
 			"schema": 3.0,
 			"study_routes": {},
 			"transactions": [
-				"stage_01-814373-2489518512",
-				"stage_02-5841445-2112477907",
-				"stage_03-14246578-555793436",
-				"stage_04-25175031-2458180873",
-				"stage_05-33037546-1386192850",
-				"stage_06-41411496-7516925",
-				"stage_07-48862338-3797299553",
-				"stage_08-62978823-29912651"
+				"stage_01-1139861-2457961876",
+				"stage_02-7819970-2352167117",
+				"stage_03-16423705-3452129620",
+				"stage_04-24792920-1213455909",
+				"stage_05-32790054-1231026024",
+				"stage_06-43309717-1245540635",
+				"stage_07-52367577-1339510680",
+				"stage_08-69793645-3666185154"
 			]
 		},
 		"profile_reloaded": {
@@ -277,18 +277,18 @@
 			"schema": 3,
 			"study_routes": {},
 			"transactions": [
-				"stage_01-814373-2489518512",
-				"stage_02-5841445-2112477907",
-				"stage_03-14246578-555793436",
-				"stage_04-25175031-2458180873",
-				"stage_05-33037546-1386192850",
-				"stage_06-41411496-7516925",
-				"stage_07-48862338-3797299553",
-				"stage_08-62978823-29912651"
+				"stage_01-1139861-2457961876",
+				"stage_02-7819970-2352167117",
+				"stage_03-16423705-3452129620",
+				"stage_04-24792920-1213455909",
+				"stage_05-32790054-1231026024",
+				"stage_06-43309717-1245540635",
+				"stage_07-52367577-1339510680",
+				"stage_08-69793645-3666185154"
 			]
 		},
-		"profile_sha256": "4a71b3c7cd313d9da5c81b63f17af4a790f4afa6510f67bf07fae7707cc908c5",
-		"resume_process_id": 29144
+		"profile_sha256": "bce711e486f2cd0ee7cfa73f9076e83ac62f9bccd1a5d7c28703d5e60a6c3638",
+		"resume_process_id": 18968
 	},
 	"roster_changes": [
 		{
@@ -478,7 +478,7 @@
 				"rune_medic": 1.0,
 				"zhaoyun": 1.0
 			},
-			"wall_ms": 4682.904
+			"wall_ms": 6273.604
 		},
 		{
 			"actual_award": {
@@ -574,7 +574,7 @@
 				"rune_medic": 1.0,
 				"zhaoyun": 1.0
 			},
-			"wall_ms": 8344.726
+			"wall_ms": 8527.636
 		},
 		{
 			"actual_award": {
@@ -681,7 +681,7 @@
 				"zhaoyun": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 9372.178
+			"wall_ms": 7500.58
 		},
 		{
 			"actual_award": {
@@ -803,7 +803,7 @@
 				"zhaoyun": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 7581.353
+			"wall_ms": 7656.043
 		},
 		{
 			"actual_award": {
@@ -931,7 +931,7 @@
 				"star_hammer": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 7974.682
+			"wall_ms": 9817.136
 		},
 		{
 			"actual_award": {
@@ -1065,7 +1065,7 @@
 				"star_hammer": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 7162.397
+			"wall_ms": 8741.806
 		},
 		{
 			"actual_award": {
@@ -1197,7 +1197,7 @@
 				"rune_medic": 3.0,
 				"star_hammer": 1.0
 			},
-			"wall_ms": 12531.969
+			"wall_ms": 16334.909
 		},
 		{
 			"actual_award": {
@@ -1343,7 +1343,7 @@
 				"rune_medic": 4.0,
 				"star_hammer": 1.0
 			},
-			"wall_ms": 13061.514
+			"wall_ms": 25713.277
 		},
 		{
 			"actual_award": {
@@ -1484,7 +1484,7 @@
 				"spirit_beast": 1,
 				"star_hammer": 1
 			},
-			"wall_ms": 13529.287
+			"wall_ms": 19596.019
 		}
 	],
 	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",

@@ -9,8 +9,10 @@ import json
 import os
 from pathlib import Path
 import re
+import struct
 import subprocess
 import time
+import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_GODOT = Path("F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe")
@@ -33,6 +35,11 @@ class CheckCase:
     required_report_values: tuple[tuple[str, str | int | bool], ...] = ()
 
 
+BRIEFING_REPORT_HASHES = (("project_sha256", "project.godot"), ("gdd_sha256", "docs/GAME_DESIGN.md"),
+                         ("briefings_sha256", "resources/briefings.json"), ("studies_sha256", "resources/studies.json"),
+                         ("units_sha256", "resources/units.json"), ("stages_sha256", "resources/stages.json"))
+BRIEFING_SCRIPT_HASHES = ("scripts/core/BattleBriefing.gd", "scripts/core/UnitStats.gd", "scripts/combat/SiegeBattle.gd")
+
 CASES = {
     case.name: case for case in (
         CheckCase("BattleSmoke", "BATTLE_SMOKE", "battle_smoke.json", timeout=300),
@@ -47,13 +54,121 @@ CASES = {
                   required_report_values=(("matrix_cases", 108),)),
         CheckCase("StudyUISmoke", "STUDY_UI_SMOKE", "study_ui_smoke.json",
                   report_hashes=(("project_sha256", "project.godot"), ("studies_sha256", "resources/studies.json"), ("units_sha256", "resources/units.json")),
-                  script_hashes=("scripts/ui/Main.gd",)),
+                  script_hashes=("scripts/ui/Main.gd", "scripts/ui/StatBadge.gd")),
+        CheckCase("BriefingSmoke", "BRIEFING_SMOKE", "briefing_smoke.json", final_phase="complete",
+                  report_hashes=BRIEFING_REPORT_HASHES, script_hashes=BRIEFING_SCRIPT_HASHES,
+                  required_report_values=(("stage_count", 8), ("matrix_cases", 108), ("gdd_version", "0.5.6"))),
+        CheckCase("BriefingUISmoke", "BRIEFING_UI_SMOKE", "briefing_ui_smoke.json",
+                  report_hashes=BRIEFING_REPORT_HASHES, script_hashes=BRIEFING_SCRIPT_HASHES + ("scripts/ui/Main.gd", "scripts/ui/StatBadge.gd"),
+                  required_report_values=(("stage_count", 8), ("gdd_version", "0.5.6"))),
         CheckCase("MainFlow", "MAIN_FLOW", "main_flow.json", headless=False, timeout=300),
         CheckCase("CampaignJourney", "CAMPAIGN_JOURNEY_COMPLETE", "campaign_journey.json", timeout=900, final_phase="complete"),
     )
 }
 VISUAL_CASES = ("MainFlow", "CampaignJourney")
 CPU_CASES = tuple(name for name, case in CASES.items() if case.headless and name not in VISUAL_CASES)
+MAIN_FLOW_CAPTURES = ("01_campaign", "06_chapter_two", "02_attributes", "03_squad", "09_enemy_book", "14_boss_book", "04_gallery", "11_guide_summon", "12_guide_camera", "13_guide_pulse", "07_battle_right", "10_settings", "15_unsaved_settings", "05_battle", "08_unlock_result")
+
+
+def png_dimensions(path: Path) -> tuple[int, int]:
+    """Read real RGB/RGBA dimensions and reject truncated/corrupt PNG chunks."""
+    raw = path.read_bytes()
+    if not raw.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("PNG signature missing")
+    cursor, dimensions, has_data = 8, None, False
+    while cursor + 12 <= len(raw):
+        length = struct.unpack_from(">I", raw, cursor)[0]
+        kind = raw[cursor + 4:cursor + 8]
+        end = cursor + 12 + length
+        if end > len(raw):
+            raise ValueError("PNG chunk is truncated")
+        data = raw[cursor + 8:cursor + 8 + length]
+        checksum = struct.unpack_from(">I", raw, cursor + 8 + length)[0]
+        if zlib.crc32(kind + data) != checksum:
+            raise ValueError("PNG chunk checksum differs")
+        if cursor == 8:
+            if kind != b"IHDR" or length != 13:
+                raise ValueError("PNG IHDR missing")
+            width, height, depth, color, compression, filtering, interlace = struct.unpack(">IIBBBBB", data)
+            if not width or not height or depth not in (8, 16) or color not in (2, 6) or compression != 0 or filtering != 0 or interlace not in (0, 1):
+                raise ValueError("PNG RGB/RGBA header invalid")
+            dimensions = (width, height)
+        elif kind == b"IHDR":
+            raise ValueError("PNG IHDR repeated")
+        if kind == b"IDAT" and data:
+            has_data = True
+        if kind == b"IEND":
+            if length or not has_data or end != len(raw) or dimensions is None:
+                raise ValueError("PNG ending invalid")
+            return dimensions
+        cursor = end
+    raise ValueError("PNG ending missing or truncated")
+
+
+def main_flow_check(report: dict, root: Path | None = None) -> list[str]:
+    base = ROOT if root is None else root
+    errors = []
+    if not isinstance(report, dict):
+        return ["MainFlow report is not an object"]
+    if report.get("passed") is not True or report.get("failures") or type(report.get("checks")) is not int or report.get("checks", 0) <= 0:
+        errors.append("MainFlow structured report failed")
+    try:
+        source = (base / "project.godot").read_text(encoding="utf-8-sig")
+        version = re.search(r'^\s*config/version\s*=\s*"([^"\r\n]+)"\s*$', source, re.MULTILINE)
+        if version is None or report.get("program_version") != version.group(1):
+            errors.append("MainFlow program version differs")
+        for key, relative in (("units_sha256", "resources/units.json"), ("stages_sha256", "resources/stages.json")):
+            if report.get(key) != hashlib.sha256((base / relative).read_bytes()).hexdigest():
+                errors.append("MainFlow input SHA differs: " + key)
+    except (OSError, ValueError) as error:
+        errors.append("MainFlow context unreadable: " + str(error))
+    for key in ("real_spine", "audio_shutdown_clean", "normal_window_close", "engine_input_dispatch_verified"):
+        if report.get(key) is not True:
+            errors.append("MainFlow required state missing: " + key)
+    if report.get("os_input_verified") is not False:
+        errors.append("MainFlow must exclude OS/manual input verification")
+    observed = report.get("host_observed_frames")
+    if type(observed) is not int or observed <= 0:
+        errors.append("MainFlow requires positive integer host observation frames")
+    for key in ("host_normal_window_frames", "host_focused_frames"):
+        if type(report.get(key)) is not int or report.get(key) != observed:
+            errors.append("MainFlow host observation incomplete: " + key)
+    captures = report.get("capture_states")
+    if not isinstance(captures, list):
+        return errors + ["MainFlow capture states missing"]
+    if type(report.get("screenshots")) is not int or report.get("screenshots") != len(MAIN_FLOW_CAPTURES) or len(captures) != len(MAIN_FLOW_CAPTURES):
+        errors.append("MainFlow requires all fifteen capture states")
+    names = [capture.get("name") for capture in captures if isinstance(capture, dict) and type(capture.get("name")) is str]
+    if len(names) != len(captures) or len(set(names)) != len(MAIN_FLOW_CAPTURES) or set(names) != set(MAIN_FLOW_CAPTURES):
+        errors.append("MainFlow capture identities incomplete or duplicated")
+    for capture in captures:
+        if not isinstance(capture, dict):
+            errors.append("MainFlow capture is not an object")
+            continue
+        name = capture.get("name")
+        if type(name) is not str or name not in MAIN_FLOW_CAPTURES:
+            errors.append("MainFlow capture identity invalid")
+            continue
+        for key in ("window_mode", "display_window_mode"):
+            if type(capture.get(key)) is not int or capture.get(key) != 0:
+                errors.append("MainFlow capture requires normal window: " + name + "/" + key)
+        if capture.get("window_visible") is not True or capture.get("focused") is not True or capture.get("actual_rendering_driver") != "vulkan":
+            errors.append("MainFlow capture host/driver invalid: " + name)
+        size = capture.get("size")
+        if size != [1280, 720] or any(type(value) is not int for value in size):
+            errors.append("MainFlow capture declared size invalid: " + name)
+        relative = "reports/runtime/" + name + ".png"
+        if capture.get("path") != "res://" + relative:
+            errors.append("MainFlow capture path does not match identity: " + name)
+        path = base / relative
+        try:
+            if png_dimensions(path) != (1280, 720):
+                errors.append("MainFlow capture actual PNG size invalid: " + name)
+            if hashlib.sha256(path.read_bytes()).hexdigest() != capture.get("sha256"):
+                errors.append("MainFlow capture PNG SHA differs: " + name)
+        except (OSError, ValueError) as error:
+            errors.append("MainFlow capture PNG invalid: " + name + "/" + str(error))
+    return errors
 
 
 def _utc_now() -> str:
@@ -149,6 +264,8 @@ def validate_report(case: CheckCase, result: dict, expected: dict) -> None:
     for key, value in case.required_report_values:
         if type(report.get(key)) is not type(value) or report.get(key) != value:
             result["errors"].append("report_required_value_mismatch: " + key)
+    if case.name == "MainFlow":
+        result["errors"].extend(main_flow_check(report))
 
 
 def run_case(case: CheckCase, godot: Path, expected: dict, verbose_render_diagnostics: bool = False) -> dict:

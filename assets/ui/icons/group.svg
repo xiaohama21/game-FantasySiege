@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>人数与范围</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="5" cy="10" r="2.5" fill="#efb65b"/>
+    <circle cx="19" cy="10" r="2.5" fill="#efb65b"/>
+    <path fill="#efb65b" d="M2 20V17C2 14 8 14 8 17V20Z"/>
+    <path fill="#efb65b" d="M16 20V17C16 14 22 14 22 17V20Z"/>
+    <circle cx="12" cy="7" r="3.3" fill="#63c5b7"/>
+    <path fill="#63c5b7" d="M7 21V17C7 12 17 12 17 17V21Z"/>
+  </g>
+</svg>

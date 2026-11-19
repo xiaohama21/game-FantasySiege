@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>前摇与冷却</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="13" r="8" fill="#efb65b"/>
+    <path fill="#63c5b7" d="M9 2H15V5H9Z"/>
+    <path d="M12 8V13L16 15"/>
+    <path stroke="#fff2d7" d="M7 8L6 9"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "remote": "https://github.com/xiaohama21/game-FantasySiege.git",
+  "branch": "0.1.3",
+  "local_commit": "6ff5e2e13e06d2c01a3cf1fe7c7e8cdef0b8b57e",
+  "remote_refs": {
+    "refs/heads/0.1.3": "6ff5e2e13e06d2c01a3cf1fe7c7e8cdef0b8b57e",
+    "refs/heads/main": "5340a0bfcb1ff9aa30a613cdd9ae13e0237c148c"
+  },
+  "scope": "Direct read-back after successful authorized push of 6ff5e2e; main left unchanged. Later uncommitted acceptance-tool improvements are not claimed published.",
+  "proxy_pull_failed": true,
+  "direct_probe_succeeded": true,
+  "push_succeeded": true,
+  "command_line": [
+    "git",
+    "-c",
+    "http.proxy=",
+    "ls-remote",
+    "origin",
+    "refs/heads/0.1.3",
+    "refs/heads/main"
+  ],
+  "stdout": "6ff5e2e13e06d2c01a3cf1fe7c7e8cdef0b8b57e\trefs/heads/0.1.3\n5340a0bfcb1ff9aa30a613cdd9ae13e0237c148c\trefs/heads/main\n",
+  "stderr": "",
+  "verified_utc": "2026-11-19T08:21:00.969161+00:00"
+}

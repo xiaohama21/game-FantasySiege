@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>治疗</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#63c5b7" d="M12 21C10 19 3 14 3 8.5C3 5 7.8 2.5 12 7C16.2 2.5 21 5 21 8.5C21 14 14 19 12 21Z"/>
+    <path fill="#fff2d7" d="M10 9H14V12H17V16H14V19H10V16H7V12H10Z" stroke-width="1.2"/>
+  </g>
+</svg>

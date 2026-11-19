@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>魔法抗性</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9" fill="#63c5b7"/>
+    <circle cx="12" cy="12" r="6.1" stroke="#fff2d7"/>
+    <path fill="#efb65b" d="M12 6L16.5 12L12 18L7.5 12Z"/>
+    <path stroke="#fff2d7" d="M12 9V13"/>
+  </g>
+</svg>

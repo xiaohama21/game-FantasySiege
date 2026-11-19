@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "low_cost_max": 90,
+  "low_cost_range_max": 100,
+  "enemies": {
+    "riftling": {"tags": ["群袭", "近战"], "counters": ["范围清群", "低费补线"]},
+    "ash_runner": {"tags": ["快突", "近战"], "counters": ["减速留人", "前排补位"]},
+    "obsidian_guard": {"tags": ["重甲", "重击"], "counters": ["魔法破甲", "前排承压"]},
+    "ember_caster": {"tags": ["远程", "范围魔法"], "counters": ["前排推进", "治疗后排"]},
+    "obsidian_warden": {"tags": ["首领", "范围重击"], "counters": ["P打断预警", "持续补盾"]},
+    "brass_chomper": {"tags": ["机械", "群袭"], "counters": ["范围清群", "低费补线"]},
+    "brass_guard": {"tags": ["机械", "重甲"], "counters": ["真实破甲", "前排承压"]},
+    "rail_stoker": {"tags": ["远程", "范围魔法"], "counters": ["治疗后排", "范围控制"]},
+    "rail_colossus": {"tags": ["首领", "范围重击"], "counters": ["P打断预警", "持续补盾"]}
+  },
+  "capabilities": {
+    "frontline": {"label": "守线前排", "description": "具备明确守线身份的非治疗英魂。"},
+    "low_cost": {"label": "低费近战补线", "description": "非治疗、具有正数伤害且当前射程不高于100px，召唤费用不高于90能量。"},
+    "aoe": {"label": "范围输出", "description": "当前最终属性具有大于零的攻击范围半径。"},
+    "magic": {"label": "魔法输出", "description": "实际攻击造成魔法伤害，治疗支援不计入输出。"},
+    "true_damage": {"label": "真实伤害", "description": "实际攻击造成无视护甲的真实伤害。"},
+    "healing": {"label": "治疗支援", "description": "当前技能可恢复正数生命。"},
+    "slow": {"label": "减速控制", "description": "当前技能使移动速度降低，并具有正数持续时间。"},
+    "siege": {"label": "攻城强化", "description": "当前技能的基地伤害倍率大于一。"}
+  },
+  "units": {
+    "guanyu": {"frontline": true},
+    "zhaoyun": {"frontline": false},
+    "zhugeliang": {"frontline": false},
+    "diaochan": {"frontline": false},
+    "lubu": {"frontline": true},
+    "iron_guard": {"frontline": true},
+    "ember_archer": {"frontline": false},
+    "rune_medic": {"frontline": false},
+    "star_hammer": {"frontline": true},
+    "rivet_gunner": {"frontline": false},
+    "moon_mage": {"frontline": false},
+    "spirit_beast": {"frontline": true}
+  },
+  "stages": {
+    "stage_01": {"recommendations": [
+      {"capability": "frontline", "reason": "先稳定断桥前线，让后排抵达。"},
+      {"capability": "low_cost", "reason": "保留补位余量，避免一次用尽能量。"},
+      {"capability": "aoe", "reason": "裂隙小鬼群聚推进，范围攻击有助于清理密集目标。"}
+    ]},
+    "stage_02": {"recommendations": [
+      {"capability": "low_cost", "reason": "快突来袭时预留补线费用。"},
+      {"capability": "slow", "reason": "减缓灰烬浮灵，为前排补位争取时间。"},
+      {"capability": "aoe", "reason": "范围攻击有助于压低长廊敌群的数量。"}
+    ]},
+    "stage_03": {"recommendations": [
+      {"capability": "frontline", "reason": "首领狂潮期间持续补前排，保护后排。"},
+      {"capability": "healing", "reason": "治疗可延长前线在首领重击下的支撑时间。"},
+      {"capability": "magic", "reason": "魔法输出为应对黑曜重甲提供另一种伤害来源。"}
+    ]},
+    "stage_04": {"recommendations": [
+      {"capability": "frontline", "reason": "首领半血进入狂潮，注意前排补位。"},
+      {"capability": "healing", "reason": "让治疗站在守线英魂后方。"},
+      {"capability": "slow", "reason": "减速为推进和脉冲冷却争取时间。"},
+      {"capability": "aoe", "reason": "清理伴随首领推进的密集小兵。"}
+    ]},
+    "stage_05": {"recommendations": [
+      {"capability": "frontline", "reason": "机械重甲需要持续稳定的前线。"},
+      {"capability": "true_damage", "reason": "真实伤害可穿过机械护甲。"},
+      {"capability": "siege", "reason": "推进到敌方基地后，攻城强化有助于缩短攻坚时间。"}
+    ]},
+    "stage_06": {"recommendations": [
+      {"capability": "frontline", "reason": "守住栈桥，避免机械敌群穿过前排。"},
+      {"capability": "healing", "reason": "支撑前排承受机械法术攻击。"},
+      {"capability": "siege", "reason": "稳定推进后使用攻城强化压低基地生命。"},
+      {"capability": "aoe", "reason": "同时处理机械小兵与远程司炉。"}
+    ]},
+    "stage_07": {"recommendations": [
+      {"capability": "slow", "reason": "控制密集机偶的推进速度。"},
+      {"capability": "aoe", "reason": "范围输出可同时打击多个机械目标。"},
+      {"capability": "true_damage", "reason": "应对工坊的高护甲防线。"}
+    ]},
+    "stage_08": {"recommendations": [
+      {"capability": "frontline", "reason": "巨匠过热后保持补盾，保护后排。"},
+      {"capability": "healing", "reason": "治疗辅助前排承受首领重击。"},
+      {"capability": "slow", "reason": "控制推进节奏，为看到重击预警后使用脉冲创造空间。"},
+      {"capability": "siege", "reason": "守线稳定后推进，攻城强化只提供战术选择，不保证胜利。"}
+    ]}
+  }
+}

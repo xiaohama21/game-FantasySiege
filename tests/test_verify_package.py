@@ -1,18 +1,29 @@
 """Check package verification failure boundaries without launching Godot."""
 from contextlib import redirect_stdout
+from functools import lru_cache
 import io
 import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import time
 import unittest
+import zlib
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import verify_package
+
+
+@lru_cache(maxsize=None)
+def fixture_png(width=1280, height=720, color=6):
+    def chunk(kind, data):
+        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data))
+    pixels = (b'\0' + bytes(width * (4 if color == 6 else 3))) * height
+    return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, color, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(pixels)) + chunk(b'IEND', b'')
 
 
 class PackageVerificationBoundaries(unittest.TestCase):
@@ -35,6 +46,11 @@ class PackageVerificationBoundaries(unittest.TestCase):
         for name in names:
             case = verify_package.run_checks.CASES[name]
             record = {'case': name, 'passed': True}
+            if name == 'MainFlow':
+                report = self.main_flow_fixture()
+                path = self.root / 'reports/main_flow.json'
+                path.write_text(json.dumps(report), encoding='utf-8')
+                record['report_sha256'] = verify_package.sha(path)
             if case.report_hashes or case.script_hashes:
                 paths = [relative for _, relative in case.report_hashes] + list(case.script_hashes)
                 for relative in paths:
@@ -52,6 +68,21 @@ class PackageVerificationBoundaries(unittest.TestCase):
             cases.append(record)
         return {'passed': True, 'program_version': '0.1.3.0', 'state': 'complete', 'suite': suite, 'cases': cases}
 
+    def main_flow_fixture(self):
+        context = {}
+        for key, relative in (('units_sha256', 'resources/units.json'), ('stages_sha256', 'resources/stages.json')):
+            path = self.root / relative
+            if not path.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('{}', encoding='utf-8')
+            context[key] = verify_package.sha(path)
+        captures = []
+        for name in verify_package.run_checks.MAIN_FLOW_CAPTURES:
+            path = self.root / 'reports/runtime' / (name + '.png')
+            path.write_bytes(fixture_png())
+            captures.append({'name': name, 'path': 'res://reports/runtime/' + name + '.png', 'sha256': verify_package.sha(path), 'size': [1280, 720], 'window_mode': 0, 'display_window_mode': 0, 'window_visible': True, 'focused': True, 'actual_rendering_driver': 'vulkan'})
+        return {'passed': True, 'checks': 1, 'failures': [], 'program_version': '0.1.3.0', 'real_spine': True, 'audio_shutdown_clean': True, 'normal_window_close': True, 'screenshots': 15, 'host_observed_frames': 20, 'host_normal_window_frames': 20, 'host_focused_frames': 20, 'engine_input_dispatch_verified': True, 'os_input_verified': False, 'capture_states': captures, **context}
+
     def change_study_report(self, suite, name, key, value):
         case = verify_package.run_checks.CASES[name]
         path = self.root / 'reports' / case.report_file
@@ -62,20 +93,29 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def art_fixture(self):
         captures = []
-        names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES)
+        names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES)
         for name in names:
             path = self.root / 'reports/runtime' / (name + '.png')
-            path.write_bytes(('fixture ' + name).encode())
+            path.write_bytes(fixture_png())
             captures.append({'name': name, 'path': 'res://reports/runtime/' + name + '.png',
                              'sha256': verify_package.sha(path), 'size': [1280, 720]})
         study_path = self.root / 'resources/studies.json'
         study_path.parent.mkdir(parents=True, exist_ok=True)
         study_path.write_text('{}', encoding='utf-8')
+        extra_hashes = {}
+        for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd'),
+                              ('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd')):
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('{}', encoding='utf-8')
+            extra_hashes[key] = verify_package.sha(path)
         return {'root_window_mode': 1, 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
-                'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path)}
+                'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes}
 
-    def execute(self, payload=None, output='COMPLETE {}\n', name='case', marker='COMPLETE', exit_code=0, stderr=''):
+    def execute(self, payload=None, output='COMPLETE {}\n', name='case', marker='COMPLETE', exit_code=0, stderr='', hidden_render=False):
         def fake_run(*args, **kwargs):
+            if name == 'checks' and isinstance(payload, dict) and any(case.get('case') == 'MainFlow' for case in payload.get('cases', [])):
+                self.main_flow_fixture()  # The mock process creates the captures after cleanup.
             if payload is not None:
                 path = self.root / 'reports/current.json'
                 path.write_text(json.dumps(payload), encoding='utf-8')
@@ -83,7 +123,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 os.utime(path, ns=(timestamp, timestamp))
             return subprocess.CompletedProcess(args[0], exit_code, stdout=output, stderr=stderr)
         with patch.object(verify_package.subprocess, 'run', side_effect=fake_run), redirect_stdout(io.StringIO()):
-            return verify_package.execute(self.root, name, ['unused'], marker, ['reports/current.json'], '0.1.3.0', 1)
+            return verify_package.execute(self.root, name, ['unused'], marker, ['reports/current.json'], '0.1.3.0', 1, hidden_render=hidden_render)
 
     def test_fresh_report_and_anchored_marker_pass(self):
         self.assertTrue(self.execute({'passed': True, 'program_version': '0.1.3.0'})['passed'])
@@ -141,7 +181,9 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_old_five_and_seven_case_summaries_cannot_pass_current_suites(self):
         for suite, old_names in (('logic', tuple(verify_package.run_checks.CPU_CASES)[:5]),
-                                 ('full', tuple(verify_package.run_checks.CPU_CASES)[:5] + verify_package.run_checks.VISUAL_CASES)):
+                                 ('full', tuple(verify_package.run_checks.CPU_CASES)[:5] + verify_package.run_checks.VISUAL_CASES),
+                                 ('logic', tuple(verify_package.run_checks.CPU_CASES)[:8]),
+                                 ('full', tuple(verify_package.run_checks.CPU_CASES)[:8] + verify_package.run_checks.VISUAL_CASES)):
             with self.subTest(suite=suite):
                 current = self.suite_fixture(suite)
                 old = {**current, 'cases': [item for item in current['cases'] if item['case'] in old_names]}
@@ -150,7 +192,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 self.assertTrue(any('completed ' in error for error in result['errors']))
 
     def test_study_runner_and_dedicated_report_hashes_cannot_be_forged(self):
-        for name in ('StudyProfileSmoke', 'StudyCombatSmoke', 'StudyUISmoke'):
+        for name in ('StudyProfileSmoke', 'StudyCombatSmoke', 'StudyUISmoke', 'BriefingSmoke', 'BriefingUISmoke'):
             for key in ('artifact_sha256', 'report_sha256'):
                 with self.subTest(case=name, field=key):
                     suite = self.suite_fixture()
@@ -161,7 +203,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
                     self.assertTrue(any('SHA differs: ' + name in error for error in result['errors']))
 
     def test_study_dedicated_report_must_exist_and_match_package_inputs(self):
-        for name in ('StudyProfileSmoke', 'StudyCombatSmoke', 'StudyUISmoke'):
+        for name in ('StudyProfileSmoke', 'StudyCombatSmoke', 'StudyUISmoke', 'BriefingSmoke', 'BriefingUISmoke'):
             with self.subTest(case=name, kind='missing'):
                 suite = self.suite_fixture()
                 case = verify_package.run_checks.CASES[name]
@@ -196,9 +238,22 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 self.assertFalse(result['passed'])
                 self.assertIn('study structured report required value differs: StudyCombatSmoke/matrix_cases', result['errors'])
 
+    def test_briefing_package_reports_require_current_design_stages_and_full_matrix(self):
+        for name in ('BriefingSmoke', 'BriefingUISmoke'):
+            for key, expected in verify_package.run_checks.CASES[name].required_report_values:
+                values = (None, True, str(expected), expected + 1, float(expected)) if type(expected) is int else (None, True, '0.5.4', '0.5.5')
+                for value in values:
+                    with self.subTest(case=name, field=key, value=value):
+                        suite = self.suite_fixture()
+                        self.change_study_report(suite, name, key, value)
+                        result = self.execute(suite, name='checks')
+                        self.assertFalse(result['passed'])
+                        self.assertIn('study structured report required value differs: ' + name + '/' + key, result['errors'])
+
     def test_study_input_change_after_runner_report_cannot_pass_package(self):
         for relative in ('resources/studies.json', 'scripts/core/UnitStats.gd',
-                         'scripts/combat/SiegeBattle.gd', 'resources/units.json', 'scripts/ui/Main.gd'):
+                         'scripts/combat/SiegeBattle.gd', 'resources/units.json', 'scripts/ui/Main.gd',
+                         'docs/GAME_DESIGN.md', 'resources/briefings.json', 'scripts/core/BattleBriefing.gd', 'resources/stages.json', 'scripts/ui/StatBadge.gd'):
             with self.subTest(input=relative):
                 suite = self.suite_fixture()
                 with (self.root / relative).open('a', encoding='utf-8') as file:
@@ -244,6 +299,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_foreground_performance_cannot_use_minimized_or_partial_population(self):
         good = {'window_mode': 0, 'window_visible': True, 'sample_frames': 300, 'focused_frames': 300,
+                'normal_window_frames': 300, 'full_resolution_frames': 300, 'actual_rendering_driver': 'vulkan',
                 'hud_visible_frames': 300, 'total_instances': 64, 'native_instances': 64, 'alive_min': 64,
                 'visible_min': 64, 'real_renderer': True, 'rendering_adapter': 'GTX1050',
                 'actual_rendering_method': 'mobile', 'playback_multiplier': 1.0, 'p95_frame_ms': 31.0, 'fps_average': 45.0,
@@ -263,12 +319,21 @@ class PackageVerificationBoundaries(unittest.TestCase):
                            ('key_instances_60hz_min', 11), ('low_priority_instances_max', 53),
                            ('frame_group_counts_min', {'2': 0, '3': 0, '4': 52}), ('production_policy_override', True),
                            ('production_frame_group_count', 4), ('render_thread_model', 'separate'),
-                           ('display_window_size', '(640, 360)'), ('maximum_live_floating_numbers', 0)]:
+                           ('display_window_size', '(640, 360)'), ('maximum_live_floating_numbers', 0),
+                           ('actual_rendering_driver', 'opengl3'), ('actual_rendering_driver', None),
+                           ('normal_window_frames', 299), ('full_resolution_frames', 299),
+                           ('normal_window_frames', 300.0), ('full_resolution_frames', 300.0),
+                           ('sample_frames', 300.0)]:
             with self.subTest(key=key):
                 self.assertTrue(verify_package.performance_check({**good, key: value}, 64, self.policy))
         self.assertTrue(verify_package.performance_check(good, 24, self.policy))
         self.assertTrue(verify_package.performance_check(good, 64, self.policy, 2.0))
         self.assertEqual(verify_package.performance_check({**good, 'playback_multiplier': 2.0}, 64, self.policy, 2.0), [])
+        for key in ('actual_rendering_driver', 'normal_window_frames', 'full_resolution_frames'):
+            with self.subTest(missing=key):
+                missing = good.copy()
+                del missing[key]
+                self.assertTrue(verify_package.performance_check(missing, 64, self.policy))
 
     def test_production_config_must_match_renderer_and_have_explicit_budget(self):
         path = self.root / 'project.godot'
@@ -396,8 +461,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_offscreen_art_rejects_old_counts_and_missing_studied_views(self):
         good = self.art_fixture()
-        self.assertEqual(good['screenshots'], 32)
-        for count in (22, 30):
+        self.assertEqual(good['screenshots'], 50)
+        for count in (22, 30, 32):
             with self.subTest(old_count=count):
                 old = {**good, 'screenshots': count, 'captures': good['captures'][:count]}
                 self.assertTrue(verify_package.offscreen_check(old, 'art_review', self.root))
@@ -407,11 +472,117 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 result = verify_package.offscreen_check({**good, 'captures': renamed}, 'art_review', self.root)
                 self.assertIn('Offscreen art must include all ten study-state and studied-hero captures', result)
 
+    def test_offscreen_art_requires_all_eighteen_briefing_views(self):
+        good = self.art_fixture()
+        self.assertEqual(len(verify_package.BRIEFING_ART_CAPTURES), 18)
+        for name in verify_package.BRIEFING_ART_CAPTURES:
+            with self.subTest(missing=name):
+                renamed = [{**item, 'name': 'replacement'} if item['name'] == name else item for item in good['captures']]
+                result = verify_package.offscreen_check({**good, 'captures': renamed}, 'art_review', self.root)
+                self.assertIn('Offscreen art must include all eighteen battle-briefing captures', result)
+
+    def test_offscreen_art_requires_current_briefing_configuration_and_script(self):
+        for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd')):
+            for kind in ('missing', 'forged', 'changed'):
+                with self.subTest(field=key, kind=kind):
+                    good = self.art_fixture()
+                    if kind == 'missing':
+                        good.pop(key)
+                    elif kind == 'forged':
+                        good[key] = 'forged'
+                    else:
+                        (self.root / relative).write_text('changed after capture', encoding='utf-8')
+                    self.assertIn('Offscreen briefing art SHA differs from this package: ' + key, verify_package.offscreen_check(good, 'art_review', self.root))
+
     def test_offscreen_art_requires_current_study_configuration_hash(self):
         good = self.art_fixture()
         self.assertTrue(verify_package.offscreen_check({**good, 'studies_sha256': 'forged'}, 'art_review', self.root))
         (self.root / 'resources/studies.json').write_text('{"changed": true}', encoding='utf-8')
         self.assertTrue(verify_package.offscreen_check(good, 'art_review', self.root))
+
+    def test_art_reports_cannot_omit_or_reuse_expired_main_and_shared_widget(self):
+        for hidden in (False, True):
+            for key, relative in (('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd')):
+                for kind in ('missing', 'forged', 'changed_after_capture'):
+                    with self.subTest(hidden_render=hidden, field=key, kind=kind):
+                        good = {'passed': True, 'program_version': '0.1.3.0', **self.art_fixture()}
+                        if kind == 'missing':
+                            good.pop(key)
+                        elif kind == 'forged':
+                            good[key] = 'expired UI source'
+                        else:
+                            (self.root / relative).write_text('new UI source after capture', encoding='utf-8')
+                        result = self.execute(good, name='art_review', hidden_render=hidden)
+                        self.assertFalse(result['passed'])
+                        self.assertIn('Offscreen UI art SHA differs from this package: ' + key, result['errors'])
+
+    def test_full_and_offscreen_art_use_the_same_complete_capture_gate(self):
+        for hidden in (False, True):
+            with self.subTest(hidden_render=hidden):
+                good = {'passed': True, 'program_version': '0.1.3.0', **self.art_fixture()}
+                self.assertTrue(self.execute(good, name='art_review', hidden_render=hidden)['passed'])
+                for key, value in (('captures', []), ('screenshots', 32), ('screenshots', 50.0), ('studies_sha256', 'forged'), ('briefings_sha256', 'forged'), ('briefing_script_sha256', 'forged'), ('main_sha256', 'forged'), ('stat_badge_sha256', 'forged'), ('portrait_count', 11), ('text_overflows', ['cropped']), ('audio_shutdown_clean', False), ('root_window_mode', 0)):
+                    with self.subTest(field=key):
+                        self.assertFalse(self.execute({**good, key: value}, name='art_review', hidden_render=hidden)['passed'])
+
+    def test_art_rejects_missing_truncated_and_wrong_actual_png_even_with_matching_sha(self):
+        for raw in (None, b'not PNG', b'\x89PNG\r\n\x1a\n', fixture_png()[:-1], fixture_png(640, 360)):
+            with self.subTest(bytes=None if raw is None else len(raw)):
+                good = self.art_fixture()
+                path = self.root / 'reports/runtime/art_0.png'
+                if raw is None:
+                    path.unlink()
+                else:
+                    path.write_bytes(raw)
+                    good['captures'][0]['sha256'] = verify_package.sha(path)
+                self.assertTrue(verify_package.offscreen_check(good, 'art_review', self.root))
+
+    def test_mainflow_requires_complete_host_observation_and_input_scope(self):
+        good = self.main_flow_fixture()
+        self.assertEqual(verify_package.main_flow_check(good, self.root), [])
+        for key, value in (('host_observed_frames', 0), ('host_observed_frames', True), ('host_normal_window_frames', 19), ('host_normal_window_frames', 20.0), ('host_focused_frames', None), ('host_focused_frames', 19), ('engine_input_dispatch_verified', False), ('os_input_verified', True), ('capture_states', []), ('capture_states', None), ('screenshots', 32)):
+            with self.subTest(field=key, value=value):
+                self.assertTrue(verify_package.main_flow_check({**good, key: value}, self.root))
+
+    def test_mainflow_capture_identity_host_size_and_hash_must_correspond(self):
+        for key, value in (('window_mode', 1), ('window_mode', False), ('display_window_mode', 1), ('window_visible', False), ('focused', False), ('actual_rendering_driver', 'opengl3'), ('size', [1280.0, 720.0]), ('sha256', 'forged'), ('name', '06_chapter_two'), ('path', 'res://reports/runtime/06_chapter_two.png'), ('path', 'res://../outside.png')):
+            with self.subTest(field=key, value=value):
+                report = self.main_flow_fixture()
+                report['capture_states'][0][key] = value
+                self.assertTrue(verify_package.main_flow_check(report, self.root))
+
+    def test_mainflow_rejects_actual_png_size_or_truncation_with_matching_hash(self):
+        for raw in (fixture_png(640, 360), fixture_png()[:-1]):
+            with self.subTest(bytes=len(raw)):
+                report = self.main_flow_fixture()
+                path = self.root / 'reports/runtime/01_campaign.png'
+                path.write_bytes(raw)
+                report['capture_states'][0]['sha256'] = verify_package.sha(path)
+                self.assertTrue(verify_package.main_flow_check(report, self.root))
+
+    def test_full_suite_consumes_shared_mainflow_and_dedicated_report_sha(self):
+        for kind in ('missing', 'forged_sha', 'incomplete_host'):
+            with self.subTest(kind=kind):
+                suite = self.suite_fixture()
+                record = next(case for case in suite['cases'] if case['case'] == 'MainFlow')
+                path = self.root / 'reports/main_flow.json'
+                if kind == 'missing':
+                    path.unlink()
+                elif kind == 'forged_sha':
+                    record['report_sha256'] = 'forged'
+                else:
+                    report = json.loads(path.read_text(encoding='utf-8'))
+                    report['host_focused_frames'] -= 1
+                    path.write_text(json.dumps(report), encoding='utf-8')
+                    record['report_sha256'] = verify_package.sha(path)
+                self.assertFalse(self.execute(suite, name='checks')['passed'])
+
+    def test_full_spine_still_rejects_background_reports(self):
+        for name in ('playback', 'playback_unmanaged', 'mesh_redraw'):
+            with self.subTest(case=name), patch.object(verify_package, 'playback_check', return_value=[]), patch.object(verify_package, 'mesh_redraw_check', return_value=[]):
+                result = self.execute({'passed': True, 'program_version': '0.1.3.0', 'background': True}, name=name)
+                self.assertFalse(result['passed'])
+                self.assertIn('Full verification cannot reuse an offscreen Spine report', result['errors'])
 
     def test_offscreen_phase_uses_only_hidden_cases_and_never_marks_delivery_ready(self):
         self.native_fixture()

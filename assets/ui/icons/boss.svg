@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>首领</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#63c5b7" d="M6 9C2 8 2 4 3 2L9 7M18 9C22 8 22 4 21 2L15 7"/>
+    <path fill="#efb65b" d="M5 10C5 5 19 5 19 10V15C19 19 15 22 12 22C9 22 5 19 5 15Z"/>
+    <path fill="#fff2d7" d="M8 10L11 12L8 14ZM16 10L13 12L16 14Z"/>
+    <path d="M10 17H14"/>
+    <path fill="#63c5b7" d="M12 3L14 6L12 9L10 6Z" stroke-width="1.2"/>
+  </g>
+</svg>

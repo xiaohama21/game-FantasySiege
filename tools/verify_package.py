@@ -13,10 +13,12 @@ import run_checks
 
 ROOT = Path(__file__).resolve().parents[1]
 BAD_LOG = ('CrashHandler',)
-ART_CAPTURE_COUNT = 32
+ART_CAPTURE_COUNT = 50
 STUDY_ART_CAPTURES = ('art_study_locked', 'art_study_unowned', 'art_study_ready', 'art_study_base',
                       'art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow',
                       'art_hero_studied', 'art_gallery_studied')
+BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in range(1, 9)) + tuple(
+    'art_briefing_stage_%02d_lower' % index for index in range(1, 9)) + ('art_briefing_locked', 'art_briefing_studied')
 
 
 def read_json(path):
@@ -117,11 +119,13 @@ def portrait_check(package, version):
 
 def performance_check(detail, count, policy, multiplier=1.0):
     failures = []
-    if detail.get('window_mode') != 0 or detail.get('window_visible') is not True:
+    if type(detail.get('window_mode')) is not int or detail.get('window_mode') != 0 or detail.get('window_visible') is not True:
         failures.append('Performance requires a visible normal window')
-    for key in ('sample_frames', 'focused_frames', 'hud_visible_frames', 'budget_valid_frames'):
-        if detail.get(key) != 300:
+    for key in ('sample_frames', 'focused_frames', 'hud_visible_frames', 'budget_valid_frames', 'normal_window_frames', 'full_resolution_frames'):
+        if type(detail.get(key)) is not int or detail.get(key) != 300:
             failures.append('Performance requires all 300 frames: ' + key)
+    if detail.get('actual_rendering_driver') != 'vulkan':
+        failures.append('Performance requires the actual Vulkan rendering driver')
     for key in ('total_instances', 'native_instances', 'native_instances_min', 'native_instances_max', 'alive_min', 'alive_max', 'visible_min', 'visible_max'):
         if type(detail.get(key)) is not int or detail.get(key) != count:
             failures.append('Performance population differs: ' + key)
@@ -258,29 +262,45 @@ def native_check(detail, package):
 
 def offscreen_check(detail, name, package):
     failures = []
-    if detail.get('root_window_mode') != 1:
+    if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
         failures.append('Offscreen verification requires a minimized host window')
     if name == 'art_review':
         captures = detail.get('captures', [])
+        if not isinstance(captures, list) or any(not isinstance(item, dict) or type(item.get('name')) is not str for item in captures):
+            return failures + ['Offscreen art capture metadata invalid']
         names = {item.get('name') for item in captures}
-        if detail.get('screenshots') != ART_CAPTURE_COUNT or len(captures) != ART_CAPTURE_COUNT or len(names) != ART_CAPTURE_COUNT:
+        if type(detail.get('screenshots')) is not int or detail.get('screenshots') != ART_CAPTURE_COUNT or len(captures) != ART_CAPTURE_COUNT or len(names) != ART_CAPTURE_COUNT:
             failures.append('Offscreen art must contain all ' + str(ART_CAPTURE_COUNT) + ' independent captures')
         if not set(STUDY_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include all ten study-state and studied-hero captures')
+        if not set(BRIEFING_ART_CAPTURES).issubset(names):
+            failures.append('Offscreen art must include all eighteen battle-briefing captures')
         if detail.get('studies_sha256') != sha(package / 'resources/studies.json'):
             failures.append('Offscreen study art recipe SHA differs from this package')
+        for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd')):
+            if detail.get(key) != sha(package / relative):
+                failures.append('Offscreen briefing art SHA differs from this package: ' + key)
+        for key, relative in (('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd')):
+            if detail.get(key) != sha(package / relative):
+                failures.append('Offscreen UI art SHA differs from this package: ' + key)
         if detail.get('portrait_count') != 12 or detail.get('text_overflows') or detail.get('audio_shutdown_clean') is not True:
             failures.append('Offscreen art portrait/text/audio gates failed')
         for capture in captures:
             relative = str(capture.get('path', '')).removeprefix('res://')
             path = (package / relative).resolve()
             path.relative_to(package)
-            if capture.get('size') != [1280, 720] or not path.is_file() or sha(path) != capture.get('sha256'):
+            size = capture.get('size')
+            if size != [1280, 720] or any(type(value) is not int for value in size) or not path.is_file() or sha(path) != capture.get('sha256'):
                 failures.append('Offscreen art image missing or changed: ' + str(capture.get('name')))
+            try:
+                if run_checks.png_dimensions(path) != (1280, 720):
+                    failures.append('Offscreen art actual PNG size differs: ' + str(capture.get('name')))
+            except (OSError, ValueError) as error:
+                failures.append('Offscreen art PNG invalid: ' + str(capture.get('name')) + '/' + str(error))
         return failures
     if detail.get('background') is not True or detail.get('performance_measured') is not False:
         failures.append('Offscreen Spine report must explicitly exclude performance measurement')
-    if detail.get('display_window_mode') != 1 or detail.get('actual_rendering_driver') != 'vulkan':
+    if type(detail.get('display_window_mode')) is not int or detail.get('display_window_mode') != 1 or detail.get('actual_rendering_driver') != 'vulkan':
         failures.append('Offscreen Spine verification requires a minimized real Vulkan host')
     if name in ('playback', 'playback_unmanaged'):
         if detail.get('background_host_valid_resources') != 21:
@@ -302,6 +322,17 @@ def suite_check(detail, package, suite, version):
         failures.append('checks must be the completed ' + str(len(expected_names)) + '-case ' + suite + ' suite')
     for name in expected_names:
         case = run_checks.CASES[name]
+        if name == 'MainFlow':
+            record = next((item for item in cases if item.get('case') == name), None)
+            path = package / 'reports' / case.report_file
+            if record is None or not path.is_file():
+                failures.append('MainFlow structured report missing')
+            else:
+                report = read_json(path)
+                if record.get('report_sha256') != sha(path):
+                    failures.append('MainFlow structured report SHA differs')
+                failures.extend(main_flow_check(report, package))
+            continue
         if not case.report_hashes and not case.script_hashes and not case.required_report_values:
             continue
         record = next((item for item in cases if item.get('case') == name), None)
@@ -329,6 +360,10 @@ def suite_check(detail, package, suite, version):
             if type(report.get(key)) is not type(value) or report.get(key) != value:
                 failures.append('study structured report required value differs: ' + name + '/' + key)
     return failures
+
+
+def main_flow_check(detail, package):
+    return run_checks.main_flow_check(detail, package)
 
 
 def execute(package, name, command, marker, reports, version, timeout, hidden_render=False):
@@ -375,7 +410,7 @@ def execute(package, name, command, marker, reports, version, timeout, hidden_re
                 errors.extend(playback_check(detail, package, project_policy(package), name == 'playback'))
             if name == 'mesh_redraw':
                 errors.extend(mesh_redraw_check(detail, package, project_policy(package)))
-            if hidden_render:
+            if hidden_render or name == 'art_review':
                 errors.extend(offscreen_check(detail, name, package))
             elif name in ('playback', 'playback_unmanaged', 'mesh_redraw') and detail.get('background') is True:
                 errors.append('Full verification cannot reuse an offscreen Spine report')
@@ -483,8 +518,8 @@ def main(argv=None):
         audit.extend(native_check(native, package))
     flow_path = package / 'reports/main_flow.json'
     flow = read_json(flow_path) if args.phase == 'full' and flow_path.exists() else {}
-    if args.phase == 'full' and (flow.get('real_spine') is not True or flow.get('audio_shutdown_clean') is not True or flow.get('screenshots', 0) < 15):
-        audit.append('Rendered MainFlow must include all UI captures, native actors and graceful audio exit')
+    if args.phase == 'full':
+        audit.extend(main_flow_check(flow, package))
     for filename in ('11_guide_summon.png', '12_guide_camera.png', '13_guide_pulse.png', '10_settings.png', '14_boss_book.png', '08_unlock_result.png'):
         if args.phase == 'full' and not (package / 'reports/runtime' / filename).is_file():
             audit.append('Missing rendered image: ' + filename)

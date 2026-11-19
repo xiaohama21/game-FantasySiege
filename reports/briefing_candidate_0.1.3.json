@@ -1,0 +1,398 @@
+{
+  "passed": true,
+  "scope": "Candidate7 battle briefing and original SVG UI increment: actual bundle CPU10, independent campaign, native probes and offscreen rendering. Foreground flow/performance remain deferred by user.",
+  "delivery_ready": false,
+  "foreground_verified": false,
+  "performance_verified": false,
+  "commercial_release_verified": false,
+  "program_version": "0.1.3.0",
+  "gdd_version": "0.5.6",
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-7",
+  "start": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-7\\开始游戏.cmd",
+  "cpu_cases": 10,
+  "cpu_checks": 8147,
+  "cases": [
+    {
+      "case": "BattleSmoke",
+      "checks": 120,
+      "passed": true
+    },
+    {
+      "case": "ProfileSmoke",
+      "checks": 24,
+      "passed": true
+    },
+    {
+      "case": "ProgressionSmoke",
+      "checks": 34,
+      "passed": true
+    },
+    {
+      "case": "PreferencesSmoke",
+      "checks": 76,
+      "passed": true
+    },
+    {
+      "case": "AudioShutdownSmoke",
+      "checks": 6,
+      "passed": true
+    },
+    {
+      "case": "StudyProfileSmoke",
+      "checks": 470,
+      "passed": true
+    },
+    {
+      "case": "StudyCombatSmoke",
+      "checks": 1873,
+      "passed": true
+    },
+    {
+      "case": "StudyUISmoke",
+      "checks": 1180,
+      "passed": true
+    },
+    {
+      "case": "BriefingSmoke",
+      "checks": 2945,
+      "passed": true
+    },
+    {
+      "case": "BriefingUISmoke",
+      "checks": 1419,
+      "passed": true
+    }
+  ],
+  "campaign_checks": 988,
+  "campaign_phase": "complete",
+  "ui_screenshots": 50,
+  "ui_checks": 6253,
+  "ui_text_overflows": [],
+  "native_resources": 21,
+  "native_animations": 220,
+  "pixel_comparisons": 2624,
+  "svg_icons": 19,
+  "source_package_files": [
+    {
+      "path": "scripts/audio/GameAudio.gd",
+      "source_sha256": "4e94e9040812b161d286aa65be9877cb1d0f506be838d75b04ba3980b3433c09",
+      "package_sha256": "4e94e9040812b161d286aa65be9877cb1d0f506be838d75b04ba3980b3433c09",
+      "matches": true
+    },
+    {
+      "path": "scripts/combat/DamageTypes.gd",
+      "source_sha256": "411f74840d0ca7e4617cfdce180195fa1a729a15aa295eccbb1e23265bab4a55",
+      "package_sha256": "411f74840d0ca7e4617cfdce180195fa1a729a15aa295eccbb1e23265bab4a55",
+      "matches": true
+    },
+    {
+      "path": "scripts/combat/SiegeBattle.gd",
+      "source_sha256": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+      "package_sha256": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/BattleBriefing.gd",
+      "source_sha256": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+      "package_sha256": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/Catalog.gd",
+      "source_sha256": "1c7abc8e8970e92b3bfccd739476418c9a026118aaea23ad06775b4345021f52",
+      "package_sha256": "1c7abc8e8970e92b3bfccd739476418c9a026118aaea23ad06775b4345021f52",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/ProfileStore.gd",
+      "source_sha256": "5df67e772e9f1168ffbeb0e649e5728905e667d9c50c7cd67b4d4c7115557318",
+      "package_sha256": "5df67e772e9f1168ffbeb0e649e5728905e667d9c50c7cd67b4d4c7115557318",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/UnitStats.gd",
+      "source_sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+      "package_sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/UserPrefs.gd",
+      "source_sha256": "fe63bd8d5d5e6ac175a6e9492795bdba7522eef1badaa5c5f1c561d17a16abb9",
+      "package_sha256": "fe63bd8d5d5e6ac175a6e9492795bdba7522eef1badaa5c5f1c561d17a16abb9",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/GuidePanel.gd",
+      "source_sha256": "a8231cb7f30af1dba1f19d8c5326532127d39e805eba2c3d26cb2ff4fcfd8b37",
+      "package_sha256": "a8231cb7f30af1dba1f19d8c5326532127d39e805eba2c3d26cb2ff4fcfd8b37",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/Main.gd",
+      "source_sha256": "32a17d86aee9047c132224b2b7ace8371944afa505e832cae8101d9ac7a02a1f",
+      "package_sha256": "32a17d86aee9047c132224b2b7ace8371944afa505e832cae8101d9ac7a02a1f",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/PortraitFrame.gd",
+      "source_sha256": "e5c847f40a49beae89e645e7cd47151d99b79cb232e241898622ad59226ef8c6",
+      "package_sha256": "e5c847f40a49beae89e645e7cd47151d99b79cb232e241898622ad59226ef8c6",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/SettingsPanel.gd",
+      "source_sha256": "73e1d741ced14828be82b9aed275b079d3fb7cc4b60aabeb924b7b073016420b",
+      "package_sha256": "73e1d741ced14828be82b9aed275b079d3fb7cc4b60aabeb924b7b073016420b",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/StatBadge.gd",
+      "source_sha256": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba",
+      "package_sha256": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/UIStyle.gd",
+      "source_sha256": "a8a0d2eae358931f0dce9a922210736c351ab1bba4b9e30fd7b84542eb8ad289",
+      "package_sha256": "a8a0d2eae358931f0dce9a922210736c351ab1bba4b9e30fd7b84542eb8ad289",
+      "matches": true
+    },
+    {
+      "path": "scripts/visuals/SpineActor.gd",
+      "source_sha256": "32106307bb9dbb53ea6a21ef46f56b95b4552c032b1f7b3454ad20e6d28710c7",
+      "package_sha256": "32106307bb9dbb53ea6a21ef46f56b95b4552c032b1f7b3454ad20e6d28710c7",
+      "matches": true
+    },
+    {
+      "path": "scripts/visuals/WorldBackdrop.gd",
+      "source_sha256": "d4099a1dbe1724d38d734e433d7fcf2ad7ef2f03defaf141a5b3bbae64b3e9ce",
+      "package_sha256": "d4099a1dbe1724d38d734e433d7fcf2ad7ef2f03defaf141a5b3bbae64b3e9ce",
+      "matches": true
+    },
+    {
+      "path": "scenes/Main.tscn",
+      "source_sha256": "67e7d31121fd4d08e0416bcac70c530d1fc48ddacddab1b682e076310bd8f1a3",
+      "package_sha256": "67e7d31121fd4d08e0416bcac70c530d1fc48ddacddab1b682e076310bd8f1a3",
+      "matches": true
+    },
+    {
+      "path": "resources/briefings.json",
+      "source_sha256": "b5f3d06c85fba205cfd01511a11247ad10f6ec3a9fc40a724980ac7d56d26cac",
+      "package_sha256": "b5f3d06c85fba205cfd01511a11247ad10f6ec3a9fc40a724980ac7d56d26cac",
+      "matches": true
+    },
+    {
+      "path": "resources/content_plan.json",
+      "source_sha256": "871597f44c13ae12ffb86097eb2e9ac6dcbb8aee34f801553716fa365ae0c1b0",
+      "package_sha256": "871597f44c13ae12ffb86097eb2e9ac6dcbb8aee34f801553716fa365ae0c1b0",
+      "matches": true
+    },
+    {
+      "path": "resources/stages.json",
+      "source_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+      "package_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+      "matches": true
+    },
+    {
+      "path": "resources/studies.json",
+      "source_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+      "package_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+      "matches": true
+    },
+    {
+      "path": "resources/units.json",
+      "source_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+      "package_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+      "matches": true
+    },
+    {
+      "path": "resources/visuals.json",
+      "source_sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+      "package_sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+      "matches": true
+    },
+    {
+      "path": "project.godot",
+      "source_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "package_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "matches": true
+    },
+    {
+      "path": "docs/GAME_DESIGN.md",
+      "source_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
+      "package_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
+      "matches": true
+    },
+    {
+      "path": "tests/ArtReview.gd",
+      "source_sha256": "61cc3381cc7db182ba12595fb47283d4898de07905df77ce7c626bb2b38acaf3",
+      "package_sha256": "61cc3381cc7db182ba12595fb47283d4898de07905df77ce7c626bb2b38acaf3",
+      "matches": true
+    },
+    {
+      "path": "tests/BriefingSmoke.gd",
+      "source_sha256": "50b9b9f08036eb2707f13a0365bbc84f383bb9218e008b215dea3a37e8c51714",
+      "package_sha256": "50b9b9f08036eb2707f13a0365bbc84f383bb9218e008b215dea3a37e8c51714",
+      "matches": true
+    },
+    {
+      "path": "tests/BriefingUISmoke.gd",
+      "source_sha256": "db180b28857f9ad2062d500d659cc9f269e8e3d835d446561e9faf4c12a374dd",
+      "package_sha256": "db180b28857f9ad2062d500d659cc9f269e8e3d835d446561e9faf4c12a374dd",
+      "matches": true
+    },
+    {
+      "path": "tests/StudyUISmoke.gd",
+      "source_sha256": "131837afff06f2338501b95f297477a105e272d9762e3fd274ff94d8949f7b47",
+      "package_sha256": "131837afff06f2338501b95f297477a105e272d9762e3fd274ff94d8949f7b47",
+      "matches": true
+    },
+    {
+      "path": "tools/run_checks.py",
+      "source_sha256": "207b7e44433748b7042769f12c28c27593d2da31d66de8f167a870ec7f3be74e",
+      "package_sha256": "207b7e44433748b7042769f12c28c27593d2da31d66de8f167a870ec7f3be74e",
+      "matches": true
+    },
+    {
+      "path": "tools/verify_package.py",
+      "source_sha256": "60bb35aaf4a69a25847ea070b59f41cdac4f2d06772049eff33b7d34bc12923d",
+      "package_sha256": "60bb35aaf4a69a25847ea070b59f41cdac4f2d06772049eff33b7d34bc12923d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/agility.svg",
+      "source_sha256": "88b1d4d7a5e57adaec71543b86d260e75ed77e42ee8b1c391637a686a93cc6ec",
+      "package_sha256": "88b1d4d7a5e57adaec71543b86d260e75ed77e42ee8b1c391637a686a93cc6ec",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/boss.svg",
+      "source_sha256": "dde60aeaf2efa9d9bb6c4aafd508cbec716277c648aa70e199bafa90cdbc95dc",
+      "package_sha256": "dde60aeaf2efa9d9bb6c4aafd508cbec716277c648aa70e199bafa90cdbc95dc",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/clock.svg",
+      "source_sha256": "fe8d7f44951d6c9e8ffa30f6f498fa3b5ff590590198a5ca6dcda095193ae2af",
+      "package_sha256": "fe8d7f44951d6c9e8ffa30f6f498fa3b5ff590590198a5ca6dcda095193ae2af",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/energy.svg",
+      "source_sha256": "d12abb0cc28d33367f8fcba32f41f6791dc85a33286267cdb803df275dec8eae",
+      "package_sha256": "d12abb0cc28d33367f8fcba32f41f6791dc85a33286267cdb803df275dec8eae",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/group.svg",
+      "source_sha256": "d3f763030edb2ca102fa8420a80c7d8846ff003842cf93fc52115ce0e0a77d5d",
+      "package_sha256": "d3f763030edb2ca102fa8420a80c7d8846ff003842cf93fc52115ce0e0a77d5d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/heal.svg",
+      "source_sha256": "6d69ad055b6581261a1ca4ad6992575af5a50659ec6148bf92c7d89a7be5057c",
+      "package_sha256": "6d69ad055b6581261a1ca4ad6992575af5a50659ec6148bf92c7d89a7be5057c",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/heart.svg",
+      "source_sha256": "e49d587ae8f613b2fec7725d0daa170398420418f961e1f1f9c7a0096c2eb87d",
+      "package_sha256": "e49d587ae8f613b2fec7725d0daa170398420418f961e1f1f9c7a0096c2eb87d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/intelligence.svg",
+      "source_sha256": "528c8c1d4885ecd89bb8bf5af4493efc6fe5f0e19324fa2816f4ae39449eb825",
+      "package_sha256": "528c8c1d4885ecd89bb8bf5af4493efc6fe5f0e19324fa2816f4ae39449eb825",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/orb.svg",
+      "source_sha256": "e469d6f4daeb6bd541a840743726e55846d650721af7e7184cd17729654c8513",
+      "package_sha256": "e469d6f4daeb6bd541a840743726e55846d650721af7e7184cd17729654c8513",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/pulse.svg",
+      "source_sha256": "cc0bb5d68b82a7cf22936844116dc47b9ac560eccfca542e1e9dce18472483c5",
+      "package_sha256": "cc0bb5d68b82a7cf22936844116dc47b9ac560eccfca542e1e9dce18472483c5",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/range.svg",
+      "source_sha256": "64e220153583424207cf8cc46f71632c21e70dd02fefcf154f9b3cee1d69c297",
+      "package_sha256": "64e220153583424207cf8cc46f71632c21e70dd02fefcf154f9b3cee1d69c297",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/shield.svg",
+      "source_sha256": "389bbd8ac61fb8a42ca95c9e03b40e299ccf01e08a9a0b86cac687e527abf98d",
+      "package_sha256": "389bbd8ac61fb8a42ca95c9e03b40e299ccf01e08a9a0b86cac687e527abf98d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/siege.svg",
+      "source_sha256": "d86e334b48fdad8c3d5e7d5547dbcc3034908bc287b23fbf0a7d102dbb7c0a5d",
+      "package_sha256": "d86e334b48fdad8c3d5e7d5547dbcc3034908bc287b23fbf0a7d102dbb7c0a5d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/slow.svg",
+      "source_sha256": "7e5fcfb71a82e2cd116e45aa0dd64257fd817677853f036654d56e50f71d33f5",
+      "package_sha256": "7e5fcfb71a82e2cd116e45aa0dd64257fd817677853f036654d56e50f71d33f5",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/star.svg",
+      "source_sha256": "e3fa92959a1d3a8146617ba07d01842ef5d9ec982e897d169730b1dfc2fb6e23",
+      "package_sha256": "e3fa92959a1d3a8146617ba07d01842ef5d9ec982e897d169730b1dfc2fb6e23",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/strength.svg",
+      "source_sha256": "9c90b9ce6018dcb75304ae83bd85a443ba56265e430134970b647ad09d334ea0",
+      "package_sha256": "9c90b9ce6018dcb75304ae83bd85a443ba56265e430134970b647ad09d334ea0",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/study.svg",
+      "source_sha256": "88aaba282d452640a513be81e5fd20333a5fae2c272180af0e2ea50e1f1eec81",
+      "package_sha256": "88aaba282d452640a513be81e5fd20333a5fae2c272180af0e2ea50e1f1eec81",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/sword.svg",
+      "source_sha256": "a5fd93abf87201fe16c072ae4cf731dadfd3eccac71ac46e17b2423f0e9443b3",
+      "package_sha256": "a5fd93abf87201fe16c072ae4cf731dadfd3eccac71ac46e17b2423f0e9443b3",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/ward.svg",
+      "source_sha256": "6e942cbafa5628a758b347376ee376a65d9173978d9d0781aaa0519234d1265a",
+      "package_sha256": "6e942cbafa5628a758b347376ee376a65d9173978d9d0781aaa0519234d1265a",
+      "matches": true
+    }
+  ],
+  "verified_log_count": 41,
+  "fatal_logs": [],
+  "source_guard": {
+    "passed": true,
+    "hashed_files": 336,
+    "changed_files": [],
+    "git_head_unchanged": true,
+    "git_branch_unchanged": true,
+    "git_status_unchanged": true
+  },
+  "report_sha256": {
+    "reports\\checks_background_frozen.json": "bab2971efd5297aed109b74eb4e40c1f0156f2fccb33e2d6244f47a7a7539fcf",
+    "reports\\checks_campaign_frozen.json": "d791351fdc1246d7a4fa31cc32b2fd494b9ef926dce1077134921b7763b1ca43",
+    "reports\\campaign_journey.json": "a695eb3c20cbd3d81131679a567f395c0776c5478d977678a42c39992a07739a",
+    "reports\\package_background.json": "50b7ff987e376ed41f87e048d3d348850d27070e1244b3cba2416f06205af82a",
+    "reports\\package_offscreen.json": "85753a6b36bf0b17189b1e91a390724db175cb53f23d7b75c8feae00e18c210f",
+    "reports\\art_review_local.json": "4c3767c66c2d309b506c0fbe00f35242ecee8187037ce478ca5289857ee400e7",
+    "reports\\build_manifest.json": "d617807d36c724747182926ea7a842b6036bac27e29b50dd0ece1fe1b41aa3ed"
+  },
+  "failures": [],
+  "verified_utc": "2026-11-19T09:48:52.527135+00:00"
+}

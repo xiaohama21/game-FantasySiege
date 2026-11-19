@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>星灯脉冲</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="6.7" stroke="#63c5b7" stroke-width="2"/>
+    <path fill="#efb65b" d="M12 4L14.2 9.8L20 12L14.2 14.2L12 20L9.8 14.2L4 12L9.8 9.8Z"/>
+    <path stroke="#63c5b7" d="M12 2V3M12 21V22M2 12H3M21 12H22"/>
+    <path stroke="#fff2d7" d="M11 11L12 8"/>
+  </g>
+</svg>

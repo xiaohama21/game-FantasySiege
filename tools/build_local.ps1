@@ -36,7 +36,7 @@ function Copy-PayloadTree([string]$Name) {
 }
 
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
-foreach ($name in @('scripts', 'scenes', 'resources', 'bin', 'assets\actors', 'assets\portraits', 'assets\environments', 'assets\fonts', 'assets\audio', 'tests', 'docs\modules')) {
+foreach ($name in @('scripts', 'scenes', 'resources', 'bin', 'assets\actors', 'assets\portraits', 'assets\environments', 'assets\fonts', 'assets\audio', 'assets\ui', 'tests', 'docs\modules')) {
     Copy-PayloadTree $name
 }
 New-Item -ItemType Directory -Path (Join-Path $packageRoot 'tools') -Force | Out-Null
@@ -61,6 +61,7 @@ start "Star Lantern Expedition" "%~dp0FantasySiege.exe" --path "%~dp0."
 营地“操作指南”可重看；“设置”可调音量、全屏、飘字及边缘滚动。
 从300星砂开始，依次远征八关；第2/4/6/8关契约新英魂，星砂用于训练，编队最多八人。
 营地“研修”：已契约且Lv.3、首通第四关后，180星砂一次解锁该英魂两条路线，之后免费切换/恢复基础，仅营地。
+关卡卡片“敌情”可查看敌军计划出场、加强波次数值、首领反制和已保存编队的战术提醒；未解锁关卡可浏览，仍需按顺序通关后出征。
 关闭后重新启动会恢复进度。独立存档位于 %APPDATA%\Godot\app_userdata\FantasySiege，不与旧游戏混用。
 本包已完成纹理与原生素材导入；请完整保留文件夹，不单独搬动FantasySiege.exe。
 D69角色素材仅供本地学习研究，请保留本包在本地，不作商业用途。

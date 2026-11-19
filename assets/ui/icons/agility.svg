@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>敏捷</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#63c5b7" d="M6 18C4 10 12 3 21 2C22 10 17 18 8 19Z"/>
+    <path d="M5 22L17 7M10 16L10 11M13 13L18 13"/>
+    <path stroke="#efb65b" d="M2 12H4M2 16H3"/>
+  </g>
+</svg>

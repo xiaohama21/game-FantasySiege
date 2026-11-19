@@ -31,6 +31,14 @@ func displayed_stats(id: String) -> Dictionary:
 		if panel.get_meta("unit_id", "") == id: return panel.get_meta("unit_stats", {})
 	return {}
 
+func badge_matches(key: String, value: String, caption: String) -> bool:
+	var badge := node_named("Stat_" + key)
+	if not badge is Control: return false
+	var text := badge.find_child("Value", true, false)
+	var title := badge.find_child("Caption", true, false)
+	var icon := badge.find_child("Icon", true, false)
+	return text is Label and title is Label and icon is TextureRect and text.is_visible_in_tree() and title.is_visible_in_tree() and text.text == value and title.text == caption and icon.texture != null and icon.mouse_filter == Control.MOUSE_FILTER_IGNORE
+
 func run() -> void:
 	check(DisplayServer.get_name() == "headless", "Study UI fixture must remain headless")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIRECTORY))
@@ -96,8 +104,13 @@ func run() -> void:
 				check(labels_contain(str(route.name)), "study current route name visible " + id)
 				app._select_hero(id)
 				check(displayed_stats(id) == expected, "hero detail uses same route/level central result " + id)
-				check(labels_contain("生命  %.0f       伤害  %.0f" % [float(expected.hp), float(expected.damage)]), "visible hero health and damage round like study/gallery " + id)
-				check(labels_contain("射程  %.0f    护甲  %.0f" % [float(expected.range), float(expected.armor)]), "visible hero range and armor round like study/gallery " + id)
+				var healer := str(expected.special.get("type", "")) == "heal"
+				check(badge_matches("hp", "%.0f" % float(expected.hp), "生命"), "visible hero life badge uses central rounded value " + id)
+				check(badge_matches("damage", "%.0f" % float(expected.special.get("amount", 0) if healer else expected.damage), "治疗" if healer else "伤害"), "visible hero damage/healing badge uses central final amount and caption " + id)
+				check(badge_matches("armor", "%.0f" % float(expected.armor), "护甲"), "visible hero armor badge uses central rounded value " + id)
+				check(badge_matches("range", "%.0f" % float(expected.range), "射程"), "visible hero range badge uses central rounded value " + id)
+				check(badge_matches("attack_interval", "%.2fs" % float(expected.attack_interval), "出手间隔"), "visible hero interval badge uses central final timing " + id)
+				check(badge_matches("cost", "%d" % int(Catalog.unit(id).get("cost", 0)), "召唤能量"), "visible hero cost badge uses actual summon recipe " + id)
 				var details: String = app._skill_details(Catalog.unit(id), expected)
 				if str(expected.special.get("type", "")) == "heal": check(("每次治疗 %.0f" % float(expected.special.amount)) in details, "healing UI shows final amount once " + id)
 				elif str(expected.special.get("type", "")) == "slow": check(("%.2fs" % float(expected.special.duration)) in details, "slow UI shows final intelligence and route duration " + id)
@@ -149,7 +162,7 @@ func run() -> void:
 	app.queue_free()
 	await process_frame
 	await root.get_node("GameAudio").shutdown()
-	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd")}, "scope": "Headless actual Main study/hero bindings, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
+	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "scripts/ui/StatBadge.gd": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd")}, "scope": "Headless actual Main study/hero bindings with six visible central-value SVG stat badges, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
 	var report := FileAccess.open("res://reports/study_ui_smoke.json", FileAccess.WRITE)
 	report.store_string(JSON.stringify(result, "\t"))
 	report.close()

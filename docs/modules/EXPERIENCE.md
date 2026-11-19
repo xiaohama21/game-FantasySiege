@@ -1,6 +1,9 @@
 # 完整体验与学习版验收
 
-> v0.7 · 2026-11-19 · GDD v0.4.8 / 程序0.1.3.0
+> v0.10 · 2026-11-19 · GDD v0.5.6 / 程序0.1.3.0
+> v0.10：用户反馈敌情难读；登记图标属性格、威胁/反制短词条和状态建议卡，以及英魂/研修/编队/HUD的一致标识。首版Art50通过4815项仅证明旧离屏范围；新视觉、CPU10/full12及当前同包须分别验收。
+> v0.9：登记战前敌情的关卡浏览、计划波次/中央敌军数值、保存编队/研修摘要和只读建议验收要求；属于后续设计，保留前台延期及当前完整包未通过范围。
+> v0.8：同步schema3研修及默认CPU8/full10；MainFlow补持续可见/焦点计数和十五张取景状态，区分引擎事件派发与操作系统人工输入。门槛不变，新增验收工具尚不代表前台通过。
 > v0.7：完整旅程报告从同项目/同包docs/GAME_DESIGN.md读取GDD标题版本行及SHA256，恢复进程核对同一文档，移除硬编码版本元数据；战斗、训练、奖励数量与旅程流程不变。
 > v0.6：Boss进入阶段时，中文HUD提示按事件世界位置匹配已触发阶段的Boss，并读取special.phase_name；不以固定名称或尚未触发的附近Boss替代。
 > v0.5：精确分离Godot verbose中NVAPI既有配置登记诊断（code -167），其余错误与全部泄漏继续拒绝，原文保留在报告。
@@ -19,6 +22,8 @@ GameAudio独立自动加载，play_cue(name)、set_context(camp/battle)、stop�
 
 英魂/敌军百科不显示D69技术ID；角色姓名、职责、技能名称、效果、伤害类型和三属性可读。治疗量/減速时长按UnitStats实际结果计算；物理/魔法/真实伤害与攻城倍率常显。Boss面板显示前摇、范围、半血加成、推退25%及脉冲反制；出现关卡从stages.waves推导。角色详情继续允许未拥有浏览但禁训练。
 
+schema3研修已实现：十二英魂各两条路线，已契约、Lv3、第四关首通后支付180星砂一次解锁，两路线开放但初次保持base；后续切换和恢复基础免费。Catalog.study、study_routes、study_route、study_modifiers提供配置深拷贝；ProfileStore.study_route、study_unlocked、unlock_study、set_study_route、study_modifiers_snapshot提供事务和开局快照。单一study_routes保存付费权益与当前选择，schema1/2只补空字典，未知路线回基础并保留权益，更高schema只读。英魂详情、研修和百科读取同一UnitStats最终值，整数显示统一四舍五入；实际战斗仍使用浮点值。完整旅程保持基础路线验收，研修组合另由三项Study检查验证，不以测试夹具发放的资源或拥有权冒充八关自然收集。
+
 HUD刷新上限10Hz，按钮操作后立即刷新。飘字最多24个复用Label，离屏命中不创建新实例；状态预警与脉冲环仍保留，所有效果不触发逻辑伤害。Boss阶段提示读取实际触发者的special.phase_name，分别展示“裂甲狂潮”与“过热锻击”；以事件世界位置、队伍和已进入phase状态匹配，未匹配时使用通用首领强化提示，不猜测最近Boss。设置/引导覆盖HUD，期间鼠标与按键不能穿过模态窗口移动地图或触发战斗。
 
 模态打开时暂时禁用底层Control的键盘焦点，焦点只在当前弹窗内流转；关闭按栈恢复原焦点模式与原焦点。底层按钮即使收到程序化pressed信号也不得执行动作。退出确认可叠在设置上，恢复时先回到设置。暂停/倍速入口也显式拒绝模态调用。
@@ -33,4 +38,24 @@ CampaignJourney使用隔离存档，训练与编队经Main接口，固定步真�
 
 正常窗口关闭由Main接管：保存独立设置，await GameAudio.shutdown()后退出。声音管理器释放播放器/缓存，并以WeakRef每20ms异步确认实际Playback已排空，上限1秒，超时记录error_message；不能仅等待固定时长即称清理成功。Engine强制--quit-after诊断绕过正常关闭流程，不用于声称优雅退出通过。待领奖胜利收到关闭请求时提供“重试领取”或“仍然退出·本次奖励不保存”，不静默失去奖励。
 
-严格验收tools/run_checks.py默认运行BattleSmoke、ProfileSmoke、ProgressionSmoke、PreferencesSmoke、AudioShutdownSmoke五项CPU检查；--visual额外包括实际渲染MainFlow及仍以headless运行的CampaignJourney，--only可选七项中的任一项。每个用例开始前清除其旧报告，记录开始/结束时戳、当前project.godot哈希与程序版本，并检查新报告生成时间及运行期间项目没有变化。进程退出0、正确父级完成标记、新JSON中的passed严格为true且日志无ERROR、Leaked instance、ObjectDB instances才通过；CampaignJourney还须父级完成标记及phase=complete，子进程/中途checkpoint不能替代最终旅程通过。汇总明确单项/逻辑/完整范围，不把历史通过报告或单项结果当成本次全量通过。
+严格验收tools/run_checks.py当前默认运行十项后台检查：BattleSmoke、ProfileSmoke、ProgressionSmoke、PreferencesSmoke、AudioShutdownSmoke、StudyProfileSmoke、StudyCombatSmoke、StudyUISmoke、BriefingSmoke、BriefingUISmoke（CPU10）。StudyProfile覆盖schema3与旧档兼容事务；StudyCombat覆盖中央数值、十二英魂×Lv1/3/20×基础/两路线的108组合、实际命中和减速期限；StudyUI通过实际Main绑定及隔离事务核对108组合、公开数值文字、模态与就绪状态。BriefingSmoke核对八关波次/中央敌军值及108研修组合准备能力，BriefingUI核对真实Main敌情绑定、只读存档、模态与出征权限；两者须记录当前GDD及输入/脚本SHA，不能继续接受固定旧GDD。以上均headless，不计前台输入。--visual加入非headless MainFlow与仍以headless运行的CampaignJourney，完整用例十二项（full12）；--only可选十二项。candidate6的CPU8/full10是历史范围，CPU10通过、单独Campaign或离屏ArtReview均不等于full12通过。
+
+每个用例开始前清除其旧报告，记录开始/结束时戳、当前project.godot哈希与程序版本，并检查新报告生成时间及运行期间项目没有变化。进程退出0、正确父级完成标记、新JSON中的passed严格为true且日志无ERROR、Leaked instance、ObjectDB instances才通过。StudyCombat、BriefingSmoke与CampaignJourney还须phase=complete；Campaign只接受父级完成，子进程/中途checkpoint不能替代最终旅程通过。研修/敌情报告的配置和程序SHA须匹配被验收项目。汇总明确单项、CPU10或full12范围，不把历史CPU8/full10或旧Art50通过当成本次全量通过。
+
+MainFlow的SceneTree宿主观察器在流程全程存续，独立于可释放的Main场景。每个process_frame累加host_observed_frames、host_normal_window_frames及host_focused_frames：normal要求root与DisplayServer均非最小化且root.visible，focused要求root.has_focus。总观察帧须大于零，normal和focused均须等于总观察帧；启动时一次设为可见windowed不足以通过。观察期间允许F11合法切换全屏、最大化和恢复窗口，不会仅因模式非windowed拒绝。
+
+十五张取景各有capture_states，记录name、path、sha256、size、window_mode、display_window_mode、window_visible、focused及actual_rendering_driver。取景时root与DisplayServer均须为windowed，窗口和图像均为1280×720且可见、聚焦，实际驱动由运行API取得并须为vulkan；全屏回归结束后恢复窗口再取景。连续观察不逐帧记录分辨率或驱动，不据此宣称这两项已全程核验。报告缺观察计数、计数不一致、十五张取景不齐、图片尺寸/哈希不符或状态字段缺失时完整验收拒绝。
+
+MainFlow中用于引擎输入回归的键鼠事件由Input.parse_input_event交给Godot分发，经过Input状态、GUI与未处理输入路径；这验证应用内事件处理和模态隔离。其他直接调用回调或程序化pressed的检查只证明对应绑定，不能升级为完整引擎派发。报告明确engine_input_dispatch_verified=true及os_input_verified=false，不能宣称操作系统注入、人工键鼠或硬件输入已经验收。真实声音听感及人工操作另行记录范围；headless dummy声音检查只证明WAV加载、音量/播放池和清理。
+
+最终门槛保持：同一干净包full12、当前完整美术图集、三份不带background的Spine播放/非托管播放/托管差图，以及正常前台Main24、Main64和Main64的2×回归均须实际通过。candidate6为full10/Art32；v0.5.5首版Art50已通过4815项，只证明该版隔离夹具离屏图、文字边界和画面完整性。用户指出的层级/标识问题由v0.5.6重排处理，当前源码/原创SVG/词条配置必须重新生成同版Art50并视觉复核，旧报告、相同图片数量或程序版本号都不覆盖新视觉。24单位目标接近60fps，64压力p95低于33.33ms；性能报告须逐帧证明可见、聚焦、非最小化、完整分辨率、实际Vulkan驱动及真实人数/采样策略。用户明确延期的前台四项继续待验，后台通过、最小化差图和历史性能报告均不替代这些条件。
+
+战前敌情的首版源码已接入，v0.5.6按用户反馈重排信息，详细规则见[BATTLE_BRIEFING](BATTLE_BRIEFING.md)。敌军独立卡片常显姓名/人数/威胁词条，六格图标属性保留中文生命/伤害/护甲/魔抗/射程/前摇及实际值，每套配方同一属性只出现一次；范围/控制/攻城等使用短技能词条和关键值，Boss琥珀阶段块突出半血强化与P打断。右栏以紧凑编队和青绿“已配备”/琥珀“可补充”建议卡表达状态、简短本关原因与合法候选，状态不只依赖颜色，候选姓名与缺口段落不重复。玩家从任一关卡卡片浏览实际敌军威胁与计划序列，锁定关卡可提前了解，但原开战和未来schema只读保护仍生效。敌军/玩家最终数值仍与UnitStats和实际战斗一致。
+
+敌情浏览不得调用begin_run、保存事务或发放资源，不能改变roster/study_routes/credits/cleared/owned/transactions及设置；建议不自动调整阵容、升级或选择研修。“调整编队”仅导航到既有编队页，返回远征保持原章节。resources/briefings.json登记中文能力、显式守线身份/低费近战阈值及八关建议；低费近战补线要求非治疗、正伤害、费用≤low_cost_max=90、最终射程≤low_cost_range_max=100。治疗/范围/控制/攻城等能力由最终数值判断。缺口人选只限已契约且不在阵容中的英魂，没有可用人选时提示训练/召唤节奏，不把未契约角色写成可用推荐。计划时间按time+index×interval及战斗同一稳定顺序展开，人数上限导致的实战延期须明确说明；相同敌军有多倍率时保留不同最终数值。中文说明常显伤害类型、Boss重击前摇/半血阶段/脉冲反制及当前编队能力缺口，不宣称建议必胜。
+
+本轮图标/短词条为原创静态SVG及配置化中文表现，只修改信息呈现；英魂/研修/编队/HUD逐步共用属性/职责/能量/冷却组件。必要中文、三属性与主属性、研修收益和代价、技能关键值与权限提示常显，不能只放tooltip或以颜色独占含义；攻击间隔、召唤冷却与前摇必须有各自名称。去掉重复句子时保留该信息在唯一明确位置，不能删除数值以规避文字检查。
+
+后台验收应逐八关核对波次数量/稳定时序与真实spawn中央值，覆盖默认/研修编队、保存后刷新、未知关卡/身份、锁定/未来schema浏览及出征拒绝、深拷贝和存档零变更。界面绑定及新离屏图还须核对每个图标对应的中文和值、不同配方、威胁/反制、Boss阶段、建议状态与合法候选、固定按钮/提示区、长列表边界和其他页面同源组件。旧版Art50的4815项不证明用户感受到的信息层级已改好；须视觉复核反馈所指页面及英魂/研修/编队/HUD。当前全量CPU10/full12和干净包证据待实际运行，原八关自然旅程、奖励事务和前台最终门槛保持。
+
+2026-11-19 图标版candidate7实际验收：19枚原创SVG、StatBadge和敌情卡片/统一词条已接入；英魂详情、研修收益/代价、编队与HUD同步。包内StudyUI1180、BriefingUI1419检查可见数字、中文标签、真实SVG与输入穿透；Art50/6253、零文字溢出，八关上下滚动/锁定/研修状态及其他页面均已实际取景。源与包Main/StatBadge/配置SHA一致，旧Art50首版4815与首轮图标6189不改写成最终截图。前台流程与性能仍延期，图形通过仅为离屏范围。

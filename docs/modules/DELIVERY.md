@@ -1,6 +1,9 @@
 # Windows本地学习版交付
 
-> v0.13 · 2026-11-19 · GDD v0.5.3 / 程序0.1.3.0
+> v0.16 · 2026-11-19 · GDD v0.5.6 / 程序0.1.3.0
+> v0.16：用户反馈后统一19枚原创SVG和属性组件，敌情/英魂/研修/编队/HUD减少重复文本；Art50追加Main及StatBadge源码SHA，完整Python104项通过。当前生成candidate7，前台项延期。
+> v0.15：先登记敌情简报验收，再添加BriefingSmoke与BriefingUISmoke，当前CPU10/full12；ArtReview扩为50张，增加八关上下页与锁定/研修阵容18张必需取景。新增配置、总纲与程序指纹，candidate6仍冻结为GDD0.5.3/CPU8/Art32旧范围。
+> v0.14：FS-036统一所有阶段Art32完整门禁；FS-037补实际Vulkan及300帧正常窗口/完整分辨率；FS-038补MainFlow持续窗口/焦点与15张取景证据。仅强化验收，candidate6保持原冻结范围。
 > v0.13：candidate6干净导入、八CPU/3351项、21/220原生、2624像素对比、Art32/3826与988项独立旅程通过；前台流程/性能延期，delivery_ready保持false，版本分支本地提交并保留待推。
 > v0.12：报告读取或门禁异常时保留Godot原始stdout/stderr，并追加验收异常；超时和启动失败安全记录，失败判定不变；研修战斗固定108项真实出生组合及当前研修配置指纹。
 > v0.11：candidate4冻结为研修前基线；新增研修存档/战斗/UI三个CPU用例及源码指纹门禁，当前CPU8/full10；离屏验收扩为32图，要求八张研修状态图及研修后英雄详情/图鉴读数图。
@@ -23,17 +26,29 @@
 
 新增assets/environments原创SVG与assets/portraits十二透明角色肖像随包复制；肖像manifest记录visuals原始配置哈希、角色/visual_id关联、原生状态、非空图像与PNG哈希。构建前缺少十二肖像时明确失败，不能发布全占位面板。包内再次核对manifest与units/visuals/真实文件，肖像来源和原配置一致；全部肖像及其派生manifest忽略Git，原创环境与工具可提交。
 
-verify_package的background阶段运行本包八CPU、21/220原生探针与静态payload检查；报告单独写package_background.json，并明确delivery_ready=false，不冒充最终包验证。隐藏窗口可用于离屏肖像/界面图像生成，不能作为性能数据。完整验收render命令读取本包project.godot实际默认backend，不能硬编码GL代替最终生产配置；Main24/64报告须核对采样300帧、完整焦点/正常窗口、真显卡/可见/存活/native/HUD和当前backend。
+verify_package的background阶段运行本包十CPU、21/220原生探针与静态payload检查；报告单独写package_background.json，并明确delivery_ready=false，不冒充最终包验证。隐藏窗口可用于离屏肖像/界面图像生成，不能作为性能数据。完整验收render命令读取本包project.godot实际默认backend，不能硬编码GL代替最终生产配置；Main24/64报告须核对采样300帧、完整焦点/正常窗口、真显卡/可见/存活/native/HUD和当前backend。
 
-offscreen阶段单独写package_offscreen.json，串行执行本包生产SpinePlayback background、非托管对照unmanaged background、SpineMeshRedraw background和隐藏ArtReview；全部图形子进程SW_HIDE，不激活桌面。初始及结束均复核payload与十二肖像哈希。两套Playback须background=true、performance_measured=false、真实Vulkan驱动、主窗/DisplayServer均MODE_MINIMIZED且21来源验证期间保持此状态；Mesh还须全部2624次取景均在有效最小化主窗中完成、两1000×760透明2D子视口、21来源220动作及RGBA零差异。ArtReview须主窗最小化、32份1280×720取景与对应文件哈希、十二肖像、零文字溢出和音频排空；新增八张art_study_locked/unowned/ready/base/sweep/heal/siege/slow以及art_hero_studied、art_gallery_studied必须分别存在，核对研修后英雄详情和图鉴同源属性、技能读数。只检查本阶段生成的日志和报告，不要求未执行的完整runner或MainFlow；已有background原生探针可另行审计并明确标作未重跑证据。
+offscreen阶段单独写package_offscreen.json，串行执行本包生产SpinePlayback background、非托管对照unmanaged background、SpineMeshRedraw background和隐藏ArtReview；全部图形子进程SW_HIDE，不激活桌面。初始及结束均复核payload与十二肖像哈希。两套Playback须background=true、performance_measured=false、真实Vulkan驱动、主窗/DisplayServer均MODE_MINIMIZED且21来源验证期间保持此状态；Mesh还须全部2624次取景均在有效最小化主窗中完成、两1000×760透明2D子视口、21来源220动作及RGBA零差异。ArtReview须主窗最小化、50份1280×720取景与对应文件哈希、十二肖像、零文字溢出和音频排空；八张art_study_locked/unowned/ready/base/sweep/heal/siege/slow以及art_hero_studied、art_gallery_studied必须分别存在，核对研修后英雄详情和图鉴同源属性、技能读数，新增18张敌情取景要求见下文。只检查本阶段生成的日志和报告，不要求未执行的完整runner或MainFlow；已有background原生探针可另行审计并明确标作未重跑证据。
 
-用户延期前台测试后继续研修养成，candidate4/GDD0.4.9/schema2及其22图、五CPU和988项旅程结果作为旧基线冻结，不就地改包。当前GDD0.5.1/schema3源码必须重新运行八CPU（原五项加StudyProfileSmoke、StudyCombatSmoke、StudyUISmoke），full必须完整十项（八CPU、MainFlow、CampaignJourney）；suite校验读取明确案例集合，拒绝旧五项/七项摘要冒充增量通过。研修用例报告同时核对当前studies.json、UnitStats/SiegeBattle/单位配置或UI脚本指纹，开跑前后这些输入不得变化，包内再次核对报告与真实bundle字节。构建仍复制整个resources/scripts/tests，因此研修配置、实现和专用用例随新包提供；没有构建和运行的增量不承接candidate4通过结论。增量中已运行的30图报告保留原范围，追加详情/图鉴取景后以新32图报告重验，不改写旧通过依据。
+研修养成阶段将candidate4/GDD0.4.9/schema2及其22图、五CPU和988项旅程结果作为旧基线冻结，不就地改包。GDD0.5.4/schema3研修源码验收范围为八CPU（原五项加StudyProfileSmoke、StudyCombatSmoke、StudyUISmoke）及十full（八CPU、MainFlow、CampaignJourney）。研修用例报告同时核对studies.json、UnitStats/SiegeBattle/单位配置或UI脚本指纹，开跑前后这些输入不得变化，包内再次核对报告与真实bundle字节。构建仍复制整个resources/scripts/tests，因此研修配置、实现和专用用例随新包提供；没有构建和运行的增量不承接candidate4通过结论。该增量曾运行的30图报告保留原范围，追加详情/图鉴取景后以新32图报告重验，不改写旧通过依据；新敌情增量采用下文CPU10/full12/Art50范围。
 
 StudyCombatSmoke通过要求matrix_cases为整数108，完整覆盖实际出生的英雄、等级及研修组合，不能沿用早期只校验显式修饰映射的报告。它同时提供studies_sha256，runner开跑前后和包内独立门禁均核对当前resources/studies.json；UnitStats、SiegeBattle及units.json指纹与phase=complete要求继续保留。
 
-v0.11阶段工具边界验证通过79项Python单测；v0.12补日志异常保留和108真实出生组合门禁后，全84项通过。当前证据reports/runner_unit_tests.json记录实际discovery命令、程序/项目指纹及起止时间；覆盖CPU8/full10完整集合、研修报告缺失/伪造、输入并发改变、嵌套UI源码指纹、Art32必需名称与配置/图片哈希。单测只用临时目录和模拟子进程，不启动Godot，不作为研修实际战斗、真实取景、旅程或性能通过证据。
+GDD0.5.5增加BriefingSmoke与BriefingUISmoke，当前background与CPU runner必须完整十项，full必须完整十二项；上文八CPU/十full/32图为研修及candidate6的历史验收范围。BriefingSmoke要求八关与108个英雄/等级/路线组合，计划时间和敌军配方数值对照真实SiegeBattle；BriefingUISmoke使用真实Main的敌情入口、锁定权限、设置模态、未来schema浏览保护及保存后更新，全部使用隔离存档。两份报告均记录当前总纲版本/哈希、briefings/studies/stages/units配置和BattleBriefing/UnitStats/SiegeBattle脚本SHA，UI另核对Main脚本；runner开跑前后与包审计共同核对，拒绝缺失、伪造或运行期间改动的输入。
+
+当前ArtReview共有50张1280×720真实取景，原十个研修名称继续保留，新增art_briefing_stage_01至08及对应_lower、art_briefing_locked和art_briefing_studied共18个必需名称。报告另提供briefings_sha256与briefing_script_sha256，逐图核对名称唯一、实际PNG尺寸/完整性和SHA、十二肖像、零文字溢出、主窗最小化及音频排空。full/offscreen消费同一50图门禁；candidate6原32图只保留旧范围，不能承接新敌情增量。未来schema提示条与三个敌情按钮须分离，逻辑界面夹具验证其矩形不相交。
+
+v0.11阶段工具边界验证通过79项Python单测；v0.12补日志异常保留和108真实出生组合门禁后，全84项通过；v0.14完整门禁强化后，全96项通过。证据reports/runner_unit_tests.json记录实际discovery命令、程序/项目指纹及起止时间。单测只用临时目录和模拟子进程，不启动Godot，不作为实际战斗、真实取景、旅程或性能通过证据。v0.15按当前CPU10/full12集合另验；旧CPU8/Art32通过记录不能替代新简报验收。
 
 offscreen阶段无帧率、前台操作或真实关卡旅程的通过声明；即使四项全部通过，delivery_ready仍false。完整full阶段仍须原有MainFlow、全部旅程及正常前台Main24/64/2×门禁，并拒绝把background=true的Spine报告作为该阶段当前运行结果。各阶段报告独立保留，offscreen不会覆盖package_verification.json或package_background.json。
+
+ArtReview无论由full还是offscreen阶段执行，均采用同一套最小化主窗、50张独立取景、十个研修与十八个敌情必需名称、studies/briefings配置及BattleBriefing脚本指纹、1280×720尺寸、真实图片SHA、十二肖像、零文字溢出及音频排空门禁。full不能仅凭ArtReview的passed字段跳过这些要求；三份Spine播放/对照/差图在full仍必须为非background报告。图片尺寸同时核对报告声明与实际PNG signature/IHDR，标准库检查PNG数据块及结尾完整性，支持RGB/RGBA而不依赖Pillow；缺失、截断或真实尺寸不符均失败。
+
+Main性能必须actual_rendering_driver为vulkan，normal_window_frames与full_resolution_frames均为严格整数300；前者逐帧核对主窗及DisplayServer均普通窗口且可见，后者逐帧核对主窗与DisplayServer均1280×720。现有末帧尺寸、window_mode/visible、300帧焦点/HUD、全部原生/存活/可见人数、托管预算和FPS/p95门禁继续保留，不能用末帧恢复窗口或分辨率替代全程。
+
+MainFlow报告须记录严格整数且大于0的host_observed_frames，host_normal_window_frames和host_focused_frames均严格等于观察帧数；持续观察要求主窗与DisplayServer非最小化、可见且有焦点，保留真实F11全屏测试。最终音频释放/窗口关闭后停止观察，不把退出后的帧加入窗口通过数。capture_states与screenshots严格对应现有15张取景，每项含name/path/sha256/size/window_mode/display_window_mode/window_visible/focused/actual_rendering_driver；取景时两种窗口模式均为0、可见聚焦、实际vulkan及1280×720，文件在本包reports/runtime中且路径、尺寸、SHA对应。engine_input_dispatch_verified=true仅证明引擎输入派发回归，os_input_verified=false保留范围，不能标人工电脑操作通过。MainFlow独立报告SHA与完整runner记录再次核对，Art32不能替代此15图前台证据。
+
+MainFlow共享门禁位于run_checks.py，单项--only、完整--visual、包full及读取式审计均消费同一窗口/取景/范围约束；包工具不反向导入。15张取景的实际PNG尺寸与SHA同样核对，不能以声明size或重复取景条目冒充正常窗口验收。
 
 verify_spine默认不写resources/visuals.json，成功或失败都保留原字节、格式、状态来源等级与肖像配方指纹。本次报告仅包含当前选择的资源，记录config_sha256_before/after、config_unchanged及update_status_requested；只有作者显式--update-status阶段可写状态，成功的runtime_pass不降级已独立确认的visual_checked/performance_checked。包内验收不得使用该写入开关，native门禁要求config_unchanged=true、两个SHA均等于本包当前配置真实SHA且未请求写状态。每个原生进程仍隔离运行，完成标记只接受完整行，stdout/stderr共同经过严格ERROR与ObjectDB/Leaked instance检查；旧native失败或旧PASS不能混入本次覆盖。
 
@@ -60,3 +75,13 @@ MainFlow实际展示三页引导、设置、敌军与Boss规则、训练和编�
 使用说明常显鼠标拖动/边缘/左右键、1—8、P、空格、F、F11、设置与指南入口；存档位置为独立Godot用户目录，重新启动保留已有进度。附字体/OFL、Godot/MIT与本地素材/运行库说明。D69及Spine原生库留在本地学习包，Git仅提交代码、原创音画、设计与可复现配置/工具，不上传受限纹理或素材截图。
 
 最终交付提交并推送0.1.3版本分支，报告程序版本、测试范围、包路径与任何实际剩余问题。当前目标完成后不启动下一编号，因此main仍保留开始0.1.3时的同步状态，不把交付作为合并入口。旧TowerDefense及外部源包继续只读，source_guard最后核对336文件和Git状态。
+
+## GDD0.5.6 图标与敌情增量
+
+用户指出首版敌情信息混乱后，本轮增加19枚可复现原创SVG与StatBadge组件；敌军卡片、属性六格、统一威胁/反制词条及Boss阶段块替代重复长段落。英魂详情、研修收益/代价、编队费用/冷却和HUD脉冲也同步。原Art50=4815仅首版范围，首轮图标Art50=6189保留实际阶段；最终源Art50=6253、零文字溢出、Main/widget/配置指纹匹配，另有实际Main交互/中央数值后台证据。前台流程、24/64/2倍速依用户安排延期。
+
+当前CPU10/full12（包含BriefingSmoke与BriefingUISmoke），包内必须重新运行十个后台案例与独立旅程。Art50在full/offscreen共同核对main_sha256与stat_badge_sha256；只检查配置而不约束UI源码的新报告不能通过。104项Python边界用例覆盖Main/widget缺失、伪造及取景后源码变更。assets/ui与StatBadge随包复制，SVG生成器为源仓库工具，不依赖用户游戏运行环境。
+
+candidate7以GDD0.5.6冻结源码与文档，后台/离屏/旅程结果按实际新包登记；candidate6/GDD0.5.3及原32图证据不改写。两种包均不能以后台通过宣称delivery_ready或商业发行通过。
+
+candidate7实际验收完成：十项CPU8147，原生21来源220动作、十二肖像/完整payload，生产与非托管播放、2624次RGBA零差、Art50/6253及独立新档八关/重启/重访988项均通过。41份日志无致命错误或泄漏，50个核心源码/配置/图标字节与源项目一致。证据为reports/briefing_candidate_0.1.3.json与包内checks_background_frozen/checks_campaign_frozen、package_background/package_offscreen及各独立报告。正常前台MainFlow和Main24/Main64/Main64_2x继续按用户安排延期，delivery_ready=false；该结论为增量本地学习候选通过。

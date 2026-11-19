@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <title>攻城</title>
+  <g fill="none" stroke="#20334d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#efb65b" d="M4 21V9H8V13H10V9H14V13H16V9H20V21Z"/>
+    <path fill="#63c5b7" d="M10 21V17C10 14 14 14 14 17V21Z"/>
+    <path fill="#fff2d7" d="M8 3L10 2L16 7L14 9Z"/>
+    <path d="M13 11L10 14L14 16L12 19"/>
+  </g>
+</svg>

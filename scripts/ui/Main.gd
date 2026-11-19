@@ -12,6 +12,7 @@ var speed := 1.0
 var selected_actor := "guanyu"
 var selected_visual := "d69_097"
 var selected_chapter := 1
+var selected_briefing := ""
 var gallery_kind := "heroes"
 var view_x := 0.0
 var view_max := 0.0
@@ -327,6 +328,10 @@ func _message(value: String) -> void:
 	if is_instance_valid(battle):
 		toast.position = Vector2(330, 174)
 		toast.size = Vector2(620, 68)
+	elif tab == "敌情":
+		toast.position = Vector2(254, 678)
+		toast.size = Vector2(1000, 40)
+		toast.add_theme_font_size_override("font_size", 14)
 	toast.text = value
 	toast.visible = true
 	toast.z_index = 800
@@ -411,6 +416,7 @@ func show_home(next_tab: String = "远征") -> void:
 	elif tab == "英魂": _heroes_page()
 	elif tab == "研修": _study_page()
 	elif tab == "编队": _squad_page()
+	elif tab == "敌情": _briefing_page()
 	else: _gallery_page()
 	if not ProfileStore.error_message.is_empty(): _message(ProfileStore.error_message)
 
@@ -455,9 +461,227 @@ func _campaign_page() -> void:
 		var reward_text := "英魂 · " + "、".join(names) if not names.is_empty() else "星砂用于训练英魂"
 		var reward_label := _label(reward_text, Rect2(16, 257, 205, 48), 15, SiegeStyle.MUTED, p)
 		reward_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var button := _button("重访" if complete else "出征" if unlocked else "先点亮前一关", Rect2(16, 311, 205, 38), start_stage.bind(str(stage.id)), p, unlocked)
+		var inspect := _button("敌情", Rect2(16, 311, 76, 38), _open_briefing.bind(str(stage.id)), p)
+		inspect.name = "Briefing_" + str(stage.id)
+		var button := _button("重访" if complete else "出征" if unlocked else "未解锁", Rect2(101, 311, 120, 38), start_stage.bind(str(stage.id)), p, unlocked)
 		button.disabled = not unlocked or not ProfileStore.can_modify()
 	_label("1—8 召唤  ·  P 脉冲  ·  空格 暂停  ·  ← → / 鼠标拖动查看战场", Rect2(261, 618, 973, 30), 17, Color("b6c8c2"))
+
+func _open_briefing(id: String) -> void:
+	var stage := Catalog.stage(id)
+	if stage.is_empty():
+		show_home("远征")
+		_message("未找到该关卡的敌情。")
+		return
+	selected_briefing = id
+	selected_chapter = int(stage.get("chapter", 1))
+	show_home("敌情")
+
+func _briefing_scroll(rect: Rect2, node_name: String) -> VBoxContainer:
+	var panel := _panel(rect)
+	var scroll := ScrollContainer.new()
+	scroll.name = node_name
+	scroll.position = Vector2(12, 10)
+	scroll.size = rect.size - Vector2(24, 20)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 12)
+	scroll.add_child(content)
+	return content
+
+func _briefing_line(value: String, parent: Node, font_size: int = 16, color: Color = SiegeStyle.INK) -> Label:
+	var label := Label.new()
+	label.text = value
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	parent.add_child(label)
+	return label
+
+func _briefing_names(ids: Array) -> String:
+	var names: Array[String] = []
+	for id: Variant in ids: names.append(str(Catalog.unit(str(id)).get("name", id)))
+	return "、".join(names)
+
+func _icon(id: String, rect: Rect2, parent: Node) -> TextureRect:
+	var art := TextureRect.new()
+	art.name = "Icon_" + id
+	art.position = rect.position
+	art.size = rect.size
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.texture = load("res://assets/ui/icons/" + id + ".svg")
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(art)
+	return art
+
+func _term(parent: Node, text: String, tint: Color = SiegeStyle.TEAL, icon_id: String = "") -> PanelContainer:
+	var chip := PanelContainer.new()
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := SiegeStyle.box(SiegeStyle.PAPER.lerp(tint, 0.13), 7, tint.lightened(0.25))
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	style.content_margin_top = 3
+	style.content_margin_bottom = 3
+	chip.add_theme_stylebox_override("panel", style)
+	parent.add_child(chip)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 5)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(row)
+	if not icon_id.is_empty():
+		var art := TextureRect.new()
+		art.texture = load("res://assets/ui/icons/" + icon_id + ".svg")
+		art.custom_minimum_size = Vector2(18, 18)
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(art)
+	var label := _briefing_line(text, row, 14, tint.darkened(0.16))
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	return chip
+
+func _briefing_card(parent: Node, tint: Color = SiegeStyle.TEAL) -> VBoxContainer:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var style := SiegeStyle.box(Color("faf6eb"), 12, tint.lightened(0.28))
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	card.add_theme_stylebox_override("panel", style)
+	parent.add_child(card)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.add_child(box)
+	return box
+
+func _stat_badge(parent: Node, key: String, icon_id: String, caption: String, value: String, tint: Color = SiegeStyle.TEAL) -> Control:
+	var badge: Control = load("res://scripts/ui/StatBadge.gd").new()
+	badge.name = "Stat_" + key
+	badge.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	parent.add_child(badge)
+	badge.call("configure", icon_id, caption, value, tint)
+	return badge
+
+func _briefing_stat_grid(parent: Node, calc: Dictionary) -> void:
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	parent.add_child(grid)
+	_stat_badge(grid, "hp", "heart", "生命", "%.0f" % float(calc.hp))
+	var kind: String = {"physical": "物理", "magic": "魔法", "true": "真实"}.get(str(calc.damage_type), "物理")
+	_stat_badge(grid, "damage", "orb" if calc.damage_type == "magic" else "sword", kind + "伤害", "%.0f" % float(calc.damage), Color("b46f45"))
+	_stat_badge(grid, "armor", "shield", "护甲", "%.0f" % float(calc.armor))
+	_stat_badge(grid, "magic_armor", "ward", "魔抗", "%.0f" % float(calc.magic_armor), Color("80679b"))
+	_stat_badge(grid, "range", "range", "射程", "%.0f" % float(calc.range))
+	_stat_badge(grid, "hit_delay", "clock", "前摇", "%.2fs" % float(calc.hit_delay), Color("9a712d"))
+
+func _capability_icon(id: String) -> String:
+	return {"frontline": "shield", "low_cost": "energy", "aoe": "group", "magic": "orb", "true_damage": "sword", "healing": "heal", "slow": "slow", "siege": "siege"}.get(id, "star")
+
+func _briefing_page() -> void:
+	var summary := BattleBriefing.summarize(selected_briefing)
+	if summary.is_empty(): return
+	var stage: Dictionary = summary.stage
+	var terms: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://resources/briefings.json"))
+	var header := _panel(Rect2(254, 93, 1000, 112), Color("224957"))
+	_label(str(stage.get("name", "远征")) + " · 战前准备", Rect2(20, 9, 730, 37), 28, Color("f4e8cb"), header)
+	_icon("group", Rect2(816, 14, 26, 26), header)
+	_label("%d 名敌军" % int(summary.total_count), Rect2(850, 10, 135, 32), 22, Color("f4cf88"), header)
+	_icon("heart", Rect2(20, 49, 21, 21), header)
+	_label("星灯 %.0f  /  敌垒 %.0f    ·    建议 Lv.%d" % [float(stage.get("player_base_hp", 0)), float(stage.get("enemy_base_hp", 0)), int(stage.get("recommended_level", 1))], Rect2(48, 47, 914, 25), 17, Color("d8e6dc"), header)
+	_icon("energy", Rect2(20, 80, 21, 21), header)
+	_label("开局 %.0f  ·  回复 %.0f / 秒  ·  能量上限 %.0f" % [float(stage.get("initial_energy", 0)), float(stage.get("income", 0)), float(stage.get("capacity", 0))], Rect2(48, 78, 914, 25), 17, Color("bdcfca"), header)
+	_label("敌军档案", Rect2(258, 216, 610, 30), 21, Color("f1e4c6"))
+	_label("队伍准备", Rect2(906, 216, 340, 30), 21, Color("f1e4c6"))
+	var enemies := _briefing_scroll(Rect2(254, 252, 636, 360), "BriefingEnemies")
+	_briefing_line("计划出场 · 非抵达时间；人数上限可延后入场。", enemies, 14, SiegeStyle.MUTED)
+	for enemy: Dictionary in summary.enemies:
+		var definition := Catalog.unit(str(enemy.id))
+		var presentation: Dictionary = terms.get("enemies", {}).get(str(enemy.id), {})
+		var special: Dictionary = enemy.variants[0].stats.special
+		var boss: bool = special.has("phase_threshold")
+		var card := _briefing_card(enemies, SiegeStyle.GOLD if boss else SiegeStyle.TEAL)
+		var title_row := HBoxContainer.new()
+		card.add_child(title_row)
+		_briefing_line(str(enemy.name), title_row, 23, SiegeStyle.INK)
+		_term(title_row, "%d名" % int(enemy.count), Color("9a712d"), "boss" if boss else "group")
+		var tags := HBoxContainer.new()
+		tags.add_theme_constant_override("separation", 6)
+		card.add_child(tags)
+		for tag: String in presentation.get("tags", [str(enemy.role)]):
+			_term(tags, tag, Color("a57438") if boss else SiegeStyle.TEAL)
+		_term(tags, "%.1f—%.1fs" % [float(enemy.first_time), float(enemy.last_time)], Color("697f86"), "clock")
+		for variant: Dictionary in enemy.variants:
+			var calc: Dictionary = variant.stats
+			var variant_label := _briefing_line("%d名 · 本波数值" % int(variant.count) if enemy.variants.size() > 1 else "", card, 13, SiegeStyle.MUTED)
+			variant_label.visible = enemy.variants.size() > 1
+			variant_label.set_meta("briefing_enemy_id", str(enemy.id))
+			variant_label.set_meta("unit_stats", calc.duplicate(true))
+			variant_label.set_meta("wave_modifiers", {"hp_mult": variant.hp_mult, "damage_mult": variant.damage_mult})
+			_briefing_stat_grid(card, calc)
+		var area := HBoxContainer.new()
+		card.add_child(area)
+		_briefing_line(str(definition.get("skill_name", "战斗技能")), area, 14, SiegeStyle.MUTED)
+		if float(enemy.variants[0].stats.aoe_radius) > 0:
+			_term(area, "范围 %.0f" % float(enemy.variants[0].stats.aoe_radius), Color("80679b"), "group")
+		if boss:
+			var phase := _briefing_card(card, SiegeStyle.GOLD)
+			_briefing_line("%.0f%%生命 → %s" % [float(special.phase_threshold) * 100, str(special.get("phase_name", "强化阶段"))], phase, 18, Color("9a712d"))
+			_briefing_line("伤害×%.2f  ·  出手间隔×%.2f  ·  移速×%.2f" % [float(special.get("phase_damage_mult", 1)), float(special.get("phase_attack_mult", 1)), float(special.get("phase_speed_mult", 1))], phase, 14, SiegeStyle.INK)
+		var counters := HBoxContainer.new()
+		counters.add_theme_constant_override("separation", 6)
+		card.add_child(counters)
+		var counter_caption := _briefing_line("应对", counters, 14, SiegeStyle.MUTED)
+		counter_caption.autowrap_mode = TextServer.AUTOWRAP_OFF
+		counter_caption.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		counter_caption.custom_minimum_size.x = 30
+		for counter: String in presentation.get("counters", [str(definition.get("counter_hint", "持续补线"))]):
+			_term(counters, counter, Color("9a712d"), "pulse" if "P" in counter else "star")
+	var preparation := BattleBriefing.readiness(selected_briefing, ProfileStore.data.get("roster", []), ProfileStore.data.get("levels", {}), ProfileStore.study_modifiers_snapshot(), ProfileStore.data.get("owned", []))
+	var squad := _briefing_scroll(Rect2(906, 252, 348, 360), "BriefingPreparation")
+	var members := _briefing_card(squad)
+	_briefing_line("已保存编队  %d / 8" % preparation.members.size(), members, 19, SiegeStyle.TEAL)
+	for member: Dictionary in preparation.members:
+		var line := _briefing_line("%s · %d级" % [str(member.name), int(member.level)], members, 15)
+		line.set_meta("briefing_member_id", str(member.id))
+		line.set_meta("unit_stats", member.stats.duplicate(true))
+		if ProfileStore.study_route(str(member.id)) != "base": _briefing_line(_study_name(str(member.id)), members, 13, SiegeStyle.TEAL)
+	for recommendation: Dictionary in preparation.recommendations:
+		var present: Array = recommendation.present
+		var tint := SiegeStyle.TEAL if not present.is_empty() else Color("9a712d")
+		var card := _briefing_card(squad, tint)
+		var title_row := HBoxContainer.new()
+		card.add_child(title_row)
+		_term(title_row, str(recommendation.label), tint, _capability_icon(str(recommendation.capability)))
+		_briefing_line("已配备" if not present.is_empty() else "可补充", card, 14, tint)
+		if not present.is_empty(): _briefing_line(_briefing_names(present), card, 15)
+		elif not recommendation.alternatives.is_empty(): _briefing_line("可选 · " + _briefing_names(recommendation.alternatives), card, 15)
+		else: _briefing_line("暂无替补，可先训练现有队员。", card, 14)
+		_briefing_line(str(recommendation.get("reason", "")), card, 14, SiegeStyle.MUTED)
+	var pulse := _briefing_card(squad, SiegeStyle.GOLD)
+	var pulse_title := HBoxContainer.new()
+	pulse.add_child(pulse_title)
+	_term(pulse_title, "星灯脉冲 [P]", Color("9a712d"), "pulse")
+	_briefing_line("%.0f能量  ·  %.0f秒冷却" % [SiegeBattle.PULSE_COST, SiegeBattle.PULSE_COOLDOWN], pulse, 16, Color("9a712d"))
+	_briefing_line("重击预警 → P打断
+首领推退效果减弱", pulse, 15)
+	_briefing_line("可选提醒 · 训练、补线与脉冲时机同样重要。", squad, 14, SiegeStyle.MUTED)
+	var return_button := _button("返回远征", Rect2(254, 632, 180, 44), show_home.bind("远征"))
+	return_button.name = "BriefingReturn"
+	var squad_button := _button("调整编队", Rect2(450, 632, 180, 44), show_home.bind("编队"))
+	squad_button.name = "BriefingSquad"
+	var can_start: bool = ProfileStore.stage_unlocked(selected_briefing) and ProfileStore.can_modify()
+	var start_button := _button("出征" if can_start else "只读浏览" if not ProfileStore.can_modify() else "先点亮前一关", Rect2(1046, 632, 208, 44), start_stage.bind(selected_briefing), null, can_start)
+	start_button.name = "BriefingStart"
+	start_button.disabled = not can_start
 
 func _card_grid(rect: Rect2, columns: int) -> GridContainer:
 	var scroll := ScrollContainer.new()
@@ -539,14 +763,28 @@ func _heroes_page() -> void:
 		var key: String = ["strength", "agility", "intelligence"][i]
 		var main: bool = key == str(unit.get("primary_attribute", "strength"))
 		var stat_panel := _panel(Rect2(24 + i * 165, 173, 151, 66), Color("e5e4d6") if not main else Color("ebdbb5"), panel)
-		_label(_attribute_name(key) + (" · 主" if main else ""), Rect2(10, 5, 138, 23), 16, SiegeStyle.INK, stat_panel)
+		_icon(key, Rect2(10, 4, 24, 24), stat_panel)
+		_label(_attribute_name(key) + (" · 主" if main else ""), Rect2(40, 5, 105, 23), 16, SiegeStyle.INK, stat_panel)
 		_label("%.0f" % float(stats.get(key, 0)), Rect2(10, 29, 138, 32), 25, SiegeStyle.TEAL, stat_panel)
 		var growth: Dictionary = unit.get("attribute_growth", {})
 		_label("+%.0f / Lv" % float(growth.get(key, 2 if main else 1)), Rect2(66, 35, 79, 25), 13, SiegeStyle.MUTED, stat_panel)
-	_label("生命  %.0f       伤害  %.0f" % [float(calc.get("hp", unit.get("hp", 0))), float(calc.get("damage", unit.get("damage", 0)))], Rect2(24, 253, 488, 31), 20, SiegeStyle.INK, panel)
-	_label("间隔  %.2fs    射程  %.0f    护甲  %.0f" % [float(calc.get("attack_interval", 1)), float(calc.get("range", 0)), float(calc.get("armor", 0))], Rect2(24, 290, 488, 31), 18, SiegeStyle.INK, panel)
-	_label("召唤  %d能量    冷却  %.1fs" % [int(unit.get("cost", 0)), float(unit.get("cooldown", 0))], Rect2(24, 327, 488, 31), 20, SiegeStyle.INK, panel)
-	var rules := _label(_skill_details(unit, calc), Rect2(24, 362, 488, 83), 15, SiegeStyle.MUTED, panel)
+	var stat_grid := GridContainer.new()
+	stat_grid.position = Vector2(24, 253)
+	stat_grid.size = Vector2(488, 110)
+	stat_grid.columns = 3
+	stat_grid.add_theme_constant_override("h_separation", 7)
+	stat_grid.add_theme_constant_override("v_separation", 6)
+	panel.add_child(stat_grid)
+	_stat_badge(stat_grid, "hp", "heart", "生命", "%.0f" % float(calc.hp))
+	var healer: bool = str(calc.special.get("type", "")) == "heal"
+	_stat_badge(stat_grid, "damage", "heal" if healer else "orb" if calc.damage_type == "magic" else "sword", "治疗" if healer else "伤害", "%.0f" % float(calc.special.get("amount", 0) if healer else calc.damage), Color("9a712d"))
+	_stat_badge(stat_grid, "armor", "shield", "护甲", "%.0f" % float(calc.armor))
+	_stat_badge(stat_grid, "range", "range", "射程", "%.0f" % float(calc.range))
+	_stat_badge(stat_grid, "attack_interval", "clock", "出手间隔", "%.2fs" % float(calc.attack_interval))
+	_stat_badge(stat_grid, "cost", "energy", "召唤能量", "%d" % int(unit.get("cost", 0)), Color("9a712d"))
+	_icon("clock", Rect2(24, 373, 20, 20), panel)
+	_label("召唤冷却 %.1fs" % float(unit.get("cooldown", 0)), Rect2(52, 369, 454, 25), 15, SiegeStyle.MUTED, panel)
+	var rules := _label(_skill_focus(unit, calc), Rect2(24, 402, 488, 43), 15, SiegeStyle.TEAL, panel)
 	rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var level: int = ProfileStore.level(selected_actor)
 	var b := _button("通关 %s 后契约" % Catalog.unlock_stage(selected_actor) if not ProfileStore.owns(selected_actor) else "已满级" if level >= 20 else "训练至 Lv.%d  ·  %d星砂" % [level + 1, ProfileStore.training_cost(selected_actor)], Rect2(24, 454, 488, 51), _train.bind(selected_actor), panel, true)
@@ -554,6 +792,15 @@ func _heroes_page() -> void:
 
 func _attribute_name(key: String) -> String:
 	return {"strength": "力量", "agility": "敏捷", "intelligence": "智力"}.get(key, "力量")
+
+func _skill_focus(unit: Dictionary, calc: Dictionary) -> String:
+	var title := str(unit.get("skill_name", "战斗职责"))
+	var special: Dictionary = calc.special
+	var kind: String = {"physical": "物理", "magic": "魔法", "true": "真实"}.get(str(calc.damage_type), "物理")
+	if str(special.get("type", "")) == "heal": return title + " · 治疗最受伤的伙伴"
+	if str(special.get("type", "")) == "slow": return title + "\n减速：剩余移速 %.0f%% · %.2fs · 范围 %.0f" % [float(special.ratio) * 100, float(special.duration), float(calc.aoe_radius)]
+	if str(special.get("type", "")) == "siege": return title + "\n攻城：基地伤害 %.2f倍 · %s" % [float(special.get("base_damage_multiplier", 1)), kind]
+	return title + "\n%s%s · 前摇 %.2fs" % ["范围 %.0f · " % float(calc.aoe_radius) if float(calc.aoe_radius) > 0 else "单体", kind, float(calc.hit_delay)]
 
 func _select_hero(id: String) -> void:
 	selected_actor = id
@@ -589,6 +836,45 @@ func _study_preview_text(calc: Dictionary) -> String:
 	else: text += "\n范围 %.0f · 前摇 %.2fs" % [float(calc.aoe_radius), float(calc.hit_delay)]
 	return text
 
+func _study_tradeoffs(modifiers: Dictionary, base: Dictionary) -> Dictionary:
+	var result := {"benefits": [], "costs": []}
+	var labels := {"hp_mult": "生命", "damage_mult": "伤害", "speed_mult": "移速", "range_mult": "射程", "attack_interval_mult": "间隔", "hit_delay_mult": "前摇", "aoe_radius_mult": "范围", "heal_amount_mult": "治疗", "slow_duration_mult": "控制时长"}
+	for key: String in modifiers:
+		var value := float(modifiers[key])
+		var benefit := true
+		var text := ""
+		if labels.has(key):
+			benefit = value < 1.0 if key in ["attack_interval_mult", "hit_delay_mult"] else value > 1.0
+			text = "%s %+.0f%%" % [labels[key], (value - 1) * 100]
+		elif key == "armor_add":
+			benefit = value > 0
+			text = "护甲 %+.0f" % value
+		elif key == "slow_ratio":
+			benefit = value < float(base.special.get("ratio", 1))
+			text = "剩余移速 %.0f%%" % (value * 100)
+		elif key == "base_damage_multiplier":
+			benefit = value > float(base.special.get("base_damage_multiplier", 1))
+			text = "攻城 %.2f倍" % value
+		if not text.is_empty():
+			if benefit: result.benefits.append(text)
+			else: result.costs.append(text)
+	return result
+
+func _study_changed_values(base: Dictionary, preview: Dictionary) -> String:
+	var labels := {"hp": "生命", "damage": "伤害", "armor": "护甲", "range": "射程", "speed": "移速", "attack_interval": "间隔", "hit_delay": "前摇", "aoe_radius": "范围"}
+	var parts: Array[String] = []
+	for key: String in labels:
+		if is_equal_approx(float(base[key]), float(preview[key])): continue
+		parts.append("%s %.2fs" % [labels[key], float(preview[key])] if key in ["attack_interval", "hit_delay"] else "%s %.0f" % [labels[key], float(preview[key])])
+	for entry: Array in [["amount", "治疗"], ["duration", "控制秒数"], ["ratio", "剩余移速"], ["base_damage_multiplier", "攻城倍率"]]:
+		var key := str(entry[0])
+		if is_equal_approx(float(base.special.get(key, 0)), float(preview.special.get(key, 0))): continue
+		if key == "ratio": parts.append("剩余移速 %.0f%%" % (float(preview.special.get(key, 1)) * 100))
+		elif key == "duration": parts.append("控制 %.2fs" % float(preview.special.get(key, 0)))
+		elif key == "amount": parts.append("治疗 %.0f" % float(preview.special.get(key, 0)))
+		else: parts.append("攻城 %.2f倍" % float(preview.special.get(key, 0)))
+	return " · ".join(parts)
+
 func _study_page() -> void:
 	var roster := Catalog.playable_roster()
 	if not roster.has(selected_actor): selected_actor = str(roster[0])
@@ -611,9 +897,21 @@ func _study_page() -> void:
 	_label("当前 · %s    Lv.%d" % [_study_name(selected_actor), ProfileStore.level(selected_actor)], Rect2(18, 51, 590, 25), 17, SiegeStyle.TEAL, panel)
 	var attrs: Dictionary = calc.stats
 	_label("力量 %.0f · 敏捷 %.0f · 智力 %.0f · 主属性 %s" % [float(attrs.strength), float(attrs.agility), float(attrs.intelligence), _attribute_name(str(calc.primary))], Rect2(18, 80, 590, 25), 15, SiegeStyle.MUTED, panel)
-	var current := _label(_study_preview_text(calc), Rect2(18, 114, 720, 68), 16, SiegeStyle.INK, panel)
+	var current := GridContainer.new()
 	current.name = "StudyCurrentStats"
-	var skill := _label(_skill_details(unit, calc), Rect2(18, 187, 720, 49), 14, SiegeStyle.MUTED, panel)
+	current.position = Vector2(18, 117)
+	current.size = Vector2(720, 52)
+	current.columns = 6
+	current.add_theme_constant_override("h_separation", 6)
+	panel.add_child(current)
+	_stat_badge(current, "hp", "heart", "生命", "%.0f" % float(calc.hp))
+	var healing: bool = str(calc.special.get("type", "")) == "heal"
+	_stat_badge(current, "damage", "heal" if healing else "sword", "治疗" if healing else "伤害", "%.0f" % float(calc.special.get("amount", 0) if healing else calc.damage))
+	_stat_badge(current, "armor", "shield", "护甲", "%.0f" % float(calc.armor))
+	_stat_badge(current, "range", "range", "射程", "%.0f" % float(calc.range))
+	_stat_badge(current, "speed", "agility", "移速", "%.0f" % float(calc.speed))
+	_stat_badge(current, "attack_interval", "clock", "间隔", "%.2fs" % float(calc.attack_interval))
+	var skill := _label(_skill_focus(unit, calc), Rect2(18, 182, 720, 49), 15, SiegeStyle.TEAL, panel)
 	skill.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var config := Catalog.study(selected_actor)
 	var study_stage := str(config.get("unlock_stage", "stage_04"))
@@ -627,6 +925,7 @@ func _study_page() -> void:
 	unlock.name = "StudyUnlock"
 	unlock.disabled = unlocked or not ProfileStore.can_modify() or not ProfileStore.owns(selected_actor) or ProfileStore.level(selected_actor) < int(config.get("min_level", 3)) or not ready_stage or ProfileStore.credits() < cost
 	var routes := Catalog.study_routes(selected_actor)
+	var base_calc := UnitStats.calculate(unit, ProfileStore.level(selected_actor))
 	for i in routes.size():
 		var route: Dictionary = routes[i]
 		var active := ProfileStore.study_route(selected_actor) == str(route.id)
@@ -635,11 +934,13 @@ func _study_page() -> void:
 		var preview := UnitStats.calculate(unit, ProfileStore.level(selected_actor), route.modifiers)
 		card.set_meta("unit_stats", preview.duplicate(true))
 		_label(str(route.name) + (" · 当前" if active else ""), Rect2(14, 7, 323, 27), 21, SiegeStyle.TEAL, card)
-		var tradeoff := _label(str(route.get("description", "")), Rect2(14, 39, 323, 36), 14, SiegeStyle.INK, card)
-		tradeoff.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		var recipe := _label(_study_modifier_text(route.modifiers), Rect2(14, 80, 323, 38), 13, SiegeStyle.MUTED, card)
-		recipe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_label(_study_preview_text(preview), Rect2(14, 122, 323, 50), 13, SiegeStyle.INK, card)
+		var tradeoffs := _study_tradeoffs(route.modifiers, base_calc)
+		var benefit := _label("收益 · " + " / ".join(tradeoffs.benefits), Rect2(14, 40, 323, 38), 14, SiegeStyle.TEAL, card)
+		benefit.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var cost_label := _label("代价 · " + " / ".join(tradeoffs.costs), Rect2(14, 84, 323, 38), 14, Color("9a712d"), card)
+		cost_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var changed := _label("选择后 · " + _study_changed_values(base_calc, preview), Rect2(14, 128, 323, 44), 12, SiegeStyle.MUTED, card)
+		changed.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		var switch := _button("当前路线" if active else "免费切换" if unlocked else "解锁后可选", Rect2(14, 177, 323, 27), _set_study_route.bind(selected_actor, str(route.id)), card, active)
 		switch.name = "StudySelect_" + str(route.id)
 		switch.add_theme_font_size_override("font_size", 14)
@@ -668,8 +969,11 @@ func _squad_page() -> void:
 	for id: String in Catalog.playable_roster():
 		var p := _hero_card(id, Rect2(0, 0, 234, 236), grid)
 		p.custom_minimum_size = Vector2(234, 236)
-		var desc := _label(str(Catalog.unit(id).get("description", Catalog.unit(id).get("summary", ""))), Rect2(16, 149, 202, 46), 14, SiegeStyle.MUTED, p)
-		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var unit := Catalog.unit(id)
+		_icon("energy", Rect2(16, 148, 19, 19), p)
+		_label("召唤 %d能量" % int(unit.get("cost", 0)), Rect2(42, 146, 174, 23), 14, Color("9a712d"), p)
+		_icon("clock", Rect2(16, 175, 19, 19), p)
+		_label("冷却 %.1fs" % float(unit.get("cooldown", 0)), Rect2(42, 173, 174, 23), 14, SiegeStyle.MUTED, p)
 		var owned: bool = ProfileStore.owns(id)
 		var button := _button("%s 后契约" % Catalog.unlock_stage(id) if not owned else "已出战 · 移出" if draft_roster.has(id) else "加入编队", Rect2(16, 200, 202, 30), _toggle_roster.bind(id), p, draft_roster.has(id))
 		button.add_theme_font_size_override("font_size", 15)
@@ -849,6 +1153,10 @@ func _build_battle_hud() -> void:
 	status_label = _label("", Rect2(439, 117, 555, 43), 16, Color("d8dfc8"))
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	pulse_button = _button("星灯脉冲 [P] · 80", Rect2(1009, 119, 246, 39), _pulse, null, true)
+	pulse_button.icon = load("res://assets/ui/icons/pulse.svg")
+	pulse_button.expand_icon = true
+	pulse_button.add_theme_constant_override("icon_max_width", 21)
+	pulse_button.add_theme_font_size_override("font_size", 14)
 	view_slider = HSlider.new()
 	view_slider.position = Vector2(244, 534)
 	view_slider.size = Vector2(792, 15)
@@ -874,7 +1182,8 @@ func _build_battle_hud() -> void:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_portrait(id, Rect2(8, 34, 59, 76), b)
 		var role_label := _label(str(unit.get("role_name", unit.get("role", "英魂"))), Rect2(73, 36, 70, 24), 13, SiegeStyle.TEAL, b)
-		var cost_label := _label("%d 能量" % int(unit.get("cost", 0)), Rect2(73, 65, 70, 23), 14, Color("9a712d"), b)
+		_icon("energy", Rect2(71, 66, 17, 17), b)
+		var cost_label := _label("%d能量" % int(unit.get("cost", 0)), Rect2(91, 65, 54, 23), 13, Color("9a712d"), b)
 		var ready_label := _label("召唤", Rect2(73, 91, 70, 21), 12, SiegeStyle.TEAL, b)
 		summon_labels.append({"name": name_label, "role": role_label, "cost": cost_label, "ready": ready_label})
 		summon_buttons.append(b)
@@ -899,7 +1208,7 @@ func _update_hud() -> void:
 	timer_label.text = "%02d:%02d    在场 %d / 64" % [int(elapsed / 60), elapsed % 60, int(snap.get("active_count", 0))]
 	var cooldowns: Dictionary = snap.get("cooldowns", {})
 	var pulse_remaining := float(snap.get("pulse_cooldown", 0))
-	pulse_button.text = "星灯脉冲 · %.1fs" % (ceilf(pulse_remaining * 10.0) / 10.0) if pulse_remaining > SiegeBattle.READY_EPSILON else "星灯脉冲 [P] · 80"
+	pulse_button.text = "脉冲[P] 80能量 · %.1fs" % (ceilf(pulse_remaining * 10.0) / 10.0) if pulse_remaining > SiegeBattle.READY_EPSILON else "星灯脉冲 [P] · 80"
 	pulse_button.disabled = paused or pulse_remaining > SiegeBattle.READY_EPSILON or float(snap.get("energy", 0)) + SiegeBattle.READY_EPSILON < float(snap.get("pulse_cost", 80)) or str(snap.get("outcome", "running")) != "running"
 	for i in summon_buttons.size():
 		var id: String = draft_roster[i]

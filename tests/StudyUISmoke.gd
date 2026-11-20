@@ -11,6 +11,8 @@ var matrix_cases := 0
 var navigation_checks := 0
 var navigation_records: Array[Dictionary] = []
 var battle_diagnostic: Dictionary = {}
+var navigation_toast_valid := true
+var navigation_toast_records: Array[Dictionary] = []
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -78,6 +80,26 @@ func verify_roster_slots(expected: Array, context: String) -> void:
 		check(button.text == "%d号位 · 移出" % slot if slot > 0 else button.text == "加入编队", context + ": visible action identifies actual slot " + id)
 	check(labels_contain("至少保留一名") and labels_contain("1—8号位对应召唤键"), context + ": roster limits and key mapping stay visible")
 
+func verify_study_toast(context: String, expected_text: String) -> void:
+	var footer := node_named("StudyFooterRule") as Label
+	var message: Label = app.toast
+	var controls_exist: bool = app.tab == "研修" and is_instance_valid(footer) and is_instance_valid(message)
+	check(controls_exist, context + ": actual study footer and transaction toast exist")
+	if not controls_exist:
+		navigation_toast_valid = false
+		return
+	var footer_rect := footer.get_global_rect()
+	var toast_rect := message.get_global_rect()
+	var text_visible: bool = footer.is_visible_in_tree() and message.is_visible_in_tree() and footer.text.contains("基础八关") and footer.text.contains("研修只改变出战策略") and message.text.contains(expected_text)
+	var separate: bool = not footer_rect.intersects(toast_rect)
+	var footer_inside: bool = footer_rect.position.y >= 0 and footer_rect.end.y <= 720
+	var toast_inside: bool = toast_rect.position.y >= 0 and toast_rect.end.y <= 720
+	check(text_visible, context + ": base-route rule and actual transaction result remain visible")
+	check(separate, context + ": toast does not cover the footer rule")
+	check(footer_inside and toast_inside, context + ": footer and whole toast stay within the 720px viewport")
+	navigation_toast_valid = navigation_toast_valid and text_visible and separate and footer_inside and toast_inside
+	navigation_toast_records.append({"context": context, "message": message.text, "footer": footer.text, "footer_rect": [footer_rect.position.x, footer_rect.position.y, footer_rect.size.x, footer_rect.size.y], "toast_rect": [toast_rect.position.x, toast_rect.position.y, toast_rect.size.x, toast_rect.size.y], "text_visible": text_visible, "nonoverlapping": separate, "footer_inside": footer_inside, "toast_inside": toast_inside})
+
 func audit_list_navigation() -> void:
 	var started_checks := checks
 	var roster: Array = Catalog.playable_roster()
@@ -120,6 +142,7 @@ func audit_list_navigation() -> void:
 	app._unlock_study(last_id)
 	await settle_list_layout()
 	verify_list_position("StudyListScroll", position, "successful study unlock")
+	verify_study_toast("successful study unlock", "两条研修路线已解锁")
 	check(profile.study_unlocked(last_id) and profile.study_route(last_id) == "base", "navigation unlock uses real transaction and retains base")
 	app._select_study(other_id)
 	await settle_list_layout()
@@ -131,6 +154,7 @@ func audit_list_navigation() -> void:
 	app._unlock_study(other_id)
 	await settle_list_layout()
 	verify_list_position("StudyListScroll", position, "failed study unlock")
+	verify_study_toast("failed study unlock", "保存失败")
 	check(not profile.study_unlocked(other_id) and profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed study unlock retains cost, state and original bytes")
 	profile.save_path = PROFILE_PATH
 	app._select_study(last_id)
@@ -145,6 +169,7 @@ func audit_list_navigation() -> void:
 	app._set_study_route(last_id, str(routes[0].id))
 	await settle_list_layout()
 	verify_list_position("StudyListScroll", position, "successful route selection respects manual position")
+	verify_study_toast("successful route selection", "已保存")
 	check(profile.study_route(last_id) == str(routes[0].id) and profile.credits() == credits, "successful route refresh retains free switching and central selection")
 	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
 	stored_data = profile.data.duplicate(true)
@@ -152,17 +177,20 @@ func audit_list_navigation() -> void:
 	app._set_study_route(last_id, str(routes[1].id))
 	await settle_list_layout()
 	verify_list_position("StudyListScroll", position, "failed route selection")
+	verify_study_toast("failed route selection", "保存失败")
 	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed route selection cannot alter profile or original file")
 	profile.save_path = PROFILE_PATH
 	app._set_study_route(last_id, "base")
 	await settle_list_layout()
 	verify_list_position("StudyListScroll", position, "free base restoration")
+	verify_study_toast("free base restoration", "已保存")
 	check(profile.study_route(last_id) == "base" and profile.credits() == credits, "base restore remains free")
 	app._select_study(last_id)
 	app._set_study_route(last_id, str(routes[0].id))
 	app._set_study_route(last_id, "base")
 	await settle_list_layout()
 	check(card_fully_visible("StudyListScroll", last_id), "repeated selection survives synchronous route rebuilds and reveals the hidden card")
+	verify_study_toast("synchronous selection and route rebuilding", "已保存")
 	check(profile.study_route(last_id) == "base" and profile.credits() == credits, "synchronous selection and route changes retain real free transactions")
 	app._select_study(str(roster[0]))
 	await settle_list_layout()
@@ -416,7 +444,7 @@ func run() -> void:
 	app.queue_free()
 	await process_frame
 	await root.get_node("GameAudio").shutdown()
-	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "navigation_checks": navigation_checks, "navigation_records": navigation_records, "battle_diagnostic": battle_diagnostic, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "scripts/ui/StatBadge.gd": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd")}, "scope": "Headless actual Main study/hero bindings, per-page list restoration and visible committed 1—8 roster slots, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
+	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "navigation_checks": navigation_checks, "navigation_records": navigation_records, "navigation_toast_valid": navigation_toast_valid and not navigation_toast_records.is_empty(), "navigation_toast_records": navigation_toast_records, "battle_diagnostic": battle_diagnostic, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "scripts/ui/StatBadge.gd": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd")}, "scope": "Headless actual Main study/hero bindings, per-page list restoration and visible committed 1—8 roster slots, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
 	var report := FileAccess.open("res://reports/study_ui_smoke.json", FileAccess.WRITE)
 	report.store_string(JSON.stringify(result, "\t"))
 	report.close()

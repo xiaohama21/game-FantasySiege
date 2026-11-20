@@ -149,6 +149,11 @@ class PackageVerificationBoundaries(unittest.TestCase):
     def navigation_fixture(self, captures, identities):
         roster = identities[:8]
         by_name = {item['name']: item for item in captures}
+        for name in verify_package.STUDY_NOTICE_CAPTURES:
+            by_name[name]['study_notice'] = {'footer_name': 'StudyFooterRule',
+                'footer_text': '路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。',
+                'footer_visible': True, 'footer_rect': [504, 641, 742, 28], 'toast_visible': True,
+                'toast_rect': [254, 678, 1000, 40], 'toast_text': '已保存 · 当前路线', 'intersects': False}
         for name, page, prefix, selected in [('art_hero_spirit_beast', '英魂', 'HeroList', 'spirit_beast'),
                                               ('art_study_siege', '研修', 'StudyList', 'rivet_gunner'),
                                               ('art_squad', '编队', 'SquadList', None), ('art_squad_lower', '编队', 'SquadList', None)]:
@@ -605,6 +610,28 @@ class PackageVerificationBoundaries(unittest.TestCase):
             with self.subTest(field=key):
                 suite=self.suite_fixture('logic')
                 self.change_study_report(suite,'PreferencesSmoke',key,value)
+                self.assertTrue(verify_package.suite_check(suite,self.root,'logic','0.1.3.0'))
+
+    def test_study_saved_notice_cannot_cover_necessary_footer_even_with_false_overlap_flag(self):
+        for name in verify_package.STUDY_NOTICE_CAPTURES:
+            with self.subTest(capture=name):
+                good = self.art_fixture()
+                next(item for item in good['captures'] if item['name']==name)['study_notice']['toast_rect'] = [254, 646, 1000, 56]
+                failures = verify_package.navigation_art_check(good,self.root)
+                self.assertTrue(any('actual rectangles cover the necessary footer rule' in item for item in failures),failures)
+        for field,value in [('footer_name','old-footer'),('footer_text','仅tooltip说明'),('footer_visible',False),
+                            ('toast_visible',False),('intersects',True),('toast_rect',[254,678,1000,45]),
+                            ('footer_rect',[504,641,True,28]),('toast_text',''),('toast_rect',[254,678,1000,float('nan')])]:
+            with self.subTest(field=field):
+                good=self.art_fixture()
+                next(item for item in good['captures'] if item['name']=='art_study_siege')['study_notice'][field]=value
+                self.assertTrue(verify_package.navigation_art_check(good,self.root))
+
+    def test_study_ui_suite_requires_real_notification_layout_verification(self):
+        for value in (None,False,1):
+            with self.subTest(value=value):
+                suite=self.suite_fixture('logic')
+                self.change_study_report(suite,'StudyUISmoke','navigation_toast_valid',value)
                 self.assertTrue(verify_package.suite_check(suite,self.root,'logic','0.1.3.0'))
 
     def test_result_art_requires_the_current_battle_bookkeeping_script(self):

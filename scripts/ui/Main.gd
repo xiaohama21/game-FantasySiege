@@ -353,7 +353,7 @@ func _message(value: String) -> void:
 	elif is_instance_valid(battle):
 		toast.position = Vector2(330, 174)
 		toast.size = Vector2(620, 68)
-	elif tab == "敌情":
+	elif tab in ["敌情", "研修"]:
 		toast.position = Vector2(254, 678)
 		toast.size = Vector2(1000, 40)
 		toast.add_theme_font_size_override("font_size", 14)
@@ -1045,7 +1045,8 @@ func _study_page() -> void:
 	restore.name = "StudyRestore"
 	restore.add_theme_font_size_override("font_size", 14)
 	restore.disabled = not unlocked or ProfileStore.study_route(selected_actor) == "base" or not ProfileStore.can_modify()
-	_label("路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。", Rect2(504, 641, 742, 28), 15, Color("c2d5cb"))
+	var footer_rule := _label("路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。", Rect2(504, 641, 742, 28), 15, Color("c2d5cb"))
+	footer_rule.name = "StudyFooterRule"
 
 func _unlock_study(id: String) -> void:
 	var success: bool = ProfileStore.unlock_study(id)

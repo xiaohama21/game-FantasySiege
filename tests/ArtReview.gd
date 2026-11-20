@@ -242,10 +242,29 @@ func capture(filename: String) -> void:
 	check(colors.size() >= 12, filename + ": composition is rendered rather than an empty surface")
 	var path := OUTPUT + "/" + filename + ".png"
 	check(picture.save_png(path) == OK, filename + ": save real Main composition")
-	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename)})
+	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename), "study_notice": audit_study_notice(filename)})
 
 func rect_data(rect: Rect2) -> Array:
 	return [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+
+func audit_study_notice(context: String) -> Dictionary:
+	if is_instance_valid(app.battle) or app.tab != "研修": return {}
+	var footer := app.screen.find_child("StudyFooterRule", true, false) as Label
+	check(footer != null and canvas_visible(footer), context + ": necessary study footer rule remains visible")
+	if footer == null: return {}
+	var footer_rect := footer.get_global_rect()
+	check(Rect2(Vector2.ZERO, Vector2(SIZE)).grow(1.0).encloses(footer_rect), context + ": footer rule fits full viewport")
+	var toast_visible: bool = is_instance_valid(app.toast) and canvas_visible(app.toast)
+	var result := {"footer_name": str(footer.name), "footer_text": footer.text, "footer_visible": canvas_visible(footer), "footer_rect": rect_data(footer_rect), "toast_visible": toast_visible}
+	if toast_visible:
+		var toast_rect: Rect2 = app.toast.get_global_rect()
+		var intersects := footer_rect.intersects(toast_rect)
+		check(not intersects, context + ": visible study notification cannot cover necessary footer rule")
+		check(Rect2(Vector2.ZERO, Vector2(SIZE)).grow(1.0).encloses(toast_rect), context + ": study notification fits full viewport")
+		result.merge({"toast_text": str(app.toast.text), "toast_rect": rect_data(toast_rect), "intersects": intersects})
+	if context in ["art_study_sweep", "art_study_heal", "art_study_siege", "art_study_slow"]:
+		check(toast_visible, context + ": actual route-save notification is visible during capture")
+	return result
 
 func audit_list_navigation(context: String) -> Dictionary:
 	if is_instance_valid(app.battle): return {}

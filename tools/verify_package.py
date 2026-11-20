@@ -22,6 +22,7 @@ BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in ran
 RESULT_ART_CAPTURES = ('art_result_victory', 'art_result_defeat', 'art_result_unsaved', 'art_result_recovered')
 SETTINGS_ART_CAPTURES = ('art_settings_save_failed', 'art_settings_temporary_return')
 NAVIGATION_ART_CAPTURES = ('art_hero_spirit_beast', 'art_study_siege', 'art_squad', 'art_squad_lower')
+STUDY_NOTICE_CAPTURES = ('art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow')
 FONT_ART_HASHES = (('ui_style_sha256', 'scripts/ui/UIStyle.gd'),
                    ('font_manifest_sha256', 'assets/fonts/manifest.json'),
                    ('font_binary_sha256', 'assets/fonts/NotoSansSC.ttf'),
@@ -353,6 +354,28 @@ def navigation_art_check(detail, package):
         return (isinstance(value, list) and len(value) == 4 and
                 all(type(number) in (int, float) and math.isfinite(number) for number in value) and
                 value[2] > 0 and value[3] > 0)
+
+    def inside_viewport(value):
+        return rectangle(value) and value[0] >= 0 and value[1] >= 0 and value[0]+value[2] <= 1281 and value[1]+value[3] <= 721
+
+    for name in STUDY_NOTICE_CAPTURES:
+        notice = by_name.get(name, {}).get('study_notice', {})
+        if not isinstance(notice, dict):
+            failures.append('Study notice actual footer/notification metadata missing: ' + name)
+            continue
+        footer_text = notice.get('footer_text', '')
+        if (notice.get('footer_name') != 'StudyFooterRule' or notice.get('footer_visible') is not True
+                or type(footer_text) is not str or '基础八关' not in footer_text or '收益' not in footer_text or '代价' not in footer_text):
+            failures.append('Study notice necessary footer rule must remain visible: ' + name)
+        footer, toast = notice.get('footer_rect'), notice.get('toast_rect')
+        if (not inside_viewport(footer) or not inside_viewport(toast) or notice.get('toast_visible') is not True
+                or type(notice.get('toast_text')) is not str or '已保存' not in notice.get('toast_text', '')
+                or notice.get('intersects') is not False):
+            failures.append('Study notice saved message must be visible and contained without overlap: ' + name)
+        if rectangle(footer) and rectangle(toast) and not (
+                footer[0]+footer[2] <= toast[0] or toast[0]+toast[2] <= footer[0]
+                or footer[1]+footer[3] <= toast[1] or toast[1]+toast[3] <= footer[1]):
+            failures.append('Study notice actual rectangles cover the necessary footer rule: ' + name)
 
     required = {'art_hero_spirit_beast': ('英魂', 'spirit_beast'),
                 'art_study_siege': ('研修', 'rivet_gunner'),

@@ -100,9 +100,9 @@ func _ready() -> void:
 	_save_button.name = "SaveAndReturn"
 	_save_button.text = "保存并返回"
 	_save_button.custom_minimum_size = Vector2(180, 44)
-	_save_button.add_theme_stylebox_override("normal", STYLE.box(STYLE.TEAL, 10))
-	_save_button.add_theme_stylebox_override("hover", STYLE.box(STYLE.TEAL.lightened(0.08), 10, STYLE.GOLD))
-	_save_button.add_theme_stylebox_override("pressed", STYLE.box(STYLE.TEAL.darkened(0.12), 10))
+	_save_button.add_theme_stylebox_override("normal", STYLE.button_box(STYLE.TEAL, 10))
+	_save_button.add_theme_stylebox_override("hover", STYLE.button_box(STYLE.TEAL.lightened(0.08), 10, STYLE.GOLD))
+	_save_button.add_theme_stylebox_override("pressed", STYLE.button_box(STYLE.TEAL.darkened(0.12), 10))
 	for color_name: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		_save_button.add_theme_color_override(color_name, STYLE.PAPER)
 	_save_button.pressed.connect(close)
@@ -114,6 +114,8 @@ func _label(text: String, font_size: int) -> Label:
 	var result := Label.new()
 	result.text = text
 	result.add_theme_font_size_override("font_size", font_size)
+	if font_size >= 24:
+		result.add_theme_font_override("font", STYLE.emphasis_font())
 	result.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return result
 

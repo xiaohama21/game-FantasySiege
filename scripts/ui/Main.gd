@@ -308,6 +308,8 @@ func _label(value: String, rect: Rect2, font_size: int = 18, color: Color = Sieg
 	l.position = rect.position
 	l.size = rect.size
 	l.add_theme_font_size_override("font_size", font_size)
+	if font_size >= 24:
+		l.add_theme_font_override("font", SiegeStyle.emphasis_font())
 	l.add_theme_color_override("font_color", color)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	(parent if parent != null else screen).add_child(l)
@@ -321,9 +323,9 @@ func _button(value: String, rect: Rect2, action: Callable, parent: Node = null, 
 	b.size = rect.size
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	if accent:
-		b.add_theme_stylebox_override("normal", SiegeStyle.box(SiegeStyle.TEAL, 10))
-		b.add_theme_stylebox_override("hover", SiegeStyle.box(SiegeStyle.TEAL.lightened(0.08), 10, SiegeStyle.GOLD))
-		b.add_theme_stylebox_override("pressed", SiegeStyle.box(SiegeStyle.TEAL.darkened(0.12), 10))
+		b.add_theme_stylebox_override("normal", SiegeStyle.button_box(SiegeStyle.TEAL, 10))
+		b.add_theme_stylebox_override("hover", SiegeStyle.button_box(SiegeStyle.TEAL.lightened(0.08), 10, SiegeStyle.GOLD))
+		b.add_theme_stylebox_override("pressed", SiegeStyle.button_box(SiegeStyle.TEAL.darkened(0.12), 10))
 		for color_name: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 			b.add_theme_color_override(color_name, Color("fffaed"))
 	b.pressed.connect(func():

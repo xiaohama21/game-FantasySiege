@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "active": {
+    "family": "Noto Sans SC",
+    "engine_family_aliases": [
+      "Noto Sans SC"
+    ],
+    "file": "NotoSansSC.ttf",
+    "sha256": "763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a",
+    "bytes": 17773244,
+    "license": "OFL.txt",
+    "license_sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+    "source_url": "https://github.com/notofonts/noto-cjk/blob/main/Sans/Variable/TTF/Subset/NotoSansSC-VF.ttf",
+    "source_kind": "local_installed_font_copy",
+    "local_source_path": "C:\\Windows\\Fonts\\NotoSansSC-VF.ttf",
+    "local_source_sha256": "763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a",
+    "upstream_hash_verified": false,
+    "font_bytes_modified": false,
+    "body_weight": 400,
+    "emphasis_weight": 600,
+    "copyright": "© 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.",
+    "embedded_license": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.",
+    "embedded_license_url": "http://scripts.sil.org/OFL",
+    "internal_version": "Version 2.04;241114210130;non-release",
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 100.0,
+        "default": 100.0,
+        "max": 900.0
+      }
+    ],
+    "name_ids": {
+      "0": [
+        "© 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'."
+      ],
+      "5": [
+        "Version 2.04;241114210130;non-release"
+      ],
+      "1": [
+        "Noto Sans SC"
+      ],
+      "2": [
+        "Regular"
+      ],
+      "3": [
+        "2.004;ADBO;NotoSansSC-Thin;ADOBE"
+      ],
+      "4": [
+        "Noto Sans SC"
+      ],
+      "6": [
+        "NotoSansSC-Thin"
+      ],
+      "13": [
+        "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software."
+      ],
+      "14": [
+        "http://scripts.sil.org/OFL"
+      ],
+      "17": [
+        "Thin"
+      ]
+    },
+    "named_instances": [
+      {
+        "coordinates": {
+          "wght": 100.0
+        },
+        "names": [
+          "Thin"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 300.0
+        },
+        "names": [
+          "Light"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 350.0
+        },
+        "names": [
+          "DemiLight"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 400.0
+        },
+        "names": [
+          "Regular"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 500.0
+        },
+        "names": [
+          "Medium"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 700.0
+        },
+        "names": [
+          "Bold"
+        ]
+      },
+      {
+        "coordinates": {
+          "wght": 900.0
+        },
+        "names": [
+          "Black"
+        ]
+      }
+    ],
+    "source_note": "Copied byte-for-byte from the installed Noto Sans SC font; upstream byte identity and a formal release were not asserted. Internal non-release version is preserved."
+  },
+  "license_source": {
+    "url": "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanssc/OFL.txt",
+    "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+    "full_text_unmodified": true,
+    "copyright_matches_embedded": true
+  },
+  "glyph_coverage": {
+    "scope": "All literal codepoints in current scripts/ui GDScript and decoded resources JSON strings; does not claim every future UI or native animation export name",
+    "checked_codepoint_count": 797,
+    "font_cmap_count": 30890,
+    "missing_characters": [],
+    "digits_have_distinct_glyphs": true
+  }
+}

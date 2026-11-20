@@ -49,6 +49,8 @@ func _label(parent: Node, value: String, rect: Rect2, size_at: int, color: Color
 	label.size = rect.size
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_font_size_override("font_size", size_at)
+	if size_at >= 24:
+		label.add_theme_font_override("font", SiegeStyle.emphasis_font())
 	label.add_theme_color_override("font_color", color)
 	parent.add_child(label)
 	return label

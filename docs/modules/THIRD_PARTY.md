@@ -1,13 +1,15 @@
 # 依赖与素材范围
 
-> v0.2 · 2026-11-19 · GDD v0.4.8 / 程序0.1.3.0
+> v0.3 · 2026-11-20 · GDD v0.5.9 / 程序0.1.3.0
+> v0.3：用户字体反馈后引入Noto Sans SC完整可变中文字体，OFL1.1声明/来源及SHA单独登记；旧字体只保留历史候选范围，D69/原生库边界不变。
 > v0.2：同步已生成原创声音和环境SVG、十二同源Spine肖像的本地派生边界；授权及商业发行仍独立验收。
 > v0.1：登记引擎、字体、D69、原生运行库和独立转换工具的来源及许可范围。
 
 | 资源 | 来源/许可 | 仓库/交付 |
 |---|---|---|
 | Godot4.7.1 | Godot Engine，MIT | 本机已安装运行时；本地便携包附官方版权声明 |
-| ZCOOL Kuaile | Google Fonts，SIL OFL1.1 | assets/fonts/OFL.txt；字体可随代码再分发 |
+| Noto Sans SC | Google Fonts / Noto项目，SIL OFL1.1 | assets/fonts/OFL.txt与manifest.json登记当前字体URL/原字节SHA/内部名称及400/600使用字重；可随代码再分发 |
+| ZCOOL Kuaile（历史） | Google Fonts，SIL OFL1.1 | 仅历史候选使用；历史包保留构建时字体与许可快照 |
 | D69骨架/纹理 | 用户现有315套包，声明限学习研究 | 用户确认暂无商用授权；原始/派生素材排除Git，本地学习版使用 |
 | Spine Godot原生扩展 | 旧项目已安装Windows64库，Esoteric Software Spine runtime | bin排除Git，本机只读复制；商业再分发条件未核实，不标商业发行 |
 | Spine格式转换脚本 | 本项目工具，接续旧项目通用转换经验 | 代码入库，所有源文件只读；不代表素材授权 |

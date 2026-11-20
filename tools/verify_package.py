@@ -20,6 +20,14 @@ STUDY_ART_CAPTURES = ('art_study_locked', 'art_study_unowned', 'art_study_ready'
 BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in range(1, 9)) + tuple(
     'art_briefing_stage_%02d_lower' % index for index in range(1, 9)) + ('art_briefing_locked', 'art_briefing_studied')
 RESULT_ART_CAPTURES = ('art_result_victory', 'art_result_defeat', 'art_result_unsaved', 'art_result_recovered')
+FONT_ART_HASHES = (('ui_style_sha256', 'scripts/ui/UIStyle.gd'),
+                   ('font_manifest_sha256', 'assets/fonts/manifest.json'),
+                   ('font_binary_sha256', 'assets/fonts/NotoSansSC.ttf'),
+                   ('font_body_sha256', 'resources/ui_font_body.tres'),
+                   ('font_emphasis_sha256', 'resources/ui_font_emphasis.tres'))
+FONT_ART_REQUIRED_CHARACTERS = '0123456789力量敏捷智力生命伤害护甲魔抗射程召唤冷却星砂训练研修保存敌情首领→×'
+FONT_INTERNAL_FAMILIES = {'Noto Sans SC', 'Noto Sans SC Thin'}
+FONT_WEIGHT_TAG = '2003265652'  # OpenType wght, as serialized from TextServer's integer tag.
 
 
 def read_json(path):
@@ -261,11 +269,77 @@ def native_check(detail, package):
     return failures
 
 
+def font_art_check(detail, package):
+    """Bind rendered font observations to this package's actual font and variants."""
+    failures = []
+    for key, relative in FONT_ART_HASHES:
+        path = package / relative
+        if not path.is_file() or detail.get(key) != sha(path):
+            failures.append('Offscreen font art SHA differs from this package: ' + key)
+    for key, expected in (('ui_font_family', 'Noto Sans SC'), ('body_weight', 400), ('emphasis_weight', 600),
+                          ('font_glyph_check', True)):
+        if type(detail.get(key)) is not type(expected) or detail.get(key) != expected:
+            failures.append('Offscreen font art identity or glyph result differs: ' + key)
+    characters = detail.get('font_glyph_characters')
+    if type(characters) is not str or not set(FONT_ART_REQUIRED_CHARACTERS).issubset(characters):
+        failures.append('Offscreen font glyph coverage must include actual Chinese rules, digits and symbols')
+    if detail.get('font_glyph_missing') != [] or type(detail.get('font_glyph_missing')) is not list:
+        failures.append('Offscreen font art must have no missing glyphs')
+    variants = detail.get('font_glyph_variants')
+    if variants != [400, 600] or any(type(value) is not int for value in variants or []):
+        failures.append('Offscreen font glyph coverage must include both actual weight variants')
+    engine_weights = detail.get('font_engine_weights')
+    coordinates = detail.get('font_engine_coordinates')
+    if not isinstance(engine_weights, dict) or set(engine_weights) != {'body', 'emphasis'}:
+        failures.append('Offscreen font art must record actual TextServer weight observations')
+    if not isinstance(coordinates, dict) or set(coordinates) != {'body', 'emphasis'}:
+        failures.append('Offscreen font art must record actual TextServer coordinates for every font RID')
+    for kind, expected in (('body', 400), ('emphasis', 600)):
+        observed = engine_weights.get(kind) if isinstance(engine_weights, dict) else None
+        if type(observed) not in (int, float) or not math.isfinite(observed) or observed != expected:
+            failures.append('Offscreen font actual TextServer weight differs: ' + kind)
+        records = coordinates.get(kind) if isinstance(coordinates, dict) else None
+        if not isinstance(records, list) or not records:
+            failures.append('Offscreen font TextServer coordinate coverage missing: ' + kind)
+            continue
+        for record in records:
+            value = record.get(FONT_WEIGHT_TAG) if isinstance(record, dict) else None
+            if type(value) not in (int, float) or not math.isfinite(value) or value != expected:
+                failures.append('Offscreen font RID uses a missing or incorrect actual wght coordinate: ' + kind)
+    try:
+        manifest = read_json(package / 'assets/fonts/manifest.json')
+        active = manifest['active']
+        if manifest.get('schema') != 1 or not isinstance(active, dict):
+            raise ValueError('font manifest must declare schema1 and active font')
+        for key, expected in (('family', 'Noto Sans SC'), ('file', 'NotoSansSC.ttf'),
+                              ('license', 'OFL.txt'), ('body_weight', 400), ('emphasis_weight', 600)):
+            if type(active.get(key)) is not type(expected) or active.get(key) != expected:
+                failures.append('Current font manifest identity differs: ' + key)
+        if active.get('sha256') != sha(package / 'assets/fonts/NotoSansSC.ttf'):
+            failures.append('Current font manifest SHA differs from actual font bytes')
+        license_path = package / 'assets/fonts/OFL.txt'
+        if active.get('license_sha256') != sha(license_path) or 'SIL OPEN FONT LICENSE Version 1.1' not in license_path.read_text(encoding='utf-8-sig'):
+            failures.append('Current font OFL license is missing or changed')
+        aliases = active.get('engine_family_aliases')
+        if (not isinstance(aliases, list) or not aliases or any(type(name) is not str for name in aliases)
+                or not set(aliases).issubset(FONT_INTERNAL_FAMILIES)):
+            failures.append('Current font manifest has unverified internal family aliases')
+        else:
+            engine = detail.get('font_engine_families')
+            if (not isinstance(engine, dict) or set(engine) != {'body', 'emphasis'}
+                    or any(type(engine.get(kind)) is not str or engine[kind] not in aliases for kind in ('body', 'emphasis'))):
+                failures.append('Offscreen font engine families differ from verified source metadata')
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as failure:
+        failures.append('Current font manifest or dependency invalid: ' + str(failure))
+    return failures
+
+
 def offscreen_check(detail, name, package):
     failures = []
     if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
         failures.append('Offscreen verification requires a minimized host window')
     if name == 'art_review':
+        failures.extend(font_art_check(detail, package))
         captures = detail.get('captures', [])
         if not isinstance(captures, list) or any(not isinstance(item, dict) or type(item.get('name')) is not str for item in captures):
             return failures + ['Offscreen art capture metadata invalid']

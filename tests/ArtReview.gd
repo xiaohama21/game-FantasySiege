@@ -4,6 +4,9 @@ extends SceneTree
 const SIZE := Vector2i(1280, 720)
 const DIRECTORY := "res://tests/.user/art_review"
 const OUTPUT := "res://reports/runtime"
+const FONT_FILE := "res://assets/fonts/NotoSansSC.ttf"
+const FONT_MANIFEST := "res://assets/fonts/manifest.json"
+const REQUIRED_FONT_CHARACTERS := "0123456789力量敏捷智力生命伤害护甲魔抗射程召唤冷却星砂训练研修保存敌情首领→×"
 var app
 var viewport: SubViewport
 var failures: Array[String] = []
@@ -15,6 +18,116 @@ var text_labels_audited := 0
 var native_viewers := 0
 var native_battle_instances := 0
 var project_sha256 := ""
+var font_context: Dictionary = {}
+var font_aliases: Array[String] = []
+var font_family := ""
+var font_engine_families: Dictionary = {}
+var font_weights: Dictionary = {}
+var font_engine_weights: Dictionary = {}
+var font_engine_coordinates: Dictionary = {}
+var font_contract_passed := false
+var font_glyph_characters: Dictionary = {}
+var font_glyph_cache: Dictionary = {}
+var font_glyph_missing: Array[String] = []
+
+func font_input_context() -> Dictionary:
+	return {"ui_style_sha256": FileAccess.get_sha256("res://scripts/ui/UIStyle.gd"), "font_manifest_sha256": FileAccess.get_sha256(FONT_MANIFEST), "font_binary_sha256": FileAccess.get_sha256(FONT_FILE), "font_body_sha256": FileAccess.get_sha256("res://resources/ui_font_body.tres"), "font_emphasis_sha256": FileAccess.get_sha256("res://resources/ui_font_emphasis.tres")}
+
+func font_weight_tag() -> int:
+	return TextServerManager.get_primary_interface().name_to_tag("wght")
+
+func configured_font_weight(font: Font) -> float:
+	if not font is FontVariation: return -1.0
+	return float((font as FontVariation).variation_opentype.get(font_weight_tag(), -1.0))
+
+func native_font_coordinates(font: Font) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	if font == null: return result
+	var server := TextServerManager.get_primary_interface()
+	for rid: RID in font.get_rids():
+		result.append(server.font_get_variation_coordinates(rid).duplicate(true))
+	return result
+
+func native_font_weight(font: Font) -> float:
+	var coordinates := native_font_coordinates(font)
+	if coordinates.is_empty(): return -1.0
+	var tag := font_weight_tag()
+	var observed := -1.0
+	for entry: Dictionary in coordinates:
+		if not entry.has(tag): return -1.0
+		var weight := float(entry[tag])
+		if observed >= 0.0 and weight != observed: return -1.0
+		observed = weight
+	return observed
+
+func is_current_font(font: Font, expected_weight: int = -1) -> bool:
+	if not font is FontVariation: return false
+	var variation := font as FontVariation
+	if variation.base_font == null or variation.base_font.resource_path != FONT_FILE: return false
+	if not font_aliases.has(font.get_font_name()): return false
+	var tag := font_weight_tag()
+	var supported := variation.base_font.get_supported_variation_list()
+	if not supported.has(tag): return false
+	var weight := configured_font_weight(font)
+	var limits: Vector3 = supported[tag]
+	if weight < limits.x or weight > limits.y or native_font_weight(font) != weight: return false
+	if expected_weight >= 0: return weight == float(expected_weight)
+	return weight == 400.0 or weight == 600.0
+
+func audit_font_glyphs(font: Font, value: String, context: String) -> void:
+	if font == null: return
+	var weight := native_font_weight(font)
+	for index in value.length():
+		var character := value.substr(index, 1)
+		var codepoint := character.unicode_at(0)
+		if codepoint <= 32: continue
+		font_glyph_characters[character] = true
+		var key := "%s:%d" % [str(weight), codepoint]
+		if font_glyph_cache.has(key): continue
+		font_glyph_cache[key] = true
+		var supported := font.has_char(codepoint)
+		check(supported, context + ": current font contains actual glyph " + character)
+		if not supported: font_glyph_missing.append(key + ":" + character)
+
+func audit_font_contract() -> void:
+	var before := failures.size()
+	font_context = font_input_context()
+	for key: String in font_context: check(not str(font_context[key]).is_empty(), "current font input hash exists: " + key)
+	var manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string(FONT_MANIFEST))
+	check(manifest is Dictionary and manifest.get("schema", 0) == 1, "current font manifest has schema1")
+	if not manifest is Dictionary: return
+	var active: Variant = manifest.get("active", {})
+	check(active is Dictionary, "current font manifest declares its active font")
+	if not active is Dictionary: return
+	font_family = str(active.get("family", ""))
+	check(font_family == "Noto Sans SC" and active.get("file", "") == "NotoSansSC.ttf", "new Chinese typeface has the declared production identity")
+	check(active.get("sha256", "") == font_context.font_binary_sha256, "actual font bytes match source manifest")
+	for alias: Variant in active.get("engine_family_aliases", []):
+		font_aliases.append(str(alias))
+	check(not font_aliases.is_empty(), "verified internal family aliases are retained")
+	var body := SiegeStyle.body_font()
+	var emphasis := SiegeStyle.emphasis_font()
+	check(is_current_font(body, 400), "body uses actual Noto Sans SC FontVariation wght400")
+	check(is_current_font(emphasis, 600), "emphasis uses actual Noto Sans SC FontVariation wght600")
+	check(app.theme.default_font == body, "actual Main theme uses the new body variation")
+	font_engine_families = {"body": body.get_font_name() if body != null else "", "emphasis": emphasis.get_font_name() if emphasis != null else ""}
+	font_weights = {"body": int(configured_font_weight(body)), "emphasis": int(configured_font_weight(emphasis))}
+	font_engine_weights = {"body": native_font_weight(body), "emphasis": native_font_weight(emphasis)}
+	font_engine_coordinates = {"body": native_font_coordinates(body), "emphasis": native_font_coordinates(emphasis)}
+	check(font_engine_weights.body == 400.0 and font_engine_weights.emphasis == 600.0, "TextServer applies actual 400/600 on every font RID")
+	audit_font_glyphs(body, REQUIRED_FONT_CHARACTERS, "body glyph contract")
+	audit_font_glyphs(emphasis, REQUIRED_FONT_CHARACTERS, "emphasis glyph contract")
+	font_contract_passed = failures.size() == before
+
+func audit_ui_fonts(context: String) -> void:
+	for node: Node in descendants(app.screen):
+		if not node is Control or not canvas_visible(node): continue
+		if not node is Label and not node is Button: continue
+		var value: String = str(node.get("text"))
+		if value.is_empty(): continue
+		var font: Font = (node as Control).get_theme_font("font")
+		check(is_current_font(font, 600 if node is Button else -1), context + ": rendered control uses current typeface/weight " + str(node.name))
+		audit_font_glyphs(font, value, context)
 
 func _initialize() -> void:
 	root.mode = Window.MODE_MINIMIZED
@@ -105,6 +218,7 @@ func capture(filename: String) -> void:
 	RenderingServer.force_draw(false)
 	check(root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED, filename + ": actual host window stays minimized")
 	audit_portraits(filename)
+	audit_ui_fonts(filename)
 	audit_text(filename)
 	var picture := viewport.get_texture().get_image()
 	check(picture != null and picture.get_size() == SIZE, filename + ": full-size offscreen Main image")
@@ -216,6 +330,7 @@ func run() -> void:
 	root.add_child(viewport)
 	app = load("res://scenes/Main.tscn").instantiate()
 	viewport.add_child(app)
+	audit_font_contract()
 	await capture("art_camp")
 	for id: String in Catalog.playable_roster():
 		app._select_hero(id)
@@ -305,6 +420,7 @@ func run() -> void:
 	await result_battle("stage_02", true, true)
 	check(FileAccess.get_sha256("res://project.godot") == project_sha256, "project configuration remains unchanged throughout art run")
 	check(text_labels_audited > 0, "real Main labels received readability audits")
+	check(font_input_context() == font_context, "font binary, variants, manifest and UI theme remain frozen throughout all captures")
 	await finish()
 
 func finish() -> void:
@@ -322,6 +438,10 @@ func finish() -> void:
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
 	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
+	report.merge(font_context)
+	var glyph_characters: Array = font_glyph_characters.keys()
+	glyph_characters.sort()
+	report.merge({"ui_font_family": font_family, "font_engine_families": font_engine_families, "font_engine_weights": font_engine_weights, "font_engine_coordinates": font_engine_coordinates, "body_weight": int(font_weights.get("body", 0)), "emphasis_weight": int(font_weights.get("emphasis", 0)), "font_glyph_check": font_contract_passed and font_glyph_missing.is_empty(), "font_glyph_characters": "".join(PackedStringArray(glyph_characters)), "font_glyph_missing": font_glyph_missing, "font_glyph_variants": [400, 600] if font_contract_passed else []})
 	var file := FileAccess.open("res://reports/art_review_local.json", FileAccess.WRITE)
 	if file == null:
 		push_error("cannot write offscreen art review report")

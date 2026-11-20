@@ -92,6 +92,30 @@ class PackageVerificationBoundaries(unittest.TestCase):
         path.write_text(json.dumps(report), encoding='utf-8')
         next(item for item in suite['cases'] if item['case'] == name)['report_sha256'] = verify_package.sha(path)
 
+    def font_fixture(self):
+        for key, relative in verify_package.FONT_ART_HASHES:
+            if key == 'font_manifest_sha256': continue
+            path = self.root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(('fixture font input: ' + relative).encode())
+        license_path = self.root / 'assets/fonts/OFL.txt'
+        license_path.write_text('SIL OPEN FONT LICENSE Version 1.1\n', encoding='utf-8')
+        active = {'family': 'Noto Sans SC', 'file': 'NotoSansSC.ttf',
+                  'sha256': verify_package.sha(self.root / 'assets/fonts/NotoSansSC.ttf'),
+                  'license': 'OFL.txt', 'license_sha256': verify_package.sha(license_path),
+                  'source_url': 'https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf',
+                  'body_weight': 400, 'emphasis_weight': 600,
+                  'engine_family_aliases': ['Noto Sans SC', 'Noto Sans SC Thin']}
+        (self.root / 'assets/fonts/manifest.json').write_text(json.dumps({'schema': 1, 'active': active}), encoding='utf-8')
+        return {**{key: verify_package.sha(self.root / relative) for key, relative in verify_package.FONT_ART_HASHES},
+                'ui_font_family': 'Noto Sans SC', 'body_weight': 400, 'emphasis_weight': 600,
+                'font_engine_families': {'body': 'Noto Sans SC Thin', 'emphasis': 'Noto Sans SC Thin'},
+                'font_engine_weights': {'body': 400.0, 'emphasis': 600.0},
+                'font_engine_coordinates': {'body': [{verify_package.FONT_WEIGHT_TAG: 400.0}],
+                                            'emphasis': [{verify_package.FONT_WEIGHT_TAG: 600.0}]},
+                'font_glyph_check': True, 'font_glyph_characters': verify_package.FONT_ART_REQUIRED_CHARACTERS,
+                'font_glyph_missing': [], 'font_glyph_variants': [400, 600]}
+
     def art_fixture(self):
         captures = []
         names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES)
@@ -112,7 +136,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
             path.write_text('{}', encoding='utf-8')
             extra_hashes[key] = verify_package.sha(path)
         return {'root_window_mode': 1, 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
-                'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes}
+                'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes,
+                **self.font_fixture()}
 
     def execute(self, payload=None, output='COMPLETE {}\n', name='case', marker='COMPLETE', exit_code=0, stderr='', hidden_render=False):
         def fake_run(*args, **kwargs):
@@ -541,6 +566,107 @@ class PackageVerificationBoundaries(unittest.TestCase):
                         result = self.execute(good, name='art_review', hidden_render=hidden)
                         self.assertFalse(result['passed'])
                         self.assertIn('Offscreen UI art SHA differs from this package: ' + key, result['errors'])
+
+    def test_art_font_hashes_require_current_theme_binary_manifest_and_variants(self):
+        for hidden in (False, True):
+            for key, relative in verify_package.FONT_ART_HASHES:
+                for kind in ('missing', 'forged', 'changed_after_capture'):
+                    with self.subTest(hidden_render=hidden, field=key, kind=kind):
+                        good = {'passed': True, 'program_version': '0.1.3.0', **self.art_fixture()}
+                        if kind == 'missing': good.pop(key)
+                        elif kind == 'forged': good[key] = 'old font input'
+                        else: (self.root / relative).write_bytes(b'new font input after capture')
+                        result = self.execute(good, name='art_review', hidden_render=hidden)
+                        self.assertFalse(result['passed'])
+                        self.assertIn('Offscreen font art SHA differs from this package: ' + key, result['errors'])
+
+    def test_art_font_requires_actual_family_weights_and_complete_glyph_coverage(self):
+        good = self.font_fixture()
+        self.assertEqual(verify_package.font_art_check(good, self.root), [])
+        for key, value in (('ui_font_family', 'ZCOOL Kuaile'), ('body_weight', 100), ('body_weight', 400.0),
+                           ('emphasis_weight', 400), ('emphasis_weight', 600.0), ('font_glyph_check', False),
+                           ('font_glyph_check', 1), ('font_glyph_characters', '0123456789'),
+                           ('font_glyph_missing', ['400:21147:力']), ('font_glyph_missing', None),
+                           ('font_glyph_variants', [400]), ('font_glyph_variants', [400.0, 600.0])):
+            with self.subTest(field=key, value=value):
+                self.assertTrue(verify_package.font_art_check({**good, key: value}, self.root))
+        for key in ('ui_font_family', 'body_weight', 'emphasis_weight', 'font_glyph_check',
+                    'font_glyph_characters', 'font_glyph_missing', 'font_glyph_variants', 'font_engine_families'):
+            with self.subTest(missing=key):
+                missing = good.copy()
+                missing.pop(key)
+                self.assertTrue(verify_package.font_art_check(missing, self.root))
+
+    def test_art_font_manifest_cannot_relabel_source_or_ignore_license(self):
+        for key, value in (('family', 'ZCOOL Kuaile'), ('file', '../other.ttf'), ('license', '../other.txt'),
+                           ('sha256', 'forged'), ('license_sha256', 'forged'), ('body_weight', 100),
+                           ('emphasis_weight', 400), ('engine_family_aliases', ['ZCOOL Kuaile'])):
+            with self.subTest(field=key):
+                good = self.font_fixture()
+                path = self.root / 'assets/fonts/manifest.json'
+                manifest = json.loads(path.read_text())
+                manifest['active'][key] = value
+                path.write_text(json.dumps(manifest))
+                good['font_manifest_sha256'] = verify_package.sha(path)
+                self.assertTrue(verify_package.font_art_check(good, self.root))
+        good = self.font_fixture()
+        path = self.root / 'assets/fonts/OFL.txt'
+        path.write_text('unrelated permission text')
+        manifest_path = self.root / 'assets/fonts/manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['active']['license_sha256'] = verify_package.sha(path)
+        manifest_path.write_text(json.dumps(manifest))
+        good['font_manifest_sha256'] = verify_package.sha(manifest_path)
+        self.assertIn('Current font OFL license is missing or changed', verify_package.font_art_check(good, self.root))
+
+    def test_art_font_engine_name_must_match_verified_internal_alias(self):
+        good = self.font_fixture()
+        self.assertEqual(verify_package.font_art_check(good, self.root), [])
+        for engine in ({'body': 'Noto Sans SC', 'emphasis': 'Other family'},
+                       {'body': 'Noto Sans SC'}, {'body': 'Noto Sans SC', 'emphasis': 'Noto Sans SC', 'other': 'Noto Sans SC'}):
+            with self.subTest(engine=engine):
+                self.assertIn('Offscreen font engine families differ from verified source metadata',
+                              verify_package.font_art_check({**good, 'font_engine_families': engine}, self.root))
+
+    def test_art_font_declared_weights_cannot_replace_native_textserver_observation(self):
+        good = self.font_fixture()
+        self.assertEqual(verify_package.font_art_check(good, self.root), [])
+        for field in ('font_engine_weights', 'font_engine_coordinates'):
+            with self.subTest(missing=field):
+                old_property_only = good.copy()
+                old_property_only.pop(field)
+                self.assertTrue(verify_package.font_art_check(old_property_only, self.root))
+        for observed in ({'body': 100, 'emphasis': 100}, {'body': 400.5, 'emphasis': 600},
+                         {'body': True, 'emphasis': 600}, {'body': 400, 'emphasis': float('nan')},
+                         {'body': 400}, None):
+            with self.subTest(actual_weights=observed):
+                self.assertTrue(verify_package.font_art_check({**good, 'font_engine_weights': observed}, self.root))
+
+    def test_art_font_requires_wght_coordinates_on_every_native_font_rid(self):
+        good = self.font_fixture()
+        for body in ([], [{}], [{'wght': 400}], [{verify_package.FONT_WEIGHT_TAG: 100}],
+                     [{verify_package.FONT_WEIGHT_TAG: 400}, {verify_package.FONT_WEIGHT_TAG: 100}],
+                     [{verify_package.FONT_WEIGHT_TAG: 400.5}], [{verify_package.FONT_WEIGHT_TAG: True}],
+                     [None], None):
+            with self.subTest(body_coordinates=body):
+                coordinates = {'body': body, 'emphasis': [{verify_package.FONT_WEIGHT_TAG: 600}]}
+                self.assertTrue(verify_package.font_art_check({**good, 'font_engine_coordinates': coordinates}, self.root))
+        # Several RIDs are valid only when all their actual coordinates match.
+        coordinates = {'body': [{verify_package.FONT_WEIGHT_TAG: 400}, {verify_package.FONT_WEIGHT_TAG: 400.0}],
+                       'emphasis': [{verify_package.FONT_WEIGHT_TAG: 600}, {verify_package.FONT_WEIGHT_TAG: 600.0}]}
+        self.assertEqual(verify_package.font_art_check({**good, 'font_engine_coordinates': coordinates}, self.root), [])
+
+    def test_full_and_offscreen_art_reject_property_only_or_thin_font_reports(self):
+        for hidden in (False, True):
+            with self.subTest(hidden_render=hidden):
+                good = {'passed': True, 'program_version': '0.1.3.0', **self.art_fixture()}
+                for key in ('font_engine_weights', 'font_engine_coordinates'):
+                    stale = good.copy()
+                    stale.pop(key)
+                    self.assertFalse(self.execute(stale, name='art_review', hidden_render=hidden)['passed'])
+                thin = {**good, 'font_engine_weights': {'body': 100, 'emphasis': 100},
+                        'font_engine_coordinates': {'body': [{}], 'emphasis': [{}]}}
+                self.assertFalse(self.execute(thin, name='art_review', hidden_render=hidden)['passed'])
 
     def test_full_and_offscreen_art_use_the_same_complete_capture_gate(self):
         for hidden in (False, True):

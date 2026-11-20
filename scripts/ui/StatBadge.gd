@@ -43,6 +43,7 @@ func configure(icon: String, caption: String, value: String, tint: Color = Siege
 	value_label.name = "Value"
 	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	value_label.text = value
-	value_label.add_theme_font_size_override("font_size", 20)
+	value_label.add_theme_font_override("font", SiegeStyle.emphasis_font())
+	value_label.add_theme_font_size_override("font_size", 18)
 	value_label.add_theme_color_override("font_color", tint)
 	text.add_child(value_label)

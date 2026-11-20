@@ -18,11 +18,11 @@
 	"failures": [],
 	"logic_performance": {
 		"active_count": 64,
-		"ms_per_step": 1.19453666666667,
-		"realtime_factor": 13.952411116165,
+		"ms_per_step": 2.88204,
+		"realtime_factor": 5.78294078731269,
 		"simulated_seconds": 5.0,
 		"visuals": false,
-		"wall_ms": 358.361
+		"wall_ms": 864.612
 	},
 	"passed": true,
 	"pulse_benefit": {

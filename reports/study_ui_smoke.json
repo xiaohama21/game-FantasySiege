@@ -1,15 +1,438 @@
 {
-	"checks": 1180,
+	"battle_diagnostic": {
+		"actual_unit": {
+			"armor": 31.0,
+			"id": "guanyu",
+			"level": 3,
+			"max_hp": 942.172,
+			"stats": {
+				"agility": 11.0,
+				"intelligence": 9.0,
+				"strength": 22.0
+			},
+			"team": 1,
+			"uid": 1
+		},
+		"auto_step": false,
+		"battle_levels": {
+			"diaochan": 3,
+			"ember_archer": 3,
+			"guanyu": 3,
+			"iron_guard": 3,
+			"lubu": 3,
+			"moon_mage": 3,
+			"rivet_gunner": 3,
+			"rune_medic": 3,
+			"spirit_beast": 4,
+			"star_hammer": 3,
+			"zhaoyun": 3,
+			"zhugeliang": 3
+		},
+		"battle_study_modifiers": {
+			"guanyu": {
+				"armor_add": 6.0,
+				"damage_mult": 0.9,
+				"hp_mult": 1.15,
+				"speed_mult": 0.9
+			}
+		},
+		"expected_unit": {
+			"aoe_radius": 68.0,
+			"armor": 31.0,
+			"attack_interval": 1.62835249042146,
+			"damage": 72.57888,
+			"damage_type": "physical",
+			"heal_multiplier": 1.09,
+			"hit_delay": 0.4,
+			"hp": 942.172,
+			"level": 3,
+			"magic_armor": 20.9,
+			"primary": "strength",
+			"range": 64.0,
+			"special": {
+				"type": "cleave"
+			},
+			"speed": 41.8365,
+			"stats": {
+				"agility": 11.0,
+				"intelligence": 9.0,
+				"strength": 22.0
+			}
+		},
+		"fixture_key_types": {
+			"bracket": "String",
+			"dot": "StringName"
+		},
+		"profile_after_start": {
+			"cleared": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits": 9720,
+			"levels": {
+				"diaochan": 3,
+				"ember_archer": 3,
+				"guanyu": 3,
+				"iron_guard": 3,
+				"lubu": 3,
+				"moon_mage": 3,
+				"rivet_gunner": 3,
+				"rune_medic": 3,
+				"spirit_beast": 4,
+				"star_hammer": 3,
+				"zhaoyun": 3,
+				"zhugeliang": 3
+			},
+			"owned": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"roster": [
+				"guanyu"
+			],
+			"schema": 3,
+			"study_routes": {
+				"guanyu": "guard",
+				"spirit_beast": "base"
+			},
+			"transactions": []
+		},
+		"profile_before_start": {
+			"cleared": [
+				"stage_01",
+				"stage_02",
+				"stage_03",
+				"stage_04",
+				"stage_05",
+				"stage_06",
+				"stage_07",
+				"stage_08"
+			],
+			"credits": 9720,
+			"levels": {
+				"diaochan": 3,
+				"ember_archer": 3,
+				"guanyu": 3,
+				"iron_guard": 3,
+				"lubu": 3,
+				"moon_mage": 3,
+				"rivet_gunner": 3,
+				"rune_medic": 3,
+				"spirit_beast": 4,
+				"star_hammer": 3,
+				"zhaoyun": 3,
+				"zhugeliang": 3
+			},
+			"owned": [
+				"guanyu",
+				"zhaoyun",
+				"zhugeliang",
+				"diaochan",
+				"lubu",
+				"iron_guard",
+				"ember_archer",
+				"rune_medic",
+				"star_hammer",
+				"rivet_gunner",
+				"moon_mage",
+				"spirit_beast"
+			],
+			"roster": [
+				"guanyu"
+			],
+			"schema": 3,
+			"study_routes": {
+				"guanyu": "guard",
+				"spirit_beast": "base"
+			},
+			"transactions": []
+		},
+		"profile_route_key_types": [
+			{
+				"id": "spirit_beast",
+				"is_string": true,
+				"is_string_name": false,
+				"type": "String"
+			},
+			{
+				"id": "guanyu",
+				"is_string": true,
+				"is_string_name": false,
+				"type": "String"
+			}
+		]
+	},
+	"checks": 1514,
 	"failures": [],
 	"isolation": "res://tests/.user/study_ui",
 	"matrix_cases": 108,
+	"navigation_checks": 327,
+	"navigation_records": [
+		{
+			"actual": 483,
+			"context": "successful hero training",
+			"expected": 483,
+			"limit": 483,
+			"scroll": "HeroListScroll"
+		},
+		{
+			"actual": 483,
+			"context": "failed hero training",
+			"expected": 483,
+			"limit": 483,
+			"scroll": "HeroListScroll"
+		},
+		{
+			"actual": 1515,
+			"context": "successful study unlock",
+			"expected": 1515,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 1515,
+			"context": "failed study unlock",
+			"expected": 1515,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 350,
+			"context": "successful route selection respects manual position",
+			"expected": 350,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 350,
+			"context": "failed route selection",
+			"expected": 350,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 350,
+			"context": "free base restoration",
+			"expected": 350,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 110,
+			"context": "unchanged hero selection returns to independent position",
+			"expected": 110,
+			"limit": 483,
+			"scroll": "HeroListScroll"
+		},
+		{
+			"actual": 210,
+			"context": "unchanged study selection returns to independent position",
+			"expected": 210,
+			"limit": 1515,
+			"scroll": "StudyListScroll"
+		},
+		{
+			"actual": 483,
+			"context": "restoration clamps a reduced scroll range",
+			"expected": 483,
+			"limit": 483,
+			"scroll": "HeroListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "successful roster removal",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "successful lower-row roster addition",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "failed roster save",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "maximum eight-person boundary",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "minimum one-person boundary",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		},
+		{
+			"actual": 200,
+			"context": "rapid navigation discards previous list restoration",
+			"expected": 200,
+			"limit": 294,
+			"scroll": "SquadListScroll"
+		}
+	],
+	"navigation_toast_records": [
+		{
+			"context": "successful study unlock",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "两条研修路线已解锁，可免费切换；当前仍为基础路线。",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		},
+		{
+			"context": "failed study unlock",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "保存失败，资源未扣除",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		},
+		{
+			"context": "successful route selection",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "已保存 · 迅爪",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		},
+		{
+			"context": "failed route selection",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "保存失败，资源未扣除",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		},
+		{
+			"context": "free base restoration",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "已保存 · 基础路线",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		},
+		{
+			"context": "synchronous selection and route rebuilding",
+			"footer": "路线有收益，也有代价。基础八关可用基础路线完成；研修只改变出战策略。",
+			"footer_inside": true,
+			"footer_rect": [
+				504.0,
+				641.0,
+				742.0,
+				28.0
+			],
+			"message": "已保存 · 基础路线",
+			"nonoverlapping": true,
+			"text_visible": true,
+			"toast_inside": true,
+			"toast_rect": [
+				254.0,
+				678.0,
+				1000.0,
+				40.0
+			]
+		}
+	],
+	"navigation_toast_valid": true,
 	"passed": true,
 	"program_version": "0.1.3.0",
 	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
-	"scope": "Headless actual Main study/hero bindings with six visible central-value SVG stat badges, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.",
+	"scope": "Headless actual Main study/hero bindings, per-page list restoration and visible committed 1—8 roster slots, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.",
 	"scripts_sha256": {
-		"scripts/ui/Main.gd": "8edfc333a58f83a4f3ce1f521c9dad0e28afb1403a6c06bd14087b88119ec8d2",
-		"scripts/ui/StatBadge.gd": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba"
+		"scripts/ui/Main.gd": "fe2f21ec754605f2e4f79b1e2c14723d9f4a9ec26d0784656187611dbb876dcd",
+		"scripts/ui/StatBadge.gd": "0c6ba342c23ade0a685885349e3b2a5db74c6f4e59a09fcfce1f52056547182a"
 	},
 	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
 	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c"

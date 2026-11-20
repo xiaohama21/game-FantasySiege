@@ -134,3 +134,9 @@ candidate9已完成自己的纹理/原生导入及包内CPU12/8558、21来源/22
 扩展StudyUISmoke：下半部选择、训练/解锁/切路线/恢复基础和编队成功/失败刷新位置、跨页独立状态、选中卡实际视口矩形、快速切页旧回调无效、真实槽位1—8与拒绝事务不变。PreferencesSmoke检查保存失败常显后果、返回dirty/值/磁盘不变和冷重读原值；模态原测试保留。Art从54扩至56，新增art_settings_save_failed、art_settings_temporary_return，原英魂末位/研修/编队下半图重新取景并检查选中可见/真实号位。UIStyle/FontVariation实际400/600、字体与所有既有图片/原生/配置/战报指纹门禁不放宽；新增SettingsPanel原字节SHA。前台MainFlow、Main24/64/2倍速仍延期，离屏不替代前台性能。
 
 视觉抽检补充：研修保存toast与y641页尾规则相交，提示需放在规则下方独立区（例如y678/40px），保留完整规则和可见错误；实际矩形不相交纳入StudyUISmoke与Art56的研修取景。候选10保留发现该缺陷时的冻结范围，修正后新候选重新验收。
+
+2026-11-20本轮实际完成：英魂/研修/编队按真实内容坐标保留会话滚动，末位→首位、重复选择、同步选择/交易重建及快速切页/开战废弃旧任务通过；保存成功/失败不丢位置。编队常显实际已保存1—8号位。设置保存失败常显当前立即生效但未落盘的条件后果，明确返回不flush且保留dirty，冷读原值、后续重试成功及future/no service只读保护均通过。研修toast独立y678区域不遮y641规则；6种真实提示的文字与矩形证据全部符合。
+
+candidate11自行导入并验包：CPU12/8919、StudyUI1514（导航303、6种toast矩形）、Prefs103、Art56/13639零缺字/文字溢出，21来源/220原始动作、十二头像、双播放、2624零差像素、独立完整旅程988全部通过；实际字体400/600不变。144个Python用例143通过/1符号链接权限跳过；49份日志（含保留窗口失效历史）严格致命错误/泄漏审计无异常。代码7e50d61及reports/navigation_candidate_0.1.3.json记录真实范围。candidate10保留旧研修toast与unmanaged窗口失效，candidate11首轮mesh仅2513/2624有效最小化捕获被拒绝，报告保留offscreen_first，标准离屏重跑后全部2624有效，不放宽门禁。首次列表/属性夹具失败和首次自动溢出门禁未发现toast遮挡的图/报告均保留。
+
+上述范围证明显式fixture路径、事务、实际布局及像素与窗口条件；另一次只读审计证实Spine启动夹具未在首次autoload读取前隔离默认user://，引擎日志也仍落入APPDATA/FantasySiege，文档的Godot/app_userdata路径不准确。当前真实目录没有profile/prefs文件，不能声称已读取真实进度，也不能将窗口变化归因于偏好或用户。known_startup_isolation_gap=true，下一轮补首次启动QA路径、独立--log-file、窗口状态转变证据及真实保存位置说明。前台MainFlow/Main24/Main64/2倍速、完整full14与商业许可仍未验收，delivery_ready=false；持续目标保持运行，不以本轮图形/UI通过缩小完成定义。

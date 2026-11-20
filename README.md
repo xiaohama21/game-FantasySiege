@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-- GDD v0.5.10；程序0.1.3.0在分支0.1.3持续开发；干净检出完整重建已通过，04244668制作工具及candidate8保留各自范围，已完成Noto Sans SC中文字体与实际400/600字重调整；candidate9保留冻结验收，继续列表位置/选中可见和设置常显后果优化。
+- GDD v0.5.10；程序0.1.3.0在分支0.1.3持续开发；干净检出完整重建已通过，04244668制作工具及candidate8保留各自范围，已完成Noto Sans SC中文字体与实际400/600字重调整；candidate11列表/选中可见、实际槽位和设置常显后果已通过本地增量验收；继续补首次启动隔离。
 - 保留关羽、赵云、诸葛亮、貂蝉、吕布；其他角色及敌人从Spine重新设计。
 - 十二英魂、九种敌军、两章八关；四次首通解锁、首通/重访收益、三属性训练、八人编队、schema1/2至3迁移与独立存档已完成。
 - 星灯远征美术体系；所有角色拥有力量、敏捷、智力与一个主属性。
@@ -16,6 +16,8 @@
 - 干净检出04244668已从源包完整重建角色/十二头像并自行构建学习包：CPU12/8558、Art54/6973、旅程988通过。105原文件、4运行库和旧工程336文件保持不变；证据见reports/rebuild_candidate_0.1.3.json，前台/性能仍延期。
 
 - 字体按用户反馈改为Noto Sans SC正文400、标题/按钮/数字600。candidate-9包内CPU12/8558、Art54/13087零缺字溢出、旅程988及原生/像素检查通过，启动exports/windows/FantasySiege-0.1.3.0-candidate-9/开始游戏.cmd；证据reports/font_candidate_0.1.3.json。当前网络同步失败，代码与报告已本地提交，前台/性能仍延期。
+
+- 界面导航增量candidate11：CPU12/8919、Art56/13639、旅程988及原生/像素范围通过，当前启动exports/windows/FantasySiege-0.1.3.0-candidate-11/开始游戏.cmd。证据reports/navigation_candidate_0.1.3.json；首次自动加载/引擎日志隔离缺口已发现并待补，前台与性能未验收。
 
 总纲：[docs/GAME_DESIGN.md](docs/GAME_DESIGN.md)，排期：[ROADMAP](docs/modules/ROADMAP.md)，角色/敌人/素材/关卡关联：[CONTENT_PLAN](docs/modules/CONTENT_PLAN.md)，双路线规则：[TRAINING](docs/modules/TRAINING.md)，战前准备：[BATTLE_BRIEFING](docs/modules/BATTLE_BRIEFING.md)。0.1.3继续完整体验开发及学习包验收。
 

@@ -1,7 +1,13 @@
 {
 	"audio_driver": "headless dummy; real listening separate",
-	"checks": 76,
+	"checks": 103,
+	"cold_reloaded_previous_settings": true,
 	"failures": [],
 	"isolated_path": "res://tests/.user/preferences_smoke",
-	"passed": true
+	"passed": true,
+	"program_version": "0.1.3.0",
+	"retry_saved_after_failure": true,
+	"settings_panel_sha256": "22d6137efab9983237c4612a97f14d59978dbff577432c995010e7eb90d26eba",
+	"temporary_return_verified": true,
+	"user_prefs_sha256": "fe63bd8d5d5e6ac175a6e9492795bdba7522eef1badaa5c5f1c561d17a16abb9"
 }

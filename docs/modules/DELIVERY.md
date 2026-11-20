@@ -110,3 +110,9 @@ ArtReview由50增至54，新增art_result_victory、art_result_defeat、art_resu
 该检出自行构建exports/windows/FantasySiege-0.1.3.0-rebuilt-1，无主项目缓存/肖像复制。包CPU12/8558、21来源/220原始动作、十二肖像、双播放模式、2624零差像素、Art54/6973零文字溢出和独立完整旅程988均通过；80份当前运行日志无致命错误或泄漏。Python全量130项中129通过、1因Windows符号链接创建权限跳过，5类目录junction和9类hardlink哨兵测试实测通过。报告reports/rebuild_candidate_0.1.3.json，详细原文件/阶段/快照SHA证据本地保留。首次独立汇总把builder新生成reports/.gdignore误认为复制来源文件，失败报告保留；修正来源分类后重核，包及载荷manifest门禁未更改。foreground/performance/commercial/delivery_ready仍false。
 
 GDD0.5.9字体验收设计：ArtReview报告ui_style_sha256、font_manifest_sha256、font_binary_sha256、font_body_sha256、font_emphasis_sha256、ui_font_family、body_weight、emphasis_weight、font_engine_weights、font_engine_coordinates与font_glyph_check；门禁必须与同包实际UIStyle、字体manifest/二进制及400/600一致，拒绝缺字段或旧字体截图。54取景/必要页名/PNG SHA/尺寸、零文字溢出及既有战报、配置、Spine指纹继续有效；原生像素/前台性能范围不外推字体结果。
+
+2026-11-20字体验收实际完成：新字体为本机Noto Sans SC只读副本，原字节SHA763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a保持不变，OFL声明含Adobe2014–2021/RFN Source，与嵌入许可一致。实际来源/内部non-release版本及upstream_hash_verified=false如实保留；不冒称下载官方发行版。fontTools核对当前UI/资源797码点全部覆盖。FontVariation以整数OpenType轴标签2003265652应用正文400、标题/按钮/关键数字600，原生TextServer每个RID坐标均证实生效。
+
+candidate9已完成自己的纹理/原生导入及包内CPU12/8558、21来源/220动作、十二头像、双播放、2624零差像素、Art54/13087零缺字/文字溢出，以及独立完整旅程988。137项Python中136通过、1权限相关跳过。49份运行日志（含保留的首轮无效窗口日志）严格致命错误/泄漏审计通过；原字体副本、旧工程336文件及main保持不变。首次字重属性通过但渲染仍Thin的54图/报告保留，FS053修正后重新取景；包首离屏差图虽然像素零差，但窗口在589/2624后恢复被严格拒绝，报告冻结offscreen_first，标准离屏阶段重跑后2624/2624最小化取景全部合格，未放宽门禁。人工抽检确认数字和中文笔画清晰、信息层级保持且无新增遮挡。
+
+可运行包exports/windows/FantasySiege-0.1.3.0-candidate-9，证据reports/font_candidate_0.1.3.json及包内frozen/独立报告，代码提交4594905。candidate8/GDD0.5.7及干净rebuild/GDD0.5.8保留原字体/范围不变。前台MainFlow、Main24/Main64/2倍速、full14和商业许可仍未验收，delivery_ready=false；持续目标保持运行，下一轮继续列表滚动/选中可见及设置临时返回常显后果的界面优化。

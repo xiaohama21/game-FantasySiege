@@ -115,3 +115,9 @@ UIStyle统一正文/强调FontVariation；Main/指南/设置的24px及以上标�
 验收记录UIStyle源码SHA、字体manifest及字体原字节SHA、实际Noto Sans SC名称/400与600变体、0—9和关键中文/符号字形覆盖。Art54须再次真实离屏取景，核对零文字溢出、字形/画面与当前字体文件一致；英魂、敌情、首领图鉴、设置、HUD与胜负结算人工抽检。真实前台流程与Main24/64/2倍速保持延期；本轮不以字体调整改变战斗/养成/存档规则。
 
 首轮画面抽检发现字符串轴键“wght”虽可保存在FontVariation属性，但Godot实际TextServer坐标为空，仍使用默认100细字。轴键改为原生OpenType整数标签2003265652；验收须读取原生font_get_variation_coordinates确认每个RID实际400/600，不能只检查资源属性中的设定值。首轮细字图/报告保留，修正后重新取景。
+
+2026-11-20字体验收实际完成：新字体为本机Noto Sans SC只读副本，原字节SHA763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a保持不变，OFL声明含Adobe2014–2021/RFN Source，与嵌入许可一致。实际来源/内部non-release版本及upstream_hash_verified=false如实保留；不冒称下载官方发行版。fontTools核对当前UI/资源797码点全部覆盖。FontVariation以整数OpenType轴标签2003265652应用正文400、标题/按钮/关键数字600，原生TextServer每个RID坐标均证实生效。
+
+candidate9已完成自己的纹理/原生导入及包内CPU12/8558、21来源/220动作、十二头像、双播放、2624零差像素、Art54/13087零缺字/文字溢出，以及独立完整旅程988。137项Python中136通过、1权限相关跳过。49份运行日志（含保留的首轮无效窗口日志）严格致命错误/泄漏审计通过；原字体副本、旧工程336文件及main保持不变。首次字重属性通过但渲染仍Thin的54图/报告保留，FS053修正后重新取景；包首离屏差图虽然像素零差，但窗口在589/2624后恢复被严格拒绝，报告冻结offscreen_first，标准离屏阶段重跑后2624/2624最小化取景全部合格，未放宽门禁。人工抽检确认数字和中文笔画清晰、信息层级保持且无新增遮挡。
+
+可运行包exports/windows/FantasySiege-0.1.3.0-candidate-9，证据reports/font_candidate_0.1.3.json及包内frozen/独立报告，代码提交4594905。candidate8/GDD0.5.7及干净rebuild/GDD0.5.8保留原字体/范围不变。前台MainFlow、Main24/Main64/2倍速、full14和商业许可仍未验收，delivery_ready=false；持续目标保持运行，下一轮继续列表滚动/选中可见及设置临时返回常显后果的界面优化。

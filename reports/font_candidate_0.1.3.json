@@ -1,0 +1,113 @@
+{
+  "passed": true,
+  "failures": [],
+  "scope": "Noto Sans SC font increment with actual native 400/600 coordinates and own candidate9 background/offscreen/campaign; foreground/performance deferred",
+  "program_version": "0.1.3.0",
+  "gdd_version": "0.5.9",
+  "font_change_commit": "4594905484b8aef522717edbbeb48ea238a94c10",
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9",
+  "start": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\开始游戏.cmd",
+  "delivery_ready": false,
+  "foreground_verified": false,
+  "performance_verified": false,
+  "commercial_release_verified": false,
+  "font_family": "Noto Sans SC",
+  "font_sha256": "763146584cf0710223441356b4395e279021b0806c196614377a7a0174ae074a",
+  "font_engine_families": {
+    "body": "Noto Sans SC",
+    "emphasis": "Noto Sans SC"
+  },
+  "font_engine_weights": {
+    "body": 400.0,
+    "emphasis": 600.0
+  },
+  "font_engine_coordinates": {
+    "body": [
+      {
+        "2003265652": 400.0
+      }
+    ],
+    "emphasis": [
+      {
+        "2003265652": 600.0
+      }
+    ]
+  },
+  "font_glyph_check": true,
+  "font_glyph_missing": [],
+  "font_glyph_characters": 565,
+  "source_font_bytes_unchanged": true,
+  "source_font_internal_version": "Version 2.04;241114210130;non-release",
+  "upstream_font_hash_verified": false,
+  "cpu_cases": 12,
+  "cpu_checks": 8558,
+  "ui_screenshots": 54,
+  "ui_checks": 13087,
+  "ui_text_overflows": [],
+  "campaign_checks": 988,
+  "native_resources": 21,
+  "native_animations": 220,
+  "pixel_comparisons": 2624,
+  "source_package_files_matched": 245,
+  "logs_audited": 49,
+  "old_project": {
+    "passed": true,
+    "hashed_files": 336,
+    "changed_files": [],
+    "git_head_unchanged": true,
+    "git_branch_unchanged": true,
+    "git_status_unchanged": true
+  },
+  "python_tests_run": 137,
+  "python_tests_passed": 136,
+  "python_skipped": 1,
+  "proofs": [
+    {
+      "path": "F:\\godotProject\\FantasySiege\\reports\\font_package_execution_local.json",
+      "sha256": "3f470eb94ace281f5c9385aff29b83724ff83643eacba79e6b7a90c0cbc1f312"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\reports\\font_source_local.json",
+      "sha256": "3bcd741c202f5c027563149052e9a8d4774a5b59c663be9532571bda885ea8b3"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\build\\python_font_final_checks.log",
+      "sha256": "d2ed91f40ee1935a8a9eec00f899aff173386d0addfd77186c7478de2829c495"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\build_manifest.json",
+      "sha256": "b67a4bad9146438ab68889ec754f359294cd337b44ec9674eaa8168e32ff910f"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\package_background.json",
+      "sha256": "e0b2bdc510b1ccfe10171310e357140fcd7477a49fb7535676786ccb0959dbfb"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\package_offscreen.json",
+      "sha256": "0cbb067d81cc33aef2e4379c92a364b70927789ba3a36752722631ffbd49c8fd"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\checks_background_frozen.json",
+      "sha256": "ea842fe54286ac562113ff1603645474c62148b32faff65dcffd78706b5f7005"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\checks_campaign_frozen.json",
+      "sha256": "cb5f2f162d63d482578724b0787105a3a168733f7c4ddc7d2c39a106d4345b08"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\campaign_journey.json",
+      "sha256": "6c7065b3a2466bf88c41db4ee8c1be9d9b3e4500464f29f520d777d15577ae1c"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\art_review_local.json",
+      "sha256": "389844b26ca7aeaf67f5497e520789e8b2f83e2902068bd22a5ab08b2690ad31"
+    },
+    {
+      "path": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-9\\reports\\performance_0.1.3\\mesh_redraw.json",
+      "sha256": "3a3d7fe0e551af36f5bb81071d3cc5414e3a6c64c819ff2c77a755ccd2bbe1e0"
+    }
+  ],
+  "detail_report": "F:\\godotProject\\FantasySiege\\reports\\font_verification_local.json",
+  "detail_sha256": "eaecf14221e3f0f5e6b25626cb460208c119f5b619f5a063c297ecfea4c625d3",
+  "first_thin_font_evidence": "reports/font_weight_first_captures_local.json"
+}

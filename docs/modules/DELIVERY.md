@@ -1,6 +1,7 @@
 # Windows本地学习版交付
 
-> v0.17 · 2026-11-20 · GDD v0.5.7 / 程序0.1.3.0
+> v0.18 · 2026-11-20 · GDD v0.5.8 / 程序0.1.3.0
+> v0.18：从干净Git检出完整bootstrap到干净学习包的复现验收，补齐肖像与依赖制作阶段；旧候选包冻结，新增管线必须实证，不替代前台性能。
 > v0.17：结算战报新增BattleReportSmoke/ResultUISmoke，CPU12/full14；Art54增加胜利/失败/未保存/恢复四种结算，验证战斗源码及UI指纹。总纲版本从当前同包文档解析，前台性能继续延期。
 > v0.16：用户反馈后统一19枚原创SVG和属性组件，敌情/英魂/研修/编队/HUD减少重复文本；Art50追加Main及StatBadge源码SHA，完整Python104项通过。当前生成candidate7，前台项延期。
 > v0.15：先登记敌情简报验收，再添加BriefingSmoke与BriefingUISmoke，当前CPU10/full12；ArtReview扩为50张，增加八关上下页与锁定/研修阵容18张必需取景。新增配置、总纲与程序指纹，candidate6仍冻结为GDD0.5.3/CPU8/Art32旧范围。
@@ -94,3 +95,11 @@ candidate7实际验收完成：十项CPU8147，原生21来源220动作、十二�
 ArtReview由50增至54，新增art_result_victory、art_result_defeat、art_result_unsaved、art_result_recovered四个必需取景。图像需当前Main、StatBadge与SiegeBattle字节指纹一致，所有阶段复用图片完整性、零文字溢出与音频排空门禁。candidate7/GDD0.5.6保持冻结，新增源码不能承接其8147/6253/988通过结论；新候选包再次按后台、独立旅程与离屏范围运行。前台MainFlow、Main24/Main64/2×和商业许可范围仍独立。
 
 2026-11-20 candidate8实际验收：BattleReportSmoke190项、ResultUISmoke221项/3实际胜利与1失败，覆盖有效贡献/归因/结束冻结、领奖失败与成功重试回执、重复渲染不领奖、导航/模态/未来存档保护及图鉴语义。新包CPU12共8558项、Art54共6973项且零文字溢出，原生21/220、双播放和2624次像素零差，以及独立八关/重启/重访988项均通过。43份应用日志无致命错误或泄漏，核心源码/配置/图标与源项目逐字节匹配。证据reports/battle_report_candidate_0.1.3.json与包内frozen checks及各独立报告；candidate7原范围保留。正常前台MainFlow、Main24/Main64/2倍速以及full14仍按用户安排待验，delivery_ready=false。
+
+## 干净Git检出与完整bootstrap（本轮设计）
+
+完整bootstrap在当前项目执行扫描、21套结构转换及配方生成，要求本次转换报告恰好覆盖目标ID且全部converted，任何失败非零退出，保留失败结果，不继续原生/肖像步骤。独立import使用已有spine_catalog.json时，清单source_root与当前参数解析后必须一致，目录外的原始文件不得被当成当前来源；不一致应明确拒绝并提示重新scan，不悄悄导入另一源。
+
+带--godot的完整制作流程：两阶段纹理/原生导入→显式21套原生作者验证并--update-status→十二真实透明Spine肖像生成与检查→新肖像编辑器导入→默认只读原生/肖像复核。作者状态更新在派生肖像前完成，冻结之后不再改配方。--import-only保留只导入已复制素材的含义，不扫描来源、不生成新配方、不重新制作肖像；未提供--godot的转换模式只能声明已转换，不能声明完整运行依赖就绪。bootstrap报告记各阶段/目标ID/路径/退出码与冻结配方SHA，失败不发布ready。
+
+复现使用F:/godotProject/FantasySiege/build下的新Git检出，起点记录实际HEAD；初始不得有.godot、assets/actors、assets/portraits或bin。明确只读D69源与原生库捐赠目录；不借主项目缓存、已派生角色或肖像。完成全流程后，在检出自己的exports/windows下创建新空学习包，包内后台/离屏/完整旅程验证；旧项目/D69读取前后校验，受限依赖和衍生文件不入Git。纯Python临时目录验证转换拒绝、清单不一致、缺ID/失败ID、步骤顺序与失败停止；实际Godot由root串行调度。资源盘点/转换/原生/图像/性能范围仍分开，前台Main24/64/2倍速保持用户延期。

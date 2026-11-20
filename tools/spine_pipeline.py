@@ -129,6 +129,7 @@ def inspect_export(path):
             'files': [{'path':str(p), 'sha256':sha(p), 'bytes':p.stat().st_size} for p in files], 'risks': risks}
 
 def scan(source):
+    source = Path(source).resolve()
     entries = []
     for folder in sorted(source.iterdir()):
         match = re.match(r'^(\d{3})', folder.name)
@@ -164,18 +165,103 @@ def conversion_safe(export, allow_deform=False):
     f = export['features']; a = f['attachments']
     return not ((f['deform_animations'] and not allow_deform) or f['path_constraints'] or f['path_animations'] or a['path'] or a['linkedmesh'] or export['missing_files'] or export['missing_attachment_paths'])
 
+def validate_catalog_source(catalog, source):
+    """Bind saved absolute source paths to the explicitly requested source tree."""
+    source = Path(source).resolve()
+    declared = catalog.get('source_root')
+    if not declared or Path(declared).resolve() != source:
+        raise ValueError('catalog source_root does not match --source-root; run scan with the requested source first')
+
+    def within_source(value):
+        if not value:
+            raise ValueError('catalog contains an empty source path; run scan again')
+        path = Path(value).resolve()
+        try:
+            path.relative_to(source)
+        except ValueError as exc:
+            raise ValueError(f'catalog source path is outside --source-root: {value}; run scan again') from exc
+
+    for entry in catalog['number_entries']:
+        within_source(entry['directory'])
+        for item in entry.get('source_projects', []): within_source(item['path'])
+        for item in entry.get('license', {}).get('notices', []): within_source(item['path'])
+        for item in entry.get('scan_errors', []): within_source(item['path'])
+        for export in entry['exports']:
+            within_source(export['json'])
+            within_source(export['atlas'])
+            for item in export['files']: within_source(item['path'])
+            for path in export.get('missing_files', []): within_source(path)
+            for page in export['texture_pages']:
+                # Atlas pages also become destination paths. Reject traversal even
+                # when it happens to resolve to another file inside the source.
+                page_path = Path(page)
+                if page_path.is_absolute() or '..' in page_path.parts:
+                    raise ValueError(f'unsafe atlas texture page: {page}; run scan again')
+                within_source(Path(export['atlas']).parent/page_path)
+
+def validate_import_destinations(number, input_files, texture_pages):
+    """Preflight every archive/runtime write before mkdir, copy or truncation.
+
+    Resolved anchors must be the project's own corresponding directories;
+    existing junctions cannot redirect an import into a donor or old project.
+    File links are rejected even when their target happens to be inside ROOT.
+    """
+    project_root = ROOT.resolve()
+    actors_root = project_root/'assets/actors'
+    source_root = project_root/'assets/source'
+    runtime_dir = actors_root/number
+    archive_dir = source_root/('d69_'+number)
+    for directory in (actors_root, source_root, runtime_dir, archive_dir):
+        if directory.resolve() != directory:
+            raise ValueError(f'import destination redirects outside its project directory: {directory}')
+
+    targets = [(source_root/'.gdignore', source_root)]
+    targets += [(archive_dir/Path(p).name, archive_dir) for p in input_files]
+    targets += [(runtime_dir/name, runtime_dir) for name in (
+        'actor.atlas', 'actor.spine-json', 'actor-data.tres', 'provenance.json',
+        'actor.atlas.import', 'actor.spine-json.import')]
+    targets += [(runtime_dir/page, runtime_dir) for page in texture_pages]
+    for target, directory in targets:
+        try:
+            target.resolve().relative_to(directory)
+        except ValueError as exc:
+            raise ValueError(f'import file destination is outside its project directory: {target}') from exc
+        if target.is_symlink():
+            raise ValueError(f'refusing to overwrite a linked import file: {target}')
+        if target.exists():
+            if not target.is_file():
+                raise ValueError(f'import file destination is not a regular file: {target}')
+            if target.stat().st_nlink > 1:
+                raise ValueError(f'refusing to overwrite a hard-linked import file: {target}')
+
 def import_ids(ids, source, allow_deform=False, prefer_previous=False):
+    source = Path(source).resolve()
+    requested_ids = [str(number).zfill(3) for number in ids]
     catpath = ROOT/'reports/spine_catalog.json'
-    cat = read(catpath) if catpath.exists() else scan(source)
-    entries = {e['source_id']:e for e in cat['number_entries']}
+    reportpath = ROOT/'reports/spine_import.json'
+    def save_report(results, error=None):
+        report = {'schema':1, 'source_root':str(source), 'catalog_path':str(catpath.resolve()),
+                  'requested_ids':requested_ids, 'passed':bool(requested_ids) and all(r['status']=='converted' for r in results),
+                  'results':results}
+        if error is not None: report['error'] = error
+        write(reportpath, report)
+        return report
+
     cfgpath = ROOT/'resources/visuals.json'
-    config = read(cfgpath) if cfgpath.exists() else {}
+    try:
+        if not requested_ids: raise ValueError('at least one source ID is required')
+        if len(requested_ids) != len(set(requested_ids)): raise ValueError('duplicate source IDs are not allowed')
+        cat = read(catpath) if catpath.exists() else scan(source)
+        validate_catalog_source(cat, source)
+        entries = {e['source_id']:e for e in cat['number_entries']}
+        config = read(cfgpath) if cfgpath.exists() else {}
+    except Exception as exc:
+        error = str(exc)
+        print('IMPORT REJECTED', error)
+        return save_report([{'source_id':number, 'status':'import_rejected', 'error':error} for number in requested_ids], error)
     results=[]
     archive_root=ROOT/'assets/source'
-    archive_root.mkdir(parents=True,exist_ok=True)
-    (archive_root/'.gdignore').write_text('',encoding='utf-8')
-    for number in ids:
-        number=number.zfill(3)
+    for number in requested_ids:
         try:
             if not re.fullmatch(r'\d{3}',number) or not 1 <= int(number) <= 315:
                 raise ValueError('source ID must be a three-digit number from 001 to 315')
@@ -188,15 +274,9 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
             if not use_previous and not export['version'].startswith(('3.8','4.3')):
                 raise ValueError('unsupported source export version '+export['version'])
             dest=ROOT/'assets/actors'/number; archive=ROOT/'assets/source'/('d69_'+number)
-            dest.mkdir(parents=True,exist_ok=True); archive.mkdir(parents=True,exist_ok=True)
             input_files=[Path(f['path']) for f in export['files']]
             input_files += [Path(n['path']) for n in entry['license']['notices']]
             input_files += [Path(p['path']) for p in entry['source_projects']]
-            hashes={}
-            for p in input_files:
-                target=archive/p.name
-                shutil.copy2(p,target)
-                hashes[p.name]={'source_path':str(p),'sha256':sha(target),'bytes':target.stat().st_size}
             method='conservative_38_to_43'
             converter.WARNINGS.clear()
             if use_previous:
@@ -210,8 +290,6 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
                 if not atlas_source.exists(): atlas_source=next(oldfolder.glob('*.atlas'))
                 method='copied_previously_validated_runtime_retested_in_new_project'
                 runtime_pages,_=atlas_info(atlas_source)
-                for p in runtime_pages: shutil.copy2(oldfolder/p,dest/p)
-                shutil.copy2(atlas_source,dest/'actor.atlas')
                 runtime_origin={'path':str(oldjson),'sha256':sha(oldjson)}
             else:
                 converted=copy.deepcopy(original)
@@ -219,9 +297,19 @@ def import_ids(ids, source, allow_deform=False, prefer_previous=False):
                     converter.upgrade(converted)
                     for bone in converted.get('bones',[]):
                         if 'transform' in bone: bone['inherit']=bone.pop('transform')
-                shutil.copy2(Path(export['atlas']),dest/'actor.atlas')
-                for p in export['texture_pages']: shutil.copy2(Path(export['atlas']).parent/p,dest/p)
+                atlas_source=Path(export['atlas'])
+                runtime_pages=export['texture_pages']
                 runtime_origin=None
+            validate_import_destinations(number, input_files, runtime_pages)
+            dest.mkdir(parents=True,exist_ok=True); archive.mkdir(parents=True,exist_ok=True)
+            (archive_root/'.gdignore').write_text('',encoding='utf-8')
+            hashes={}
+            for p in input_files:
+                target=archive/p.name
+                shutil.copy2(p,target)
+                hashes[p.name]={'source_path':str(p),'sha256':sha(target),'bytes':target.stat().st_size}
+            shutil.copy2(atlas_source,dest/'actor.atlas')
+            for p in runtime_pages: shutil.copy2(atlas_source.parent/p,dest/p)
             write(dest/'actor.spine-json',converted)
             native_imports_invalidated=invalidate_native_imports(dest)
             tres=f'''[gd_resource type="SpineSkeletonDataResource" load_steps=3 format=3]
@@ -257,16 +345,22 @@ default_mix = 0.08
             results.append({'source_id':number,'status':'converted','method':method})
             print('CONVERTED',number,export['export_name'])
         except Exception as exc:
+            if isinstance(config.get('d69_'+number), dict):
+                config['d69_'+number]['status'] = 'import_rejected'
             results.append({'source_id':number,'status':'import_rejected','error':str(exc)}); print('REJECTED',number,str(exc))
-    write(cfgpath,config); write(ROOT/'reports/spine_import.json',{'schema':1,'results':results})
+    write(cfgpath,config)
+    return save_report(results)
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('command',choices=['scan','import'])
     parser.add_argument('--source-root',type=Path,default=DEFAULT_SOURCE); parser.add_argument('--ids',default='097,312,314,072,163')
     parser.add_argument('--allow-deform',action='store_true',help='Enable mesh deform format adaptation; requires isolated native verification')
     parser.add_argument('--prefer-previous',action='store_true',help='Optional diagnostic: copy four previous read-only runtime adaptations')
-    args=parser.parse_args()
-    if args.command=='scan': scan(args.source_root)
-    else: import_ids(args.ids.split(','),args.source_root,args.allow_deform,args.prefer_previous)
+    args=parser.parse_args(argv)
+    if args.command=='scan':
+        scan(args.source_root)
+        return 0
+    report = import_ids(args.ids.split(','),args.source_root,args.allow_deform,args.prefer_previous)
+    return 0 if report['passed'] else 1
 
-if __name__=='__main__': main()
+if __name__=='__main__': sys.exit(main())

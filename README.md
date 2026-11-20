@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-- GDD v0.5.7；程序0.1.3.0在分支0.1.3继续结算战报与图鉴体验完善；已推送2630eb0图标/敌情里程碑，candidate7保留冻结范围。
+- GDD v0.5.8；程序0.1.3.0在分支0.1.3继续干净检出的完整重建验证；已推送9adb86d战报/图鉴里程碑，candidate8保留冻结范围，持续目标已恢复运行。
 - 保留关羽、赵云、诸葛亮、貂蝉、吕布；其他角色及敌人从Spine重新设计。
 - 十二英魂、九种敌军、两章八关；四次首通解锁、首通/重访收益、三属性训练、八人编队、schema1/2至3迁移与独立存档已完成。
 - 星灯远征美术体系；所有角色拥有力量、敏捷、智力与一个主属性。
@@ -18,6 +18,8 @@
 ## 本地运行
 
 已接入素材的本机：Godot4.7.1打开`project.godot`运行，或执行`tools/play.ps1`。从Git克隆后需要本地D69学习源包与Spine原生库，运行`tools/bootstrap_local.ps1`；这些受限依赖有意排除Git，详见[THIRD_PARTY](docs/modules/THIRD_PARTY.md)。
+
+完整重建须提供Godot：`python tools/bootstrap_local.py --source-root <本地D69目录> --runtime-from <只读Spine运行库bin目录> --godot <Godot控制台exe>`。工具完成21套转换、原生作者验证、十二透明肖像制作/导入及冻结后的只读复核，任何一步失败均停止并保留reports/bootstrap_local.json证据。省略--godot只完成转换；--import-only只导入已经存在的素材。生成完成后执行`tools/build_local.ps1 -Destination <本项目exports/windows下的新空目录>`，包使用自己的缓存，保留旧候选。
 
 本机便携学习包：`exports/windows/FantasySiege-0.1.1.2/开始游戏.cmd`，自带Godot，无需另装引擎。重新生成执行`tools/build_local.ps1`，包仅本地保留。使用0.1.1.2，旧0.1.1.0/0.1.1.1目录为问题复现副本。
 

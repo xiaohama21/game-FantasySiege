@@ -13,13 +13,15 @@ import run_checks
 
 ROOT = Path(__file__).resolve().parents[1]
 BAD_LOG = ('CrashHandler',)
-ART_CAPTURE_COUNT = 54
+ART_CAPTURE_COUNT = 56
 STUDY_ART_CAPTURES = ('art_study_locked', 'art_study_unowned', 'art_study_ready', 'art_study_base',
                       'art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow',
                       'art_hero_studied', 'art_gallery_studied')
 BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in range(1, 9)) + tuple(
     'art_briefing_stage_%02d_lower' % index for index in range(1, 9)) + ('art_briefing_locked', 'art_briefing_studied')
 RESULT_ART_CAPTURES = ('art_result_victory', 'art_result_defeat', 'art_result_unsaved', 'art_result_recovered')
+SETTINGS_ART_CAPTURES = ('art_settings_save_failed', 'art_settings_temporary_return')
+NAVIGATION_ART_CAPTURES = ('art_hero_spirit_beast', 'art_study_siege', 'art_squad', 'art_squad_lower')
 FONT_ART_HASHES = (('ui_style_sha256', 'scripts/ui/UIStyle.gd'),
                    ('font_manifest_sha256', 'assets/fonts/manifest.json'),
                    ('font_binary_sha256', 'assets/fonts/NotoSansSC.ttf'),
@@ -334,12 +336,103 @@ def font_art_check(detail, package):
     return failures
 
 
+def navigation_art_check(detail, package):
+    """Check observed controls and viewport geometry, not an aggregate PASS flag."""
+    failures = []
+    captures = detail.get('captures', [])
+    if not isinstance(captures, list): return ['Navigation art capture metadata invalid']
+    by_name = {item['name']: item for item in captures if isinstance(item, dict) and type(item.get('name')) is str}
+    try:
+        units = read_json(package / 'resources/units.json')
+        playable = {key for key, unit in units.items() if unit.get('playable') is True}
+        if len(playable) != 12: raise ValueError('twelve playable identities required')
+    except (OSError, ValueError, AttributeError, TypeError) as error:
+        return ['Navigation art playable identities invalid: ' + str(error)]
+
+    def rectangle(value):
+        return (isinstance(value, list) and len(value) == 4 and
+                all(type(number) in (int, float) and math.isfinite(number) for number in value) and
+                value[2] > 0 and value[3] > 0)
+
+    required = {'art_hero_spirit_beast': ('英魂', 'spirit_beast'),
+                'art_study_siege': ('研修', 'rivet_gunner'),
+                'art_squad': ('编队', None), 'art_squad_lower': ('编队', None)}
+    prefixes = {'英魂': 'HeroList', '研修': 'StudyList', '编队': 'SquadList'}
+    for name, (page, selected) in required.items():
+        capture = by_name.get(name, {})
+        navigation = capture.get('navigation', {})
+        if not isinstance(navigation, dict):
+            failures.append('Navigation art observed controls missing: ' + name)
+            continue
+        if (navigation.get('page') != page or navigation.get('scroll_name') != prefixes[page] + 'Scroll'
+                or navigation.get('grid_name') != prefixes[page] + 'Grid' or navigation.get('restore_ready') is not True
+                or type(navigation.get('scroll_vertical')) is not int or navigation['scroll_vertical'] < 0):
+            failures.append('Navigation art current list identity/restoration differs: ' + name)
+        view = navigation.get('view_rect')
+        if not rectangle(view) or view[0] < 0 or view[1] < 0 or view[0] + view[2] > 1281 or view[1] + view[3] > 721:
+            failures.append('Navigation art actual list viewport invalid: ' + name)
+        if selected is not None:
+            card = navigation.get('selected_rect')
+            if (navigation.get('selected_id') != selected or navigation.get('selected_card') != 'HeroCard_' + selected
+                    or navigation.get('selected_visible') is not True or navigation.get('selected_metadata') is not True):
+                failures.append('Navigation art actual selected card differs: ' + name)
+            if not rectangle(card) or not rectangle(view) or not (
+                    view[0] - 1 <= card[0] and view[1] - 1 <= card[1]
+                    and card[0] + card[2] <= view[0] + view[2] + 1 and card[1] + card[3] <= view[1] + view[3] + 1):
+                failures.append('Navigation art selected card is outside actual viewport: ' + name)
+        else:
+            roster = navigation.get('saved_roster')
+            cards = navigation.get('cards')
+            if (not isinstance(roster, list) or not 1 <= len(roster) <= 8 or any(type(key) is not str for key in roster)
+                    or len(set(roster)) != len(roster) or not set(roster).issubset(playable)):
+                failures.append('Navigation art saved roster invalid: ' + name)
+                continue
+            if (not isinstance(cards, list) or len(cards) != 12 or any(not isinstance(card, dict) or type(card.get('unit_id')) is not str for card in cards)
+                    or {card.get('unit_id') for card in cards} != playable):
+                failures.append('Navigation art all twelve squad cards must be observed: ' + name)
+                continue
+            for card in cards:
+                key = card['unit_id']
+                slot = roster.index(key) + 1 if key in roster else 0
+                if (card.get('card_name') != 'HeroCard_' + key or card.get('button_name') != 'RosterToggle_' + key
+                        or type(card.get('slot')) is not int or card['slot'] != slot
+                        or type(card.get('button_slot')) is not int or card['button_slot'] != slot
+                        or (slot > 0 and card.get('button_text') != '%d号位 · 移出' % slot)):
+                    failures.append('Navigation art actual saved summon slot differs: ' + name + '/' + key)
+
+    settings = detail.get('settings_navigation')
+    if not isinstance(settings, dict): return failures + ['Settings art observed failure/return state missing']
+    failed = settings.get('failed', {})
+    returned = settings.get('returned', {})
+    if not isinstance(failed, dict) or not isinstance(returned, dict):
+        return failures + ['Settings art observed failure/return state invalid']
+    if (failed.get('capture') != SETTINGS_ART_CAPTURES[0] or failed.get('control_names') != ['SaveAndReturn', 'LeaveWithoutSave', 'UnsavedConsequence']
+            or failed.get('button_text') != '暂不保存并返回' or type(failed.get('consequence_text')) is not str
+            or '尚未保存' not in failed.get('consequence_text', '') or '若之后仍未保存' not in failed.get('consequence_text', '')):
+        failures.append('Settings art must show named controls and visible conditional unsaved consequences')
+    for key in ('modal_active', 'save_failed', 'consequence_visible', 'runtime_preview_retained', 'dirty_retained', 'paused'):
+        if failed.get(key) is not True: failures.append('Settings art failed modal observation missing: ' + key)
+    if returned.get('capture') != SETTINGS_ART_CAPTURES[1]: failures.append('Settings art temporary-return capture missing')
+    for key in ('modal_closed', 'pause_restored', 'battle_snapshot_unchanged', 'runtime_preview_retained', 'dirty_retained', 'cold_reloaded_previous_settings'):
+        if returned.get(key) is not True: failures.append('Settings art temporary-return observation missing: ' + key)
+    for state, keys in [(failed, ('preferences_before_sha256', 'preferences_after_sha256')),
+                        (returned, ('preferences_before_sha256', 'preferences_after_sha256')),
+                        (returned, ('profile_before_sha256', 'profile_after_sha256'))]:
+        before, after = (state.get(key) for key in keys)
+        if type(before) is not str or re.fullmatch('[0-9a-f]{64}', before) is None or before != after:
+            failures.append('Settings art temporary return changed saved bytes: ' + '/'.join(keys))
+    if failed.get('preferences_before_sha256') != returned.get('preferences_before_sha256'):
+        failures.append('Settings art failure and temporary return use different saved settings')
+    return failures
+
+
 def offscreen_check(detail, name, package):
     failures = []
     if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
         failures.append('Offscreen verification requires a minimized host window')
     if name == 'art_review':
         failures.extend(font_art_check(detail, package))
+        failures.extend(navigation_art_check(detail, package))
         captures = detail.get('captures', [])
         if not isinstance(captures, list) or any(not isinstance(item, dict) or type(item.get('name')) is not str for item in captures):
             return failures + ['Offscreen art capture metadata invalid']
@@ -352,13 +445,17 @@ def offscreen_check(detail, name, package):
             failures.append('Offscreen art must include all eighteen battle-briefing captures')
         if not set(RESULT_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include all four result-report captures')
+        if not set(SETTINGS_ART_CAPTURES).issubset(names):
+            failures.append('Offscreen art must include both failed-settings and temporary-return captures')
+        if not set(NAVIGATION_ART_CAPTURES).issubset(names):
+            failures.append('Offscreen art must include selected lower-list and actual squad-slot captures')
         if detail.get('studies_sha256') != sha(package / 'resources/studies.json'):
             failures.append('Offscreen study art recipe SHA differs from this package')
         for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd')):
             if detail.get(key) != sha(package / relative):
                 failures.append('Offscreen briefing art SHA differs from this package: ' + key)
         for key, relative in (('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd'),
-                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd')):
+                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd'), ('settings_panel_sha256', 'scripts/ui/SettingsPanel.gd')):
             if detail.get(key) != sha(package / relative):
                 failures.append('Offscreen UI art SHA differs from this package: ' + key)
         if detail.get('portrait_count') != 12 or detail.get('text_overflows') or detail.get('audio_shutdown_clean') is not True:

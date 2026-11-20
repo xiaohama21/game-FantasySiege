@@ -18,6 +18,7 @@ var text_labels_audited := 0
 var native_viewers := 0
 var native_battle_instances := 0
 var project_sha256 := ""
+var settings_panel_sha256 := ""
 var font_context: Dictionary = {}
 var font_aliases: Array[String] = []
 var font_family := ""
@@ -29,6 +30,7 @@ var font_contract_passed := false
 var font_glyph_characters: Dictionary = {}
 var font_glyph_cache: Dictionary = {}
 var font_glyph_missing: Array[String] = []
+var settings_navigation: Dictionary = {}
 
 func font_input_context() -> Dictionary:
 	return {"ui_style_sha256": FileAccess.get_sha256("res://scripts/ui/UIStyle.gd"), "font_manifest_sha256": FileAccess.get_sha256(FONT_MANIFEST), "font_binary_sha256": FileAccess.get_sha256(FONT_FILE), "font_body_sha256": FileAccess.get_sha256("res://resources/ui_font_body.tres"), "font_emphasis_sha256": FileAccess.get_sha256("res://resources/ui_font_emphasis.tres")}
@@ -215,6 +217,17 @@ func canvas_visible(node: Node) -> bool:
 func capture(filename: String) -> void:
 	await process_frame
 	await process_frame
+	await process_frame
+	await process_frame
+	# Battle construction keeps the previous camp tab for navigation; only an
+	# actual camp list has a pending restoration that this capture may await.
+	if not is_instance_valid(app.battle):
+		var list_names := {"英魂": "HeroListScroll", "研修": "StudyListScroll", "编队": "SquadListScroll"}
+		if list_names.has(app.tab):
+			var list := app.screen.find_child(str(list_names[app.tab]), true, false) as ScrollContainer
+			for frame in 8:
+				if not is_instance_valid(list) or list.get_meta("list_restore_ready", false) == true: break
+				await process_frame
 	RenderingServer.force_draw(false)
 	check(root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED, filename + ": actual host window stays minimized")
 	audit_portraits(filename)
@@ -229,7 +242,88 @@ func capture(filename: String) -> void:
 	check(colors.size() >= 12, filename + ": composition is rendered rather than an empty surface")
 	var path := OUTPUT + "/" + filename + ".png"
 	check(picture.save_png(path) == OK, filename + ": save real Main composition")
-	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x})
+	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename)})
+
+func rect_data(rect: Rect2) -> Array:
+	return [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+
+func audit_list_navigation(context: String) -> Dictionary:
+	if is_instance_valid(app.battle): return {}
+	var names := {"英魂": "HeroList", "研修": "StudyList", "编队": "SquadList"}
+	if not names.has(app.tab): return {}
+	var prefix: String = names[app.tab]
+	var scroll := app.screen.find_child(prefix + "Scroll", true, false) as ScrollContainer
+	var grid := app.screen.find_child(prefix + "Grid", true, false) as GridContainer
+	check(scroll != null and grid != null, context + ": named real card list exists")
+	if scroll == null or grid == null: return {}
+	check(scroll.get_meta("list_restore_ready", false) == true, context + ": latest card-list restoration completed")
+	var view := scroll.get_global_rect()
+	var result := {"page": str(app.tab), "scroll_name": str(scroll.name), "grid_name": str(grid.name), "restore_ready": scroll.get_meta("list_restore_ready", false), "scroll_vertical": scroll.scroll_vertical, "view_rect": rect_data(view)}
+	if app.tab in ["英魂", "研修"]:
+		var id: String = str(app.selected_actor)
+		var card := grid.find_child("HeroCard_" + id, true, false) as Control
+		check(card != null, context + ": current selected card exists")
+		if card == null: return result
+		var visible := view.grow(1.0).encloses(card.get_global_rect())
+		check(visible, context + ": selected character card is fully visible")
+		check(card.get_meta("list_unit_id", "") == id and card.get_meta("list_selected", false) == true, context + ": selected card metadata matches actual Main selection")
+		result.merge({"selected_id": id, "selected_card": str(card.name), "selected_rect": rect_data(card.get_global_rect()), "selected_visible": visible, "selected_metadata": card.get_meta("list_selected", false)})
+	else:
+		var roster: Array = root.get_node("ProfileStore").data.get("roster", []).duplicate()
+		var records: Array[Dictionary] = []
+		for id: String in Catalog.playable_roster():
+			var card := grid.find_child("HeroCard_" + id, true, false) as Control
+			var button := grid.find_child("RosterToggle_" + id, true, false) as Button
+			check(card != null and button != null, context + ": named squad card/action exists " + id)
+			if card == null or button == null: continue
+			var slot := roster.find(id) + 1
+			check(int(card.get_meta("roster_slot", -1)) == slot and int(button.get_meta("roster_slot", -1)) == slot, context + ": actual saved roster slot matches card and action " + id)
+			if slot > 0: check(button.text == "%d号位 · 移出" % slot, context + ": summon keyboard slot is always visible " + id)
+			records.append({"unit_id": id, "card_name": str(card.name), "button_name": str(button.name), "slot": card.get_meta("roster_slot", -1), "button_slot": button.get_meta("roster_slot", -1), "button_text": button.text})
+		result.merge({"saved_roster": roster, "cards": records})
+	return result
+
+func settings_return_art() -> void:
+	var prefs = root.get_node("UserPrefs")
+	var profile = root.get_node("ProfileStore")
+	var original_values: Dictionary = prefs._values.duplicate(true)
+	var original_path: String = prefs.save_path
+	var before_sha := FileAccess.get_sha256(original_path)
+	var profile_sha := FileAccess.get_sha256(profile.save_path)
+	var snapshot: Dictionary = app.battle.get_snapshot().duplicate(true)
+	app.paused = false
+	app.battle.set_visual_playback(1.0)
+	var before_paused: bool = app.paused
+	app._open_settings()
+	var panel = app.settings_panel
+	check(is_instance_valid(panel) and app._active_modal() == panel, "real Main owns the settings modal")
+	if not is_instance_valid(panel): return
+	panel.option_buttons.edge_scroll.button_pressed = not bool(original_values.edge_scroll)
+	var preview_value: bool = bool(prefs.get_value("edge_scroll"))
+	var temporary_path := original_path + ".tmp"
+	check(DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(temporary_path)) == OK, "isolated empty temp directory creates a real editable settings save failure")
+	check(not panel.close() and panel.visible and app._active_modal() == panel, "failed save keeps the actual settings modal open")
+	var consequence: Label = panel.find_child("UnsavedConsequence", true, false)
+	var leave: Button = panel.find_child("LeaveWithoutSave", true, false)
+	check(consequence != null and consequence.visible and consequence.text.contains("尚未保存") and consequence.text.contains("若之后仍未保存"), "failure consequences are visible without a tooltip")
+	check(leave != null and leave.visible and leave.text == "暂不保存并返回", "temporary return action names its unsaved consequence")
+	settings_navigation["failed"] = {"capture": "art_settings_save_failed", "modal_active": app._active_modal() == panel, "save_failed": panel.status_label.text.contains("保存失败"), "control_names": ["SaveAndReturn", str(leave.name), str(consequence.name)], "button_text": leave.text, "consequence_text": consequence.text, "consequence_visible": consequence.visible, "runtime_preview_retained": bool(prefs.get_value("edge_scroll")) == preview_value, "dirty_retained": bool(prefs.dirty), "paused": bool(app.paused), "preferences_before_sha256": before_sha, "preferences_after_sha256": FileAccess.get_sha256(original_path)}
+	await capture("art_settings_save_failed")
+	leave.pressed.emit()
+	await process_frame
+	var cold = load("res://scripts/core/UserPrefs.gd").new()
+	cold.configure_path(original_path)
+	var cold_matches: bool = cold.get_value("edge_scroll") == original_values.edge_scroll
+	cold.free()
+	check(not is_instance_valid(app.settings_panel) and app._active_modal() == null, "temporary return releases Main settings modal")
+	check(app.paused == before_paused and app.battle.get_snapshot() == snapshot, "temporary return restores actual battle pause and leaves logical battle unchanged")
+	check(bool(prefs.dirty) and bool(prefs.get_value("edge_scroll")) == preview_value and cold_matches, "temporary return keeps preview dirty while a cold reader uses the saved value")
+	check(FileAccess.get_sha256(original_path) == before_sha and FileAccess.get_sha256(profile.save_path) == profile_sha, "temporary return does not write preferences or character profile")
+	settings_navigation["returned"] = {"capture": "art_settings_temporary_return", "modal_closed": not is_instance_valid(app.settings_panel) and app._active_modal() == null, "pause_restored": app.paused == before_paused, "battle_snapshot_unchanged": app.battle.get_snapshot() == snapshot, "runtime_preview_retained": bool(prefs.get_value("edge_scroll")) == preview_value, "dirty_retained": bool(prefs.dirty), "cold_reloaded_previous_settings": cold_matches, "preferences_before_sha256": before_sha, "preferences_after_sha256": FileAccess.get_sha256(original_path), "profile_before_sha256": profile_sha, "profile_after_sha256": FileAccess.get_sha256(profile.save_path)}
+	await capture("art_settings_temporary_return")
+	check(DirAccess.remove_absolute(ProjectSettings.globalize_path(temporary_path)) == OK, "remove only the isolated empty temporary blocker")
+	check(prefs.set_value("edge_scroll", original_values.edge_scroll) and prefs.flush(), "restore original silent preferences after settings presentation fixture")
+	check(prefs._values == original_values and FileAccess.get_sha256(original_path) == before_sha, "settings art leaves original isolated preferences values and bytes intact")
 
 func scroll_to_bottom() -> void:
 	for node: Node in descendants(app.screen):
@@ -294,6 +388,7 @@ func result_battle(stage_id: String, summon: bool, fail_save: bool = false) -> v
 
 func run() -> void:
 	project_sha256 = FileAccess.get_sha256("res://project.godot")
+	settings_panel_sha256 = FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd")
 	if DisplayServer.get_name() == "headless":
 		check(false, "ArtReview requires a real renderer for offscreen images; omit --headless")
 		await finish()
@@ -397,6 +492,7 @@ func run() -> void:
 		await capture("art_chapter_%d_left" % chapter)
 		app._set_view_position(app.view_max)
 		await capture("art_chapter_%d_right" % chapter)
+	await settings_return_art()
 	app.show_home("图鉴")
 	app.set_process(true)
 	await process_frame
@@ -421,6 +517,7 @@ func run() -> void:
 	check(FileAccess.get_sha256("res://project.godot") == project_sha256, "project configuration remains unchanged throughout art run")
 	check(text_labels_audited > 0, "real Main labels received readability audits")
 	check(font_input_context() == font_context, "font binary, variants, manifest and UI theme remain frozen throughout all captures")
+	check(FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd") == settings_panel_sha256, "settings panel source remains frozen throughout all captures")
 	await finish()
 
 func finish() -> void:
@@ -437,8 +534,9 @@ func finish() -> void:
 	await audio.shutdown()
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
-	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
+	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery, fully visible selected card lists and actual saved summon slots, two failed-settings/temporary-return states and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	report.merge(font_context)
+	report.merge({"settings_panel_sha256": settings_panel_sha256, "settings_navigation": settings_navigation})
 	var glyph_characters: Array = font_glyph_characters.keys()
 	glyph_characters.sort()
 	report.merge({"ui_font_family": font_family, "font_engine_families": font_engine_families, "font_engine_weights": font_engine_weights, "font_engine_coordinates": font_engine_coordinates, "body_weight": int(font_weights.get("body", 0)), "emphasis_weight": int(font_weights.get("emphasis", 0)), "font_glyph_check": font_contract_passed and font_glyph_missing.is_empty(), "font_glyph_characters": "".join(PackedStringArray(glyph_characters)), "font_glyph_missing": font_glyph_missing, "font_glyph_variants": [400, 600] if font_contract_passed else []})

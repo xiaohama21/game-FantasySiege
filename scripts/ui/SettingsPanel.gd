@@ -18,6 +18,7 @@ const OPTION_ROWS := {
 var volume_sliders: Dictionary = {}
 var option_buttons: Dictionary = {}
 var status_label: Label
+var unsaved_consequence: Label
 var _volume_labels: Dictionary = {}
 var _prefs: Node
 var _audio: Node
@@ -83,13 +84,20 @@ func _ready() -> void:
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(status_label)
+	unsaved_consequence = _label("", 15)
+	unsaved_consequence.name = "UnsavedConsequence"
+	unsaved_consequence.custom_minimum_size = Vector2(540, 42)
+	unsaved_consequence.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	unsaved_consequence.add_theme_color_override("font_color", STYLE.INK)
+	unsaved_consequence.visible = false
+	content.add_child(unsaved_consequence)
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 12)
 	content.add_child(actions)
 	_leave_button = Button.new()
-	_leave_button.text = "暂时返回"
-	_leave_button.tooltip_text = "当前调整保留到本次运行结束，下次启动仍使用上次保存的设置。"
-	_leave_button.custom_minimum_size = Vector2(150, 44)
+	_leave_button.name = "LeaveWithoutSave"
+	_leave_button.text = "暂不保存并返回"
+	_leave_button.custom_minimum_size = Vector2(190, 44)
 	_leave_button.pressed.connect(_leave_without_save)
 	_leave_button.visible = false
 	actions.add_child(_leave_button)
@@ -178,6 +186,13 @@ func _refresh() -> void:
 	var message := str(_prefs.get("error_message")) if available else "设置服务无法连接。"
 	status_label.text = message if not message.is_empty() else "音量为 0 时静音。关闭设置后继续原来的游戏状态。"
 	status_label.add_theme_color_override("font_color", Color("a74336") if not message.is_empty() else STYLE.MUTED)
+	unsaved_consequence.visible = _save_failed
+	if not available:
+		unsaved_consequence.text = "设置服务当前不可用。\n暂不保存返回不会写入设置文件。"
+	elif not editable:
+		unsaved_consequence.text = "当前版本无法保存较新版本的设置。\n暂不保存返回不会改写原文件。"
+	else:
+		unsaved_consequence.text = "本次设置立即生效，但尚未保存。\n若之后仍未保存，重启会恢复上次已保存的设置。"
 
 func _volume_changed(value: float, key: String) -> void:
 	if is_instance_valid(_prefs): _prefs.call("set_value", key, value / 100.0)

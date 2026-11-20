@@ -118,7 +118,14 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def art_fixture(self):
         captures = []
-        names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES)
+        identities = ['guanyu', 'zhaoyun', 'zhugeliang', 'diaochan', 'lubu', 'iron_guard', 'ember_archer',
+                      'rune_medic', 'rivet_gunner', 'moon_mage', 'star_hammer', 'spirit_beast']
+        base = ['art_camp'] + ['art_hero_' + key for key in identities] + ['art_hero_collection_lower', 'art_squad', 'art_squad_lower',
+                'art_chapter_1_left', 'art_chapter_1_right', 'art_chapter_2_left', 'art_chapter_2_right', 'art_gallery_hero', 'art_gallery_boss']
+        names = base + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES) + list(verify_package.SETTINGS_ART_CAPTURES)
+        units_path = self.root / 'resources/units.json'
+        units_path.parent.mkdir(parents=True, exist_ok=True)
+        units_path.write_text(json.dumps({key: {'playable': True} for key in identities}), encoding='utf-8')
         for name in names:
             path = self.root / 'reports/runtime' / (name + '.png')
             path.write_bytes(fixture_png())
@@ -130,14 +137,41 @@ class PackageVerificationBoundaries(unittest.TestCase):
         extra_hashes = {}
         for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd'),
                               ('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd'),
-                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd')):
+                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd'), ('settings_panel_sha256', 'scripts/ui/SettingsPanel.gd')):
             path = self.root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
             extra_hashes[key] = verify_package.sha(path)
         return {'root_window_mode': 1, 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
                 'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes,
-                **self.font_fixture()}
+                **self.font_fixture(), **self.navigation_fixture(captures, identities)}
+
+    def navigation_fixture(self, captures, identities):
+        roster = identities[:8]
+        by_name = {item['name']: item for item in captures}
+        for name, page, prefix, selected in [('art_hero_spirit_beast', '英魂', 'HeroList', 'spirit_beast'),
+                                              ('art_study_siege', '研修', 'StudyList', 'rivet_gunner'),
+                                              ('art_squad', '编队', 'SquadList', None), ('art_squad_lower', '编队', 'SquadList', None)]:
+            value = {'page': page, 'scroll_name': prefix + 'Scroll', 'grid_name': prefix + 'Grid', 'restore_ready': True,
+                     'scroll_vertical': 180, 'view_rect': [254, 98, 442, 535]}
+            if selected is not None:
+                value.update(selected_id=selected, selected_card='HeroCard_' + selected, selected_rect=[254, 250, 207, 158],
+                             selected_visible=True, selected_metadata=True)
+            else:
+                value.update(saved_roster=roster, cards=[{'unit_id': key, 'card_name': 'HeroCard_' + key, 'button_name': 'RosterToggle_' + key,
+                            'slot': roster.index(key)+1 if key in roster else 0, 'button_slot': roster.index(key)+1 if key in roster else 0,
+                            'button_text': '%d号位 · 移出' % (roster.index(key)+1) if key in roster else '加入编队'} for key in identities])
+            by_name[name]['navigation'] = value
+        digest = 'a' * 64
+        return {'settings_navigation': {
+            'failed': {'capture': 'art_settings_save_failed', 'control_names': ['SaveAndReturn', 'LeaveWithoutSave', 'UnsavedConsequence'],
+                       'button_text': '暂不保存并返回', 'consequence_text': '本次设置立即生效，但尚未保存。\n若之后仍未保存，重启会恢复上次已保存的设置。',
+                       'modal_active': True, 'save_failed': True, 'consequence_visible': True, 'runtime_preview_retained': True,
+                       'dirty_retained': True, 'paused': True, 'preferences_before_sha256': digest, 'preferences_after_sha256': digest},
+            'returned': {'capture': 'art_settings_temporary_return', 'modal_closed': True, 'pause_restored': True,
+                         'battle_snapshot_unchanged': True, 'runtime_preview_retained': True, 'dirty_retained': True,
+                         'cold_reloaded_previous_settings': True, 'preferences_before_sha256': digest, 'preferences_after_sha256': digest,
+                         'profile_before_sha256': digest, 'profile_after_sha256': digest}}}
 
     def execute(self, payload=None, output='COMPLETE {}\n', name='case', marker='COMPLETE', exit_code=0, stderr='', hidden_render=False):
         def fake_run(*args, **kwargs):
@@ -491,13 +525,13 @@ class PackageVerificationBoundaries(unittest.TestCase):
         good = self.art_fixture()
         self.assertEqual(verify_package.offscreen_check(good, 'art_review', self.root), [])
         self.assertTrue(verify_package.offscreen_check({**good, 'audio_shutdown_clean': False}, 'art_review', self.root))
-        (self.root / 'reports/runtime/art_0.png').write_bytes(b'changed')
+        (self.root / 'reports/runtime/art_camp.png').write_bytes(b'changed')
         self.assertTrue(verify_package.offscreen_check(good, 'art_review', self.root))
 
     def test_offscreen_art_rejects_old_counts_and_missing_studied_views(self):
         good = self.art_fixture()
-        self.assertEqual(good['screenshots'], 54)
-        for count in (22, 30, 32):
+        self.assertEqual(good['screenshots'], 56)
+        for count in (22, 30, 32, 50, 54):
             with self.subTest(old_count=count):
                 old = {**good, 'screenshots': count, 'captures': good['captures'][:count]}
                 self.assertTrue(verify_package.offscreen_check(old, 'art_review', self.root))
@@ -514,6 +548,64 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 next(item for item in good['captures'] if item['name'] == name)['name'] = 'unrelated_result'
                 failures = verify_package.offscreen_check(good, 'art_review', self.root)
                 self.assertTrue(any('four result-report captures' in item for item in failures), failures)
+
+    def test_settings_art_requires_both_named_failure_and_return_views_and_current_script(self):
+        for name in verify_package.SETTINGS_ART_CAPTURES:
+            with self.subTest(capture=name):
+                good = self.art_fixture()
+                next(item for item in good['captures'] if item['name'] == name)['name'] = 'unrelated_settings'
+                failures = verify_package.offscreen_check(good, 'art_review', self.root)
+                self.assertTrue(any('both failed-settings and temporary-return captures' in item for item in failures), failures)
+        for kind in ('missing', 'forged', 'changed_after_capture'):
+            with self.subTest(script=kind):
+                good = self.art_fixture()
+                if kind == 'missing': good.pop('settings_panel_sha256')
+                elif kind == 'forged': good['settings_panel_sha256'] = 'old-settings-script'
+                else: (self.root/'scripts/ui/SettingsPanel.gd').write_text('new settings UI')
+                self.assertTrue(any('settings_panel_sha256' in item for item in verify_package.offscreen_check(good, 'art_review', self.root)))
+
+    def test_navigation_art_rejects_self_reported_visibility_outside_actual_viewport(self):
+        for key, value in [('selected_visible', False), ('selected_rect', [254, 700, 207, 158]),
+                           ('selected_rect', [254, 250, True, 158]), ('selected_rect', [254, 250, float('nan'), 158]),
+                           ('selected_id', 'guanyu'), ('selected_card', 'invented-card'), ('restore_ready', False),
+                           ('scroll_name', 'old-scroll'), ('scroll_vertical', True), ('view_rect', [0, 0, 1920, 1080])]:
+            with self.subTest(field=key):
+                good = self.art_fixture()
+                next(item for item in good['captures'] if item['name']=='art_hero_spirit_beast')['navigation'][key] = value
+                self.assertTrue(verify_package.navigation_art_check(good, self.root))
+
+    def test_navigation_art_slots_must_match_actual_saved_roster_and_all_twelve_cards(self):
+        for key, value in [('slot', 8), ('button_slot', False), ('button_text', '已出战 · 移出'),
+                           ('button_name', 'invented-toggle'), ('card_name', 'old-card')]:
+            with self.subTest(field=key):
+                good = self.art_fixture()
+                navigation = next(item for item in good['captures'] if item['name']=='art_squad')['navigation']
+                navigation['cards'][0][key] = value
+                self.assertTrue(verify_package.navigation_art_check(good, self.root))
+        for field, value in [('saved_roster', []), ('saved_roster', ['guanyu']*2), ('saved_roster', ['unknown']), ('cards', [])]:
+            with self.subTest(field=field,value=value):
+                good = self.art_fixture()
+                next(item for item in good['captures'] if item['name']=='art_squad')['navigation'][field] = value
+                self.assertTrue(verify_package.navigation_art_check(good, self.root))
+
+    def test_settings_art_requires_visible_conditional_consequences_and_disk_runtime_invariants(self):
+        for phase, key, value in [('failed','control_names',[]), ('failed','button_text','暂时返回'),
+                                  ('failed','consequence_text','详情请看tooltip'), ('failed','consequence_visible',False),
+                                  ('failed','modal_active',False), ('failed','preferences_after_sha256','b'*64),
+                                  ('returned','modal_closed',False), ('returned','pause_restored',False),
+                                  ('returned','dirty_retained',False), ('returned','runtime_preview_retained',False),
+                                  ('returned','cold_reloaded_previous_settings',False), ('returned','profile_after_sha256','b'*64)]:
+            with self.subTest(phase=phase,field=key):
+                good = self.art_fixture();good['settings_navigation'][phase][key] = value
+                self.assertTrue(verify_package.navigation_art_check(good, self.root))
+
+    def test_preferences_suite_requires_new_settings_script_and_cold_return_evidence(self):
+        for key,value in [('settings_panel_sha256','old-script'), ('user_prefs_sha256','old-prefs'),
+                          ('temporary_return_verified',False), ('cold_reloaded_previous_settings',False), ('retry_saved_after_failure',False)]:
+            with self.subTest(field=key):
+                suite=self.suite_fixture('logic')
+                self.change_study_report(suite,'PreferencesSmoke',key,value)
+                self.assertTrue(verify_package.suite_check(suite,self.root,'logic','0.1.3.0'))
 
     def test_result_art_requires_the_current_battle_bookkeeping_script(self):
         for value in (None, 'expired'):
@@ -681,7 +773,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
         for raw in (None, b'not PNG', b'\x89PNG\r\n\x1a\n', fixture_png()[:-1], fixture_png(640, 360)):
             with self.subTest(bytes=None if raw is None else len(raw)):
                 good = self.art_fixture()
-                path = self.root / 'reports/runtime/art_0.png'
+                path = self.root / 'reports/runtime/art_camp.png'
                 if raw is None:
                     path.unlink()
                 else:

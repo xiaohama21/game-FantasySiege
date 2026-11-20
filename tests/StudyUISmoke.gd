@@ -8,6 +8,9 @@ var profile
 var checks := 0
 var failures: Array[String] = []
 var matrix_cases := 0
+var navigation_checks := 0
+var navigation_records: Array[Dictionary] = []
+var battle_diagnostic: Dictionary = {}
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -38,6 +41,221 @@ func badge_matches(key: String, value: String, caption: String) -> bool:
 	var title := badge.find_child("Caption", true, false)
 	var icon := badge.find_child("Icon", true, false)
 	return text is Label and title is Label and icon is TextureRect and text.is_visible_in_tree() and title.is_visible_in_tree() and text.text == value and title.text == caption and icon.texture != null and icon.mouse_filter == Control.MOUSE_FILTER_IGNORE
+
+func settle_list_layout() -> void:
+	for _frame in 4: await process_frame
+
+func list_scroll(value: String) -> ScrollContainer:
+	return node_named(value) as ScrollContainer
+
+func list_scroll_limit(scroll: ScrollContainer) -> int:
+	var bar := scroll.get_v_scroll_bar()
+	return maxi(0, floori(bar.max_value - bar.page))
+
+func card_fully_visible(scroll_name: String, id: String) -> bool:
+	var scroll := list_scroll(scroll_name)
+	var card := node_named("HeroCard_" + id) as Control
+	return is_instance_valid(scroll) and is_instance_valid(card) and bool(scroll.get_meta("list_restore_ready", false)) and bool(card.get_meta("list_selected", false)) and scroll.get_global_rect().encloses(card.get_global_rect())
+
+func verify_list_position(name: String, expected: int, context: String) -> void:
+	var scroll := list_scroll(name)
+	check(is_instance_valid(scroll), context + ": rebuilt list exists")
+	if not is_instance_valid(scroll): return
+	var after := scroll.scroll_vertical
+	check(bool(scroll.get_meta("list_restore_ready", false)), context + ": layout restoration completes")
+	check(after == expected and after >= 0 and after <= list_scroll_limit(scroll), context + ": real vertical position remains valid and unchanged")
+	navigation_records.append({"context": context, "scroll": name, "expected": expected, "actual": after, "limit": list_scroll_limit(scroll)})
+
+func verify_roster_slots(expected: Array, context: String) -> void:
+	check(app.draft_roster == expected and profile.data.roster == expected, context + ": slots read the actual committed roster")
+	for id: String in Catalog.playable_roster():
+		var card := node_named("HeroCard_" + id)
+		var button := node_named("RosterToggle_" + id) as Button
+		var slot: int = expected.find(id) + 1
+		check(is_instance_valid(card) and is_instance_valid(button), context + ": roster controls exist " + id)
+		if not is_instance_valid(card) or not is_instance_valid(button): continue
+		check(int(card.get_meta("roster_slot", -1)) == slot and int(button.get_meta("roster_slot", -1)) == slot, context + ": real card and action expose saved slot " + id)
+		check(button.text == "%d号位 · 移出" % slot if slot > 0 else button.text == "加入编队", context + ": visible action identifies actual slot " + id)
+	check(labels_contain("至少保留一名") and labels_contain("1—8号位对应召唤键"), context + ": roster limits and key mapping stay visible")
+
+func audit_list_navigation() -> void:
+	var started_checks := checks
+	var roster: Array = Catalog.playable_roster()
+	var last_id: String = str(roster[-1])
+	var other_id: String = str(roster[-2])
+	var candidate: Dictionary = profile.data.duplicate(true)
+	candidate.owned = roster.duplicate()
+	candidate.cleared = Catalog.stages().map(func(stage: Dictionary) -> String: return str(stage.id))
+	candidate.credits = 10000
+	candidate.study_routes = {}
+	for id: String in roster: candidate.levels[id] = 3
+	candidate.roster = roster.slice(0, 8)
+	check(profile._commit(candidate), "save isolated eligible navigation fixture")
+	app._select_hero(last_id)
+	await settle_list_layout()
+	check(card_fully_visible("HeroListScroll", last_id), "last hero selection reveals its complete current card")
+	var scroll := list_scroll("HeroListScroll")
+	if not is_instance_valid(scroll):
+		navigation_checks = checks - started_checks
+		return
+	check(scroll.scroll_vertical > 0, "last hero selection uses a genuine lower scroll position")
+	var position := scroll.scroll_vertical
+	var before_level: int = profile.level(last_id)
+	app._train(last_id)
+	await settle_list_layout()
+	verify_list_position("HeroListScroll", position, "successful hero training")
+	check(profile.level(last_id) == before_level + 1 and displayed_stats(last_id) == app._hero_calculation(last_id), "training refresh retains same central final stats")
+	var stored_bytes := FileAccess.get_file_as_string(PROFILE_PATH)
+	var stored_data: Dictionary = profile.data.duplicate(true)
+	profile.save_path = DIRECTORY + "/missing/navigation_profile.json"
+	app._train(last_id)
+	await settle_list_layout()
+	verify_list_position("HeroListScroll", position, "failed hero training")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed training preserves profile values and disk bytes")
+	profile.save_path = PROFILE_PATH
+	app.show_home("研修")
+	await settle_list_layout()
+	check(card_fully_visible("StudyListScroll", last_id), "cross-page changed hero selection is fully visible in study")
+	position = list_scroll("StudyListScroll").scroll_vertical
+	app._unlock_study(last_id)
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", position, "successful study unlock")
+	check(profile.study_unlocked(last_id) and profile.study_route(last_id) == "base", "navigation unlock uses real transaction and retains base")
+	app._select_study(other_id)
+	await settle_list_layout()
+	check(card_fully_visible("StudyListScroll", other_id), "another lower study choice reveals its complete current card")
+	position = list_scroll("StudyListScroll").scroll_vertical
+	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
+	stored_data = profile.data.duplicate(true)
+	profile.save_path = DIRECTORY + "/missing/navigation_profile.json"
+	app._unlock_study(other_id)
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", position, "failed study unlock")
+	check(not profile.study_unlocked(other_id) and profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed study unlock retains cost, state and original bytes")
+	profile.save_path = PROFILE_PATH
+	app._select_study(last_id)
+	await settle_list_layout()
+	var routes: Array = Catalog.study_routes(last_id)
+	var study_scroll := list_scroll("StudyListScroll")
+	study_scroll.scroll_vertical = mini(350, list_scroll_limit(study_scroll))
+	position = study_scroll.scroll_vertical
+	await settle_list_layout()
+	check(position > 0 and not card_fully_visible("StudyListScroll", last_id), "manual study scrolling can browse away while detail remains selected")
+	var credits: int = profile.credits()
+	app._set_study_route(last_id, str(routes[0].id))
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", position, "successful route selection respects manual position")
+	check(profile.study_route(last_id) == str(routes[0].id) and profile.credits() == credits, "successful route refresh retains free switching and central selection")
+	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
+	stored_data = profile.data.duplicate(true)
+	profile.save_path = DIRECTORY + "/missing/navigation_profile.json"
+	app._set_study_route(last_id, str(routes[1].id))
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", position, "failed route selection")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed route selection cannot alter profile or original file")
+	profile.save_path = PROFILE_PATH
+	app._set_study_route(last_id, "base")
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", position, "free base restoration")
+	check(profile.study_route(last_id) == "base" and profile.credits() == credits, "base restore remains free")
+	app._select_study(last_id)
+	app._set_study_route(last_id, str(routes[0].id))
+	app._set_study_route(last_id, "base")
+	await settle_list_layout()
+	check(card_fully_visible("StudyListScroll", last_id), "repeated selection survives synchronous route rebuilds and reveals the hidden card")
+	check(profile.study_route(last_id) == "base" and profile.credits() == credits, "synchronous selection and route changes retain real free transactions")
+	app._select_study(str(roster[0]))
+	await settle_list_layout()
+	check(card_fully_visible("StudyListScroll", str(roster[0])) and list_scroll("StudyListScroll").scroll_vertical == 0, "bottom-to-first study selection uses new content coordinates and reveals first card")
+	app._select_hero(last_id)
+	await settle_list_layout()
+	app._select_hero(str(roster[0]))
+	await settle_list_layout()
+	check(card_fully_visible("HeroListScroll", str(roster[0])) and list_scroll("HeroListScroll").scroll_vertical == 0, "bottom-to-first hero selection uses new content coordinates and reveals first card")
+	app._select_hero(other_id)
+	await settle_list_layout()
+	check(card_fully_visible("HeroListScroll", other_id), "changed selection is visible in heroes")
+	var hero_scroll := list_scroll("HeroListScroll")
+	hero_scroll.scroll_vertical = mini(110, list_scroll_limit(hero_scroll))
+	var hero_position := hero_scroll.scroll_vertical
+	app.show_home("研修")
+	await settle_list_layout()
+	check(card_fully_visible("StudyListScroll", other_id), "study notices a selection changed in another page")
+	study_scroll = list_scroll("StudyListScroll")
+	study_scroll.scroll_vertical = mini(210, list_scroll_limit(study_scroll))
+	var study_position := study_scroll.scroll_vertical
+	stored_data = profile.data.duplicate(true)
+	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
+	app.show_home("英魂")
+	await settle_list_layout()
+	verify_list_position("HeroListScroll", hero_position, "unchanged hero selection returns to independent position")
+	app.show_home("研修")
+	await settle_list_layout()
+	verify_list_position("StudyListScroll", study_position, "unchanged study selection returns to independent position")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "scroll and selection memory never write the profile")
+	app.show_home("英魂")
+	await settle_list_layout()
+	hero_scroll = list_scroll("HeroListScroll")
+	hero_scroll.size.y = 250
+	await settle_list_layout()
+	hero_scroll.scroll_vertical = list_scroll_limit(hero_scroll)
+	var enlarged_range_position := hero_scroll.scroll_vertical
+	app.show_home("英魂")
+	await settle_list_layout()
+	hero_scroll = list_scroll("HeroListScroll")
+	check(enlarged_range_position > list_scroll_limit(hero_scroll), "navigation fixture genuinely reduces the available scroll range")
+	verify_list_position("HeroListScroll", list_scroll_limit(hero_scroll), "restoration clamps a reduced scroll range")
+	app.show_home("编队")
+	await settle_list_layout()
+	var squad_scroll := list_scroll("SquadListScroll")
+	squad_scroll.scroll_vertical = mini(200, list_scroll_limit(squad_scroll))
+	position = squad_scroll.scroll_vertical
+	check(position > 0, "squad fixture uses real lower rows")
+	var committed_roster: Array = profile.data.roster.duplicate()
+	verify_roster_slots(committed_roster, "initial eight-person roster")
+	app._toggle_roster(str(committed_roster[0]))
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "successful roster removal")
+	committed_roster.remove_at(0)
+	verify_roster_slots(committed_roster, "removal shifts actual slots")
+	app._toggle_roster(last_id)
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "successful lower-row roster addition")
+	committed_roster.append(last_id)
+	verify_roster_slots(committed_roster, "addition uses actual eighth slot")
+	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
+	stored_data = profile.data.duplicate(true)
+	profile.save_path = DIRECTORY + "/missing/navigation_profile.json"
+	app._toggle_roster(str(committed_roster[0]))
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "failed roster save")
+	verify_roster_slots(committed_roster, "failed save retains real slot labels")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "failed roster save preserves array and bytes")
+	profile.save_path = PROFILE_PATH
+	app._toggle_roster(str(roster[0]))
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "maximum eight-person boundary")
+	verify_roster_slots(committed_roster, "rejected ninth member keeps slot order")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "ninth member rejection preserves profile")
+	candidate = profile.data.duplicate(true)
+	candidate.roster = [last_id]
+	check(profile._commit(candidate), "save declared single-member navigation fixture")
+	app.show_home("编队")
+	await settle_list_layout()
+	app._toggle_roster(last_id)
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "minimum one-person boundary")
+	verify_roster_slots([last_id], "last-member rejection keeps first slot")
+	stored_data = profile.data.duplicate(true)
+	stored_bytes = FileAccess.get_file_as_string(PROFILE_PATH)
+	app._select_hero(last_id)
+	app._select_study(str(roster[0]))
+	app.show_home("编队")
+	await settle_list_layout()
+	verify_list_position("SquadListScroll", position, "rapid navigation discards previous list restoration")
+	check(node_named("HeroListScroll") == null and node_named("StudyListScroll") == null, "old deferred tasks cannot recreate or affect another page")
+	check(profile.data == stored_data and FileAccess.get_file_as_string(PROFILE_PATH) == stored_bytes, "rapid UI rebuilding does not write profile")
+	navigation_checks = checks - started_checks
 
 func run() -> void:
 	check(DisplayServer.get_name() == "headless", "Study UI fixture must remain headless")
@@ -118,19 +336,55 @@ func run() -> void:
 					check(("射程 %.0f" % float(expected.range)) in details and ("护甲 %.0f" % float(expected.armor)) in details, "ordinary skill text uses final range and armor " + id)
 				await process_frame
 				matrix_cases += 1
+	await audit_list_navigation()
 	# Main passes a deep-copied active study selection to a real logical battle.
+	var dot_key_probe: Dictionary = {}
+	dot_key_probe.guanyu = "guard"
+	var bracket_key_probe: Dictionary = {}
+	bracket_key_probe["guanyu"] = "guard"
+	var dot_key: Variant = dot_key_probe.keys()[0]
+	var bracket_key: Variant = bracket_key_probe.keys()[0]
+	check(dot_key is StringName and not dot_key is String, "fresh dictionary dot assignment creates a StringName fixture key")
+	check(bracket_key is String and not bracket_key is StringName, "literal bracket assignment uses real save/API String key type")
+	battle_diagnostic["fixture_key_types"] = {"dot": type_string(typeof(dot_key)), "bracket": type_string(typeof(bracket_key))}
 	candidate = profile.data.duplicate(true)
 	candidate.levels.guanyu = 3
-	candidate.study_routes.guanyu = "guard"
+	candidate.study_routes["guanyu"] = "guard"
 	candidate.roster = ["guanyu"]
 	check(profile._commit(candidate), "save battle study fixture")
+	var route_key_types: Array[Dictionary] = []
+	for id: Variant in profile.data.study_routes:
+		route_key_types.append({"id": str(id), "type": type_string(typeof(id)), "is_string": id is String, "is_string_name": id is StringName})
+		check(id is String, "battle fixture study key follows real save/API String type " + str(id))
+	battle_diagnostic["profile_route_key_types"] = route_key_types
+	var expected_opening_modifiers := {"guanyu": Catalog.study_modifiers("guanyu", "guard")}
+	check(profile.study_modifiers_snapshot() == expected_opening_modifiers, "typed fixture builds the actual guard modifier snapshot before Main start")
+	battle_diagnostic["profile_before_start"] = profile.data.duplicate(true)
+	app._select_hero("spirit_beast")
 	app.start_stage("stage_01")
 	app.battle.render_visuals = false
 	app.set_process(false)
+	await settle_list_layout()
+	check(app.active_card_scroll == null and node_named("HeroListScroll") == null and node_named("StudyListScroll") == null, "opening battle invalidates a pending list restore")
 	check(app.battle.try_summon("guanyu"), "Main starts and summons studied hero")
 	var expected := UnitStats.calculate(Catalog.unit("guanyu"), 3, Catalog.study_modifiers("guanyu", "guard"))
-	var actor: Dictionary = app.battle.units[0]
-	check(is_equal_approx(float(actor.max_hp), float(expected.hp)) and is_equal_approx(float(actor.armor), float(expected.armor)), "Main battle inherits current central study HP and armor")
+	var actor: Dictionary = {}
+	for unit: Dictionary in app.battle.units:
+		if str(unit.get("id", "")) == "guanyu" and int(unit.get("team", 0)) == 1:
+			actor = unit
+			break
+	var actual_unit: Dictionary = {}
+	for key: String in ["uid", "id", "team", "level", "max_hp", "armor", "stats"]:
+		actual_unit[key] = actor.get(key)
+	battle_diagnostic["actual_unit"] = actual_unit
+	battle_diagnostic["expected_unit"] = expected.duplicate(true)
+	battle_diagnostic["profile_after_start"] = profile.data.duplicate(true)
+	battle_diagnostic["battle_levels"] = app.battle._levels.duplicate(true)
+	battle_diagnostic["battle_study_modifiers"] = app.battle._study_modifiers.duplicate(true)
+	battle_diagnostic["auto_step"] = bool(app.battle.auto_step)
+	check(app.battle._study_modifiers == expected_opening_modifiers, "Main battle receives the exact nonempty guard modifier snapshot")
+	print("STUDY_UI_BATTLE_DIAGNOSTIC " + JSON.stringify(battle_diagnostic))
+	check(not actor.is_empty() and is_equal_approx(float(actor.max_hp), float(expected.hp)) and is_equal_approx(float(actor.armor), float(expected.armor)), "Main battle inherits current central study HP and armor for the actual summoned hero")
 	profile.data.study_routes.guanyu = "sweep"
 	profile.data.levels.guanyu = 20
 	check(app.battle._levels.guanyu == 3, "Main battle retains opening level snapshot")
@@ -162,7 +416,7 @@ func run() -> void:
 	app.queue_free()
 	await process_frame
 	await root.get_node("GameAudio").shutdown()
-	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "scripts/ui/StatBadge.gd": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd")}, "scope": "Headless actual Main study/hero bindings with six visible central-value SVG stat badges, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
+	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "matrix_cases": matrix_cases, "navigation_checks": navigation_checks, "navigation_records": navigation_records, "battle_diagnostic": battle_diagnostic, "program_version": str(ProjectSettings.get_setting("application/config/version")), "project_sha256": FileAccess.get_sha256("res://project.godot"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "scripts_sha256": {"scripts/ui/Main.gd": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "scripts/ui/StatBadge.gd": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd")}, "scope": "Headless actual Main study/hero bindings, per-page list restoration and visible committed 1—8 roster slots, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.", "isolation": DIRECTORY}
 	var report := FileAccess.open("res://reports/study_ui_smoke.json", FileAccess.WRITE)
 	report.store_string(JSON.stringify(result, "\t"))
 	report.close()

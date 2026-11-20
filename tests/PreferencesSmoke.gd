@@ -9,6 +9,9 @@ var failures: Array[String] = []
 var checks := 0
 var _changes := 0
 var _closes := 0
+var temporary_return_verified := false
+var cold_reloaded_previous_settings := false
+var retry_saved_after_failure := false
 
 func check(condition: bool, message: String) -> void:
 	checks += 1
@@ -39,7 +42,10 @@ func _new_prefs(path: String) -> Node:
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIRECTORY))
 	var path := DIRECTORY + "/preferences.json"
-	for filename in ["preferences.json", "partial.json", "corrupt.json", "future.json", "external_future.json"]:
+	var conflict_directory := ProjectSettings.globalize_path(DIRECTORY + "/temporary.json.tmp")
+	if DirAccess.dir_exists_absolute(conflict_directory):
+		check(DirAccess.remove_absolute(conflict_directory) == OK, "remove only the isolated empty temp-conflict directory from an interrupted run")
+	for filename in ["preferences.json", "partial.json", "corrupt.json", "future.json", "external_future.json", "temporary.json"]:
 		for suffix in ["", ".bak", ".tmp"]:
 			var target: String = DIRECTORY + "/" + filename + suffix
 			if FileAccess.file_exists(target): DirAccess.remove_absolute(ProjectSettings.globalize_path(target))
@@ -148,6 +154,7 @@ func run() -> void:
 	panel.closed.connect(_count_close)
 	host.add_child(panel)
 	check(panel.volume_sliders.size() == 3 and panel.option_buttons.size() == 3, "settings exposes three volumes and display/input flags")
+	check(not panel.unsaved_consequence.visible and not panel._leave_button.visible, "normal settings do not offer the failed-save temporary return")
 	panel.volume_sliders.music_volume.value = 25
 	check(float(recovered.call("get_value", "music_volume")) == 0.25, "settings slider updates live preference")
 	panel.option_buttons.edge_scroll.button_pressed = false
@@ -161,16 +168,83 @@ func run() -> void:
 	host.add_child(failed_panel)
 	check(not failed_panel.close() and _closes == 1 and failed_panel.visible, "save failure keeps modal open without closed signal")
 	check(failed_panel.status_label.text.contains("保存失败") and failed_panel._leave_button.visible, "failure gives clear message and explicit temporary return")
+	check(failed_panel.unsaved_consequence.visible and failed_panel.unsaved_consequence.name == "UnsavedConsequence", "failure consequence is a visible stable control")
+	check(failed_panel.unsaved_consequence.text.contains("立即生效") and failed_panel.unsaved_consequence.text.contains("若之后仍未保存"), "failure explains live values and conditional restart consequence without hover")
+	check(failed_panel._leave_button.name == "LeaveWithoutSave" and failed_panel._leave_button.text == "暂不保存并返回", "temporary return names its unsaved action")
 	failed_panel.call("_leave_without_save")
 	check(_closes == 2, "explicit temporary return closes after failed save")
 	await process_frame
+
+	# Use a valid previous file and an isolated empty .tmp directory to reject the
+	# write before any disk commit. Both live values and cold readback are observed.
+	var temporary_path := DIRECTORY + "/temporary.json"
+	var temporary := _new_prefs(temporary_path)
+	check(bool(temporary.call("set_value", "master_volume", 0.62)) and bool(temporary.call("set_value", "music_volume", 0.31)) and bool(temporary.call("flush")), "commit the temporary-return baseline")
+	var previous_values: Dictionary = temporary.get("_values").duplicate(true)
+	var previous_bytes := FileAccess.get_file_as_string(temporary_path)
+	var temporary_panel := SETTINGS.new()
+	temporary_panel.configure(temporary, audio)
+	temporary_panel.closed.connect(_count_close)
+	host.add_child(temporary_panel)
+	temporary_panel.call("_leave_without_save")
+	check(temporary_panel.visible and _closes == 2 and not bool(temporary.get("dirty")), "temporary return is unavailable before a save failure")
+	temporary_panel.volume_sliders.music_volume.value = 83
+	temporary_panel.option_buttons.edge_scroll.button_pressed = false
+	check(float(temporary.call("get_value", "music_volume")) == 0.83 and not bool(temporary.call("get_value", "edge_scroll")) and bool(temporary.get("dirty")), "panel changes remain live pending an explicit save")
+	check(DirAccess.make_dir_absolute(conflict_directory) == OK, "create isolated temp-write conflict")
+	check(not temporary_panel.close() and temporary_panel.visible and _closes == 2, "write conflict keeps the settings modal open")
+	check(temporary_panel.status_label.text.contains("保存失败") and temporary_panel.unsaved_consequence.visible, "write failure separates visible error and consequence")
+	check(temporary_panel.unsaved_consequence.text.contains("若之后仍未保存") and temporary_panel.unsaved_consequence.text.contains("上次已保存"), "restart statement permits a later successful save")
+	check(FileAccess.get_file_as_string(temporary_path) == previous_bytes, "failed settings save preserves the original disk bytes")
+	temporary_panel.volume_sliders.music_volume.value = 47
+	check(float(temporary.call("get_value", "music_volume")) == 0.47 and temporary_panel.unsaved_consequence.visible and temporary_panel.unsaved_consequence.text.contains("尚未保存"), "adjusting after failure keeps consequence visible and live value current")
+	check(FileAccess.get_file_as_string(temporary_path) == previous_bytes and bool(temporary.get("dirty")), "continued adjustment does not silently write or clear dirty")
+	temporary_panel._leave_button.pressed.emit()
+	await process_frame
+	temporary_return_verified = _closes == 3 and not is_instance_valid(temporary_panel) and bool(temporary.get("dirty")) and float(temporary.call("get_value", "music_volume")) == 0.47 and not bool(temporary.call("get_value", "edge_scroll")) and FileAccess.get_file_as_string(temporary_path) == previous_bytes
+	check(temporary_return_verified, "explicit temporary return keeps live values and unsaved state without an extra flush")
+	var cold := _new_prefs(temporary_path)
+	cold_reloaded_previous_settings = cold.get("_values") == previous_values and not bool(cold.get("dirty")) and FileAccess.get_file_as_string(temporary_path) == previous_bytes
+	check(cold_reloaded_previous_settings, "a new preference instance reads the previous saved settings after temporary return")
+	check(DirAccess.remove_absolute(conflict_directory) == OK, "remove the isolated empty write conflict")
+	var retry_panel := SETTINGS.new()
+	retry_panel.configure(temporary, audio)
+	retry_panel.closed.connect(_count_close)
+	host.add_child(retry_panel)
+	check(retry_panel.close() and _closes == 4 and not bool(temporary.get("dirty")), "a later save can persist changes that were temporarily kept live")
+	await process_frame
+	var cold_after_retry := _new_prefs(temporary_path)
+	retry_saved_after_failure = cold_after_retry.get("_values") == temporary.get("_values") and float(cold_after_retry.call("get_value", "music_volume")) == 0.47 and not bool(cold_after_retry.call("get_value", "edge_scroll")) and FileAccess.get_file_as_string(temporary_path) != previous_bytes
+	check(retry_saved_after_failure, "conditional restart explanation matches a later successful save and cold read")
+	check(cold.get("_values") == previous_values, "the first cold-read instance retains its own observed baseline")
+
+	var future_panel := SETTINGS.new()
+	future_panel.configure(future, audio)
+	future_panel.closed.connect(_count_close)
+	host.add_child(future_panel)
+	check(not future_panel.volume_sliders.music_volume.editable and future_panel.option_buttons.edge_scroll.disabled, "future settings remain read-only in the panel")
+	check(not future_panel.close() and _closes == 4 and future_panel.unsaved_consequence.visible, "future-schema save failure explains explicit return")
+	check(future_panel.unsaved_consequence.text.contains("不会改写原文件") and not future_panel.unsaved_consequence.text.contains("立即生效"), "read-only consequence does not promise editable previews")
+	future_panel._leave_button.pressed.emit()
+	await process_frame
+	check(_closes == 5 and FileAccess.get_file_as_string(future_path) == future_bytes and not bool(future.get("dirty")), "temporary return leaves future settings untouched")
+	var service_panel := SETTINGS.new()
+	service_panel.configure(future, audio)
+	service_panel.closed.connect(_count_close)
+	host.add_child(service_panel)
+	service_panel.configure(null)
+	check(not service_panel.volume_sliders.music_volume.editable and service_panel.option_buttons.edge_scroll.disabled, "missing preferences service disables adjustment")
+	check(not service_panel.close() and service_panel.unsaved_consequence.visible and service_panel.unsaved_consequence.text.contains("不会写入设置文件"), "missing service gives an accurate non-writing return consequence")
+	service_panel._leave_button.pressed.emit()
+	await process_frame
+	check(_closes == 6 and FileAccess.get_file_as_string(future_path) == future_bytes, "missing service temporary return performs no disk change")
 	check(FileAccess.get_file_as_string(profile_path) == profile_bytes, "settings panel also leaves character save isolated")
 	await audio.shutdown()
 	check(audio.shutdown_clean, "audio mixer releases all playback references before exit")
-	for node in [prefs, restored, recovered, partial, corrupt, future, external, failed, audio, host]:
+	for node in [prefs, restored, recovered, partial, corrupt, future, external, failed, temporary, cold, cold_after_retry, audio, host]:
 		if is_instance_valid(node): node.queue_free()
 	await process_frame
-	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "isolated_path": DIRECTORY, "audio_driver": "headless dummy; real listening separate"}
+	var result := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "isolated_path": DIRECTORY, "audio_driver": "headless dummy; real listening separate", "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "settings_panel_sha256": FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd"), "user_prefs_sha256": FileAccess.get_sha256("res://scripts/core/UserPrefs.gd"), "temporary_return_verified": temporary_return_verified, "cold_reloaded_previous_settings": cold_reloaded_previous_settings, "retry_saved_after_failure": retry_saved_after_failure}
 	write_json("res://reports/preferences_smoke.json", result)
 	print("PREFERENCES_SMOKE " + JSON.stringify(result))
 	quit(0 if failures.is_empty() else 1)

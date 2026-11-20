@@ -55,6 +55,10 @@ var viewer
 var toast: Label
 var toast_time := 0.0
 var motes: Array = []
+var card_list_positions: Dictionary = {}
+var active_card_scroll: ScrollContainer
+var card_list_generation := 0
+var pending_card_focus: Dictionary = {}
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -250,6 +254,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_ESCAPE: show_home()
 
 func _clear_screen() -> void:
+	_remember_card_list_position()
+	card_list_generation += 1
+	active_card_scroll = null
 	focus_locks.clear()
 	if is_instance_valid(screen):
 		remove_child(screen)
@@ -702,22 +709,91 @@ func _briefing_page() -> void:
 	start_button.disabled = not can_start
 
 func _card_grid(rect: Rect2, columns: int) -> GridContainer:
+	var page: String = tab
+	var prefix: String = str({"英魂": "HeroList", "研修": "StudyList", "编队": "SquadList"}.get(page, "ActorList"))
 	var scroll := ScrollContainer.new()
+	scroll.name = prefix + "Scroll"
 	scroll.position = rect.position
 	scroll.size = rect.size
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.set_meta("list_page", page)
+	scroll.set_meta("list_restore_ready", false)
+	scroll.set_meta("list_selected_id", selected_actor if page in ["英魂", "研修"] else "")
 	screen.add_child(scroll)
+	active_card_scroll = scroll
 	var grid := GridContainer.new()
+	grid.name = prefix + "Grid"
 	grid.columns = columns
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 14)
 	scroll.add_child(grid)
+	var state: Dictionary = card_list_positions.get(page, {})
+	var restore_position: int = int(state.get("scroll_vertical", 0))
+	var focus_id := ""
+	if pending_card_focus.has(page) and str(pending_card_focus[page]) != selected_actor:
+		pending_card_focus.erase(page)
+	if page in ["英魂", "研修"] and (state.is_empty() or str(state.get("selected_id", "")) != selected_actor or str(pending_card_focus.get(page, "")) == selected_actor):
+		focus_id = selected_actor
+	# Keep a selection request until its layout task actually completes. A route,
+	# unlock or training action may rebuild this same page synchronously first.
+	_restore_card_list.call_deferred(weakref(scroll), weakref(grid), page, card_list_generation, restore_position, focus_id)
 	return grid
+
+func _remember_card_list_position() -> void:
+	if not is_instance_valid(active_card_scroll) or not active_card_scroll.is_inside_tree(): return
+	# A just-created list still has the temporary zero position. Keep its previous
+	# state until the layout restoration completes, including during rapid navigation.
+	if not bool(active_card_scroll.get_meta("list_restore_ready", false)): return
+	var page: String = str(active_card_scroll.get_meta("list_page", ""))
+	if page.is_empty(): return
+	card_list_positions[page] = {"scroll_vertical": active_card_scroll.scroll_vertical, "selected_id": str(active_card_scroll.get_meta("list_selected_id", ""))}
+
+func _card_list_restore_is_current(scroll_ref: WeakRef, generation: int) -> bool:
+	if generation != card_list_generation: return false
+	var instance: Variant = scroll_ref.get_ref()
+	return instance is ScrollContainer and is_instance_valid(instance) and instance == active_card_scroll and instance.is_inside_tree()
+
+func _restore_card_list(scroll_ref: WeakRef, grid_ref: WeakRef, page: String, generation: int, restore_position: int, focus_id: String) -> void:
+	if not _card_list_restore_is_current(scroll_ref, generation): return
+	# Containers need their minimum sizes before the scroll range and selected-card
+	# rectangle are usable. Recheck ownership after each layout frame.
+	await get_tree().process_frame
+	if not _card_list_restore_is_current(scroll_ref, generation): return
+	await get_tree().process_frame
+	if not _card_list_restore_is_current(scroll_ref, generation): return
+	var scroll := scroll_ref.get_ref() as ScrollContainer
+	var grid := grid_ref.get_ref() as GridContainer
+	if not is_instance_valid(grid) or grid.get_parent() != scroll or str(scroll.get_meta("list_page", "")) != page: return
+	var scrollbar := scroll.get_v_scroll_bar()
+	var limit: int = maxi(0, floori(scrollbar.max_value - scrollbar.page))
+	var target: int = clampi(restore_position, 0, limit)
+	if not focus_id.is_empty():
+		for card: Node in grid.get_children():
+			if card is Control and str(card.get_meta("list_unit_id", "")) == focus_id:
+				# The grid's content coordinates are stable after layout. A global
+				# rectangle can still reflect the previous scroll transform in this
+				# frame, so calculate the target without first moving the grid.
+				var top: float = card.position.y
+				var bottom: float = top + card.size.y
+				if top < float(target): target = floori(top)
+				elif bottom > float(target) + scrollbar.page: target = ceili(bottom - scrollbar.page)
+				break
+	scroll.scroll_vertical = clampi(target, 0, limit)
+	await get_tree().process_frame
+	if not _card_list_restore_is_current(scroll_ref, generation): return
+	scroll = scroll_ref.get_ref() as ScrollContainer
+	scroll.set_meta("list_restore_ready", true)
+	_remember_card_list_position()
+	if str(pending_card_focus.get(page, "")) == focus_id:
+		pending_card_focus.erase(page)
 
 func _hero_card(id: String, rect: Rect2, parent: Node = null) -> Panel:
 	var unit := Catalog.unit(id)
 	var p := _panel(rect, SiegeStyle.PAPER, parent)
+	p.name = "HeroCard_" + id
+	p.set_meta("list_unit_id", id)
+	p.set_meta("list_selected", tab in ["英魂", "研修"] and id == selected_actor)
 	var name_label := _label(str(unit.get("name", id)), Rect2(12, 9, rect.size.x - 24, 32), 22, SiegeStyle.INK, p)
 	_fit_name(name_label, 22)
 	var image_width := 87.0 if rect.size.x >= 230 else 78.0
@@ -821,6 +897,7 @@ func _skill_focus(unit: Dictionary, calc: Dictionary) -> String:
 	return title + "\n%s%s · 前摇 %.2fs" % ["范围 %.0f · " % float(calc.aoe_radius) if float(calc.aoe_radius) > 0 else "单体", kind, float(calc.hit_delay)]
 
 func _select_hero(id: String) -> void:
+	pending_card_focus["英魂"] = id
 	selected_actor = id
 	show_home("英魂")
 
@@ -831,6 +908,7 @@ func _train(id: String) -> void:
 	_message("训练完成，所有召唤实例都会继承成长。" if success else ProfileStore.error_message if not ProfileStore.error_message.is_empty() else "星砂不足或已满级。")
 
 func _select_study(id: String) -> void:
+	pending_card_focus["研修"] = id
 	selected_actor = id
 	show_home("研修")
 
@@ -993,10 +1071,14 @@ func _squad_page() -> void:
 		_icon("clock", Rect2(16, 175, 19, 19), p)
 		_label("冷却 %.1fs" % float(unit.get("cooldown", 0)), Rect2(42, 173, 174, 23), 14, SiegeStyle.MUTED, p)
 		var owned: bool = ProfileStore.owns(id)
-		var button := _button("%s 后契约" % Catalog.unlock_stage(id) if not owned else "已出战 · 移出" if draft_roster.has(id) else "加入编队", Rect2(16, 200, 202, 30), _toggle_roster.bind(id), p, draft_roster.has(id))
+		var slot: int = draft_roster.find(id) + 1
+		p.set_meta("roster_slot", slot)
+		var button := _button("%s 后契约" % Catalog.unlock_stage(id) if not owned else "%d号位 · 移出" % slot if slot > 0 else "加入编队", Rect2(16, 200, 202, 30), _toggle_roster.bind(id), p, slot > 0)
+		button.name = "RosterToggle_" + id
+		button.set_meta("roster_slot", slot)
 		button.add_theme_font_size_override("font_size", 15)
 		button.disabled = not ProfileStore.can_modify() or not owned or (not draft_roster.has(id) and draft_roster.size() >= 8)
-	_label("当前 %d / 8 名英魂。点击即保存，至少保留一名。" % draft_roster.size(), Rect2(263, 610, 970, 39), 20, Color("c2d5cb"))
+	_label("当前 %d / 8 名英魂。点击即保存，至少保留一名；1—8号位对应召唤键。" % draft_roster.size(), Rect2(263, 610, 970, 39), 18, Color("c2d5cb"))
 
 func _toggle_roster(id: String) -> void:
 	var candidate := draft_roster.duplicate()

@@ -33,6 +33,7 @@ class CheckCase:
     report_hashes: tuple[tuple[str, str], ...] = ()
     script_hashes: tuple[str, ...] = ()
     required_report_values: tuple[tuple[str, str | int | bool], ...] = ()
+    require_gdd_version: bool = False
 
 
 BRIEFING_REPORT_HASHES = (("project_sha256", "project.godot"), ("gdd_sha256", "docs/GAME_DESIGN.md"),
@@ -57,10 +58,16 @@ CASES = {
                   script_hashes=("scripts/ui/Main.gd", "scripts/ui/StatBadge.gd")),
         CheckCase("BriefingSmoke", "BRIEFING_SMOKE", "briefing_smoke.json", final_phase="complete",
                   report_hashes=BRIEFING_REPORT_HASHES, script_hashes=BRIEFING_SCRIPT_HASHES,
-                  required_report_values=(("stage_count", 8), ("matrix_cases", 108), ("gdd_version", "0.5.6"))),
+                  required_report_values=(("stage_count", 8), ("matrix_cases", 108)), require_gdd_version=True),
         CheckCase("BriefingUISmoke", "BRIEFING_UI_SMOKE", "briefing_ui_smoke.json",
                   report_hashes=BRIEFING_REPORT_HASHES, script_hashes=BRIEFING_SCRIPT_HASHES + ("scripts/ui/Main.gd", "scripts/ui/StatBadge.gd"),
-                  required_report_values=(("stage_count", 8), ("gdd_version", "0.5.6"))),
+                  required_report_values=(("stage_count", 8),), require_gdd_version=True),
+        CheckCase("BattleReportSmoke", "BATTLE_REPORT_SMOKE", "battle_report_smoke.json", final_phase="complete",
+                  report_hashes=BRIEFING_REPORT_HASHES, script_hashes=("scripts/combat/SiegeBattle.gd", "scripts/core/UnitStats.gd"),
+                  require_gdd_version=True),
+        CheckCase("ResultUISmoke", "RESULT_UI_SMOKE", "result_ui_smoke.json", final_phase="complete", timeout=300,
+                  report_hashes=BRIEFING_REPORT_HASHES, script_hashes=("scripts/combat/SiegeBattle.gd", "scripts/core/UnitStats.gd", "scripts/ui/Main.gd", "scripts/ui/StatBadge.gd"),
+                  require_gdd_version=True),
         CheckCase("MainFlow", "MAIN_FLOW", "main_flow.json", headless=False, timeout=300),
         CheckCase("CampaignJourney", "CAMPAIGN_JOURNEY_COMPLETE", "campaign_journey.json", timeout=900, final_phase="complete"),
     )
@@ -188,6 +195,12 @@ def case_artifact_context(case: CheckCase, root: Path | None = None) -> dict:
     context = {key: hashlib.sha256((base / relative).read_bytes()).hexdigest() for key, relative in case.report_hashes}
     if case.script_hashes:
         context["scripts_sha256"] = {relative: hashlib.sha256((base / relative).read_bytes()).hexdigest() for relative in case.script_hashes}
+    if case.require_gdd_version:
+        document = (base / "docs/GAME_DESIGN.md").read_text(encoding="utf-8-sig")
+        header = re.search(r'^> 文档 v([^\s]+)\s+·', document, re.MULTILINE)
+        if header is None:
+            raise ValueError("same-project GDD version header missing")
+        context["gdd_version"] = header.group(1)
     return context
 
 

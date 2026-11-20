@@ -13,12 +13,13 @@ import run_checks
 
 ROOT = Path(__file__).resolve().parents[1]
 BAD_LOG = ('CrashHandler',)
-ART_CAPTURE_COUNT = 50
+ART_CAPTURE_COUNT = 54
 STUDY_ART_CAPTURES = ('art_study_locked', 'art_study_unowned', 'art_study_ready', 'art_study_base',
                       'art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow',
                       'art_hero_studied', 'art_gallery_studied')
 BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in range(1, 9)) + tuple(
     'art_briefing_stage_%02d_lower' % index for index in range(1, 9)) + ('art_briefing_locked', 'art_briefing_studied')
+RESULT_ART_CAPTURES = ('art_result_victory', 'art_result_defeat', 'art_result_unsaved', 'art_result_recovered')
 
 
 def read_json(path):
@@ -275,12 +276,15 @@ def offscreen_check(detail, name, package):
             failures.append('Offscreen art must include all ten study-state and studied-hero captures')
         if not set(BRIEFING_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include all eighteen battle-briefing captures')
+        if not set(RESULT_ART_CAPTURES).issubset(names):
+            failures.append('Offscreen art must include all four result-report captures')
         if detail.get('studies_sha256') != sha(package / 'resources/studies.json'):
             failures.append('Offscreen study art recipe SHA differs from this package')
         for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd')):
             if detail.get(key) != sha(package / relative):
                 failures.append('Offscreen briefing art SHA differs from this package: ' + key)
-        for key, relative in (('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd')):
+        for key, relative in (('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd'),
+                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd')):
             if detail.get(key) != sha(package / relative):
                 failures.append('Offscreen UI art SHA differs from this package: ' + key)
         if detail.get('portrait_count') != 12 or detail.get('text_overflows') or detail.get('audio_shutdown_clean') is not True:

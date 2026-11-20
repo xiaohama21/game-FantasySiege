@@ -151,6 +151,33 @@ func setup_battle(stage_id: String) -> void:
 	check(native_here > 0, "battle composition contains actual living Spine models " + stage_id)
 	app._set_view_position(0)
 
+func result_battle(stage_id: String, summon: bool, fail_save: bool = false) -> void:
+	app.start_stage(stage_id)
+	app.set_process(false)
+	check(is_instance_valid(app.battle), "result art starts actual battle " + stage_id)
+	if not is_instance_valid(app.battle): return
+	var profile = root.get_node("ProfileStore")
+	var original_path: String = profile.save_path
+	if fail_save: profile.save_path = DIRECTORY + "/missing_result/profile.json"
+	for tick in 1000:
+		if str(app.battle.get_snapshot().outcome) != "running": break
+		if summon:
+			for id: String in app.draft_roster: app._summon(id)
+			if tick % 70 == 0: app._pulse()
+		app.battle.advance(0.5)
+	check(str(app.battle.get_snapshot().outcome) == ("victory" if summon else "defeat"), "result art follows real battle outcome " + stage_id)
+	check(is_instance_valid(app.result_panel) and app.result_report.get("outcome", "") == app.battle.get_snapshot().outcome, "actual result renders frozen battle report")
+	app._update_hud()
+	if fail_save:
+		check(not app.result_saved and not app.run_token.is_empty(), "unsaved result retains exact reward transaction")
+		await capture("art_result_unsaved")
+		profile.save_path = original_path
+		app._retry_reward()
+		check(app.result_saved and is_instance_valid(app.result_panel), "successful retry keeps same report and saved receipt")
+		await capture("art_result_recovered")
+	else:
+		await capture("art_result_victory" if summon else "art_result_defeat")
+
 func run() -> void:
 	project_sha256 = FileAccess.get_sha256("res://project.godot")
 	if DisplayServer.get_name() == "headless":
@@ -267,6 +294,15 @@ func run() -> void:
 	check(is_instance_valid(app.viewer) and app.viewer.using_spine(), "actual boss gallery preview uses native Spine")
 	if is_instance_valid(app.viewer) and app.viewer.using_spine(): native_viewers += 1
 	await capture("art_gallery_boss")
+	check(profile._commit(fixture), "restore base fixture before real result art")
+	await result_battle("stage_01", true)
+	await result_battle("stage_01", false)
+	var result_fixture: Dictionary = fixture.duplicate(true)
+	result_fixture.cleared = ["stage_01"]
+	result_fixture.owned = Catalog.initial_roster()
+	result_fixture.roster = Catalog.initial_roster()
+	check(profile._commit(result_fixture), "save isolated first-contract receipt art fixture")
+	await result_battle("stage_02", true, true)
 	check(FileAccess.get_sha256("res://project.godot") == project_sha256, "project configuration remains unchanged throughout art run")
 	check(text_labels_audited > 0, "real Main labels received readability audits")
 	await finish()
@@ -285,7 +321,7 @@ func finish() -> void:
 	await audio.shutdown()
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
-	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges and native gallery. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
+	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	var file := FileAccess.open("res://reports/art_review_local.json", FileAccess.WRITE)
 	if file == null:
 		push_error("cannot write offscreen art review report")

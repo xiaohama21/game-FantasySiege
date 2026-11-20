@@ -96,3 +96,9 @@ Python84项PASS；旧项目336文件/Git状态核验PASS。前台MainFlow、Main
 本轮开工代理pull实际失败，直连git -c http.proxy= pull --ff-only成功Already up to date。6ff5e2e此前已推，当前main保持5340a0b，不启动新编号或合并main。
 源CPU10通过8147项；sourceJourney992/GDD0.5.6，源Art50最终6253/零overflow，Python104通过。新的candidate7干净构建/双导入、包内10CPU8147、native21/220/portrait/payload、双播放/2624零差/Art50-6253、独立9场旅程988全部PASS；41日志零致命/泄漏、50核心文件source/package SHA匹配，证据reports/briefing_candidate_0.1.3.json及包内checks_background_frozen/checks_campaign_frozen。用户仍延期前台MainFlow/Main24/Main64/2倍速，本轮不CUA/不前台性能，delivery_ready=false，目标保持active。
 候选包 F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-7/开始游戏.cmd。candidate6及所有旧包保留，各自文档/报告为冻结范围。旧项目336文件及Git状态核验PASS。当前准备在0.1.3提交本轮图标/敌情与工具门禁，同步遵循代理优先、实测直连可用回退，推送最终SHA另以remote_sync_latest_local.json记录。交付留版本分支，后续按原目标继续完善完整体验；前台性能依用户后续安排。
+
+## 2026-11-20 战报/图鉴candidate8增量交付
+用户继续开发，沿用前台性能延期授权。开工7897代理pull失败，直连pull reset失败；开发后直连ls-remote成功核对2630eb0及main5340a0b，不虚称pull成功。仍在0.1.3，未开新编号/未合并main。
+先设计GDD0.5.7/BATTLE_REPORT0.1/CORE0.18/EXPERIENCE0.11/UI_ART0.19/ROADMAP0.9，再实现实际有效对兵/治疗/攻城、召唤/阵亡/英魂承伤、成功支出与脉冲人次/真实打断记录；结束冻结、开局深拷贝、新局归零，不改战斗数值/存档schema。结算同屏奖励/贡献，重试成功留完整回执，下一关/本关敌情/编队安全导航；图鉴最终治疗/间隔/魔抗/首领phase名称比例三倍率及准确词条、选择器模态/细生命条与旧toast修复。BUGS0.25 FS041–046已记。
+Source新战报190与ResultUI221 PASS，首次非class测试推断类型编译错误日志保留，修test类型后通过；sourceCPU12唯一旧Briefing硬编码0.5.6失败报告保留，改动态同项目版本后2945复测PASS。Python109PASS，SourceArt54/6973/零溢出通过。干净candidate8双导入、包内CPU12/8558、native21/220/肖像/payload、双播放/2624零差/Art54-6973、独立旅程988全部PASS。43日志无致命/泄漏，source/package核心字节匹配，旧项目336哈希/Git状态不变。
+当前包 F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-8/开始游戏.cmd，证据reports/battle_report_candidate_0.1.3.json与包内checks_background_frozen/checks_campaign_frozen等。candidate7及旧包均保留。准备提交推0.1.3；同步最终SHA见remote_sync_latest_local.json及Git，不把交付作为合并main时机。本轮未CUA/未前台性能；MainFlow/Main24/Main64/2x/full14仍延期，继续原目标，不能标完整学习版或商用发行已完成。

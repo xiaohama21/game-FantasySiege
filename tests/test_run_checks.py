@@ -40,7 +40,8 @@ class StrictRunnerBoundaries(unittest.TestCase):
                 path = self.root / relative
                 if not path.exists():
                     path.parent.mkdir(parents=True, exist_ok=True)
-                    path.write_text("fixture input: " + relative + "\n", encoding="utf-8")
+                    text = "> 文档 v0.5.7 · fixture\n" if relative == "docs/GAME_DESIGN.md" else "fixture input: " + relative + "\n"
+                    path.write_text(text, encoding="utf-8")
         root_patch = patch.object(run_checks, "ROOT", self.root)
         root_patch.start()
         self.addCleanup(root_patch.stop)
@@ -267,6 +268,30 @@ class StrictRunnerBoundaries(unittest.TestCase):
                         result = self.run_case(wrong_scope, name)
                         self.assertIn("report_required_value_mismatch: " + key, result["errors"])
 
+    def test_design_version_is_read_from_the_same_project_instead_of_a_fixed_release(self):
+        path = self.root / "docs/GAME_DESIGN.md"
+        path.write_text("> 文档 v0.9.3 · later design fixture\n", encoding="utf-8")
+        for name in ("BriefingSmoke", "BriefingUISmoke", "BattleReportSmoke", "ResultUISmoke"):
+            with self.subTest(case=name):
+                result = self.run_case(self.success, name)
+                self.assertTrue(result["passed"], result)
+                self.assertEqual(result["artifact_sha256"]["gdd_version"], "0.9.3")
+
+    def test_new_result_reports_require_current_design_and_exact_core_input(self):
+        for name in ("BattleReportSmoke", "ResultUISmoke"):
+            for key in ("gdd_version", "gdd_sha256", "scripts_sha256"):
+                with self.subTest(case=name, field=key):
+                    def stale(command, **kwargs):
+                        response = self.success(command, **kwargs)
+                        case = run_checks.CASES[name]
+                        data = self.payload(case)
+                        data[key] = "old" if key != "scripts_sha256" else {}
+                        self.write_report(case, data)
+                        return response
+                    result = self.run_case(stale, name)
+                    self.assertFalse(result["passed"])
+                    self.assertIn("report_artifact_hash_mismatch: " + key, result["errors"])
+
     def test_briefing_rejects_each_changed_design_configuration_and_script(self):
         for name in ("BriefingSmoke", "BriefingUISmoke"):
             case = run_checks.CASES[name]
@@ -434,7 +459,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         code, summary = self.run_main([], inspect)
         self.assertEqual(code, 0, summary)
         self.assertEqual(tuple(names), run_checks.CPU_CASES)
-        self.assertEqual(len(names), 10)
+        self.assertEqual(len(names), 12)
         self.assertEqual(summary["suite"], "logic")
 
     def test_visual_suite_adds_mainflow_and_headless_campaign(self):

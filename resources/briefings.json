@@ -5,13 +5,13 @@
   "enemies": {
     "riftling": {"tags": ["群袭", "近战"], "counters": ["范围清群", "低费补线"]},
     "ash_runner": {"tags": ["快突", "近战"], "counters": ["减速留人", "前排补位"]},
-    "obsidian_guard": {"tags": ["重甲", "重击"], "counters": ["魔法破甲", "前排承压"]},
+    "obsidian_guard": {"tags": ["重甲", "重击"], "counters": ["魔法输出", "前排承压"]},
     "ember_caster": {"tags": ["远程", "范围魔法"], "counters": ["前排推进", "治疗后排"]},
-    "obsidian_warden": {"tags": ["首领", "范围重击"], "counters": ["P打断预警", "持续补盾"]},
+    "obsidian_warden": {"tags": ["首领", "范围重击"], "counters": ["P打断重击", "持续补盾"]},
     "brass_chomper": {"tags": ["机械", "群袭"], "counters": ["范围清群", "低费补线"]},
-    "brass_guard": {"tags": ["机械", "重甲"], "counters": ["真实破甲", "前排承压"]},
+    "brass_guard": {"tags": ["机械", "重甲"], "counters": ["真实伤害", "前排承压"]},
     "rail_stoker": {"tags": ["远程", "范围魔法"], "counters": ["治疗后排", "范围控制"]},
-    "rail_colossus": {"tags": ["首领", "范围重击"], "counters": ["P打断预警", "持续补盾"]}
+    "rail_colossus": {"tags": ["首领", "范围重击"], "counters": ["P打断重击", "持续补盾"]}
   },
   "capabilities": {
     "frontline": {"label": "守线前排", "description": "具备明确守线身份的非治疗英魂。"},

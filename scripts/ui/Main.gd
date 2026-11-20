@@ -34,6 +34,11 @@ var status_label: Label
 var pause_button: Button
 var speed_button: Button
 var result_panel: Panel
+var result_shade: ColorRect
+var result_report: Dictionary = {}
+var result_award: Dictionary = {}
+var result_saved := false
+var result_victory := false
 var settings_panel
 var guide_panel
 var settings_was_paused := false
@@ -118,7 +123,7 @@ func _retry_exit_save() -> void:
 	if UserPrefs.dirty and not UserPrefs.flush(): _message(UserPrefs.error_message)
 
 func _active_modal() -> Control:
-	for layer in [exit_panel, settings_panel, guide_panel]:
+	for layer in [exit_panel, settings_panel, guide_panel, result_panel]:
 		if is_instance_valid(layer): return layer
 	return null
 
@@ -230,6 +235,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if is_instance_valid(guide_panel):
 		if event.keycode == KEY_ESCAPE: guide_panel.close()
 		return
+	if is_instance_valid(result_panel):
+		if event.keycode == KEY_ESCAPE: show_home()
+		return
 	if is_instance_valid(battle):
 		if event.keycode >= KEY_1 and event.keycode <= KEY_8:
 			var index: int = event.keycode - KEY_1
@@ -255,6 +263,11 @@ func _clear_screen() -> void:
 	view_slider = null
 	toast = null
 	result_panel = null
+	result_shade = null
+	result_report.clear()
+	result_award.clear()
+	result_saved = false
+	result_victory = false
 	settings_panel = null
 	guide_panel = null
 	intro_panel = null
@@ -325,7 +338,10 @@ func _message(value: String) -> void:
 		toast = _label("", Rect2(254, 646, 386, 56), 16, Color("ffe3a3"))
 		toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		toast.add_theme_stylebox_override("normal", SiegeStyle.box(Color(0.06, 0.15, 0.2, 0.96), 10))
-	if is_instance_valid(battle):
+	if is_instance_valid(result_panel):
+		toast.position = Vector2(224, 653)
+		toast.size = Vector2(832, 45)
+	elif is_instance_valid(battle):
 		toast.position = Vector2(330, 174)
 		toast.size = Vector2(620, 68)
 	elif tab == "敌情":
@@ -477,8 +493,8 @@ func _open_briefing(id: String) -> void:
 	selected_chapter = int(stage.get("chapter", 1))
 	show_home("敌情")
 
-func _briefing_scroll(rect: Rect2, node_name: String) -> VBoxContainer:
-	var panel := _panel(rect)
+func _briefing_scroll(rect: Rect2, node_name: String, parent: Node = null) -> VBoxContainer:
+	var panel := _panel(rect, SiegeStyle.PAPER, parent)
 	var scroll := ScrollContainer.new()
 	scroll.name = node_name
 	scroll.position = Vector2(12, 10)
@@ -797,7 +813,7 @@ func _skill_focus(unit: Dictionary, calc: Dictionary) -> String:
 	var title := str(unit.get("skill_name", "战斗职责"))
 	var special: Dictionary = calc.special
 	var kind: String = {"physical": "物理", "magic": "魔法", "true": "真实"}.get(str(calc.damage_type), "物理")
-	if str(special.get("type", "")) == "heal": return title + " · 治疗最受伤的伙伴"
+	if str(special.get("type", "")) == "heal": return title + " · 治疗最受伤的伙伴\n不能修复基地"
 	if str(special.get("type", "")) == "slow": return title + "\n减速：剩余移速 %.0f%% · %.2fs · 范围 %.0f" % [float(special.ratio) * 100, float(special.duration), float(calc.aoe_radius)]
 	if str(special.get("type", "")) == "siege": return title + "\n攻城：基地伤害 %.2f倍 · %s" % [float(special.get("base_damage_multiplier", 1)), kind]
 	return title + "\n%s%s · 前摇 %.2fs" % ["范围 %.0f · " % float(calc.aoe_radius) if float(calc.aoe_radius) > 0 else "单体", kind, float(calc.hit_delay)]
@@ -1016,6 +1032,7 @@ func _gallery_page() -> void:
 	_button("英魂", Rect2(272, 98, 166, 40), _gallery_category.bind("heroes"), null, gallery_kind == "heroes")
 	_button("敌军", Rect2(454, 98, 166, 40), _gallery_category.bind("enemies"), null, gallery_kind == "enemies")
 	var picker := OptionButton.new()
+	picker.name = "GalleryPicker"
 	picker.position = Vector2(272, 151)
 	picker.size = Vector2(364, 44)
 	var current := 0
@@ -1025,7 +1042,10 @@ func _gallery_page() -> void:
 		if str(unit.get("visual_id", "")) == selected_visual: current = i
 	picker.select(current)
 	screen.add_child(picker)
-	picker.item_selected.connect(func(index: int): selected_visual = str(Catalog.unit(str(ids[index])).get("visual_id", "")); show_home("图鉴"))
+	picker.item_selected.connect(func(index: int):
+		if not _button_action_allowed(picker): return
+		selected_visual = str(Catalog.unit(str(ids[index])).get("visual_id", ""))
+		show_home("图鉴"))
 	var id: String = ids[current]
 	var unit := Catalog.unit(id)
 	selected_visual = str(unit.get("visual_id", ""))
@@ -1036,25 +1056,55 @@ func _gallery_page() -> void:
 	panel.set_meta("unit_stats", calc.duplicate(true))
 	panel.set_meta("unit_id", id)
 	_label(str(unit.get("name", id)), Rect2(18, 13, 348, 36), 25, SiegeStyle.INK, panel)
-	var desc := _label(str(unit.get("description", unit.get("summary", ""))), Rect2(18, 57, 348, 47), 16, SiegeStyle.MUTED, panel)
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_label(str(unit.get("role_name", "")) + " · 主属性 " + _attribute_name(str(unit.get("primary_attribute", "strength"))), Rect2(18, 112, 348, 25), 16, SiegeStyle.TEAL, panel)
+	_label(str(unit.get("role_name", "")) + " · 主属性 " + _attribute_name(str(calc.primary)), Rect2(18, 53, 348, 25), 15, SiegeStyle.TEAL, panel)
 	var attrs: Dictionary = calc.get("stats", {})
-	_label("力量 %.0f · 敏捷 %.0f · 智力 %.0f" % [float(attrs.get("strength", 0)), float(attrs.get("agility", 0)), float(attrs.get("intelligence", 0))], Rect2(18, 145, 348, 25), 15, SiegeStyle.INK, panel)
-	_label("生命 %.0f · %s %.0f" % [float(calc.get("hp", 0)), "治疗基础" if unit.get("special") is Dictionary and str(unit.special.get("type", "")) == "heal" else "伤害", float(calc.get("damage", 0))], Rect2(18, 178, 348, 25), 16, SiegeStyle.INK, panel)
-	var damage_name: String = {"physical":"物理", "magic":"魔法", "true":"真实"}.get(str(unit.get("damage_type", "physical")), "物理")
-	_label("%s · %.2fs · 射程 %.0f" % [damage_name, float(calc.get("attack_interval", 1)), float(calc.get("range", 0))], Rect2(18, 209, 348, 25), 15, SiegeStyle.MUTED, panel)
-	var skills := _label(_skill_details(unit, calc), Rect2(18, 245, 348, 95), 14, SiegeStyle.INK, panel)
+	_label("力量 %.0f · 敏捷 %.0f · 智力 %.0f" % [float(attrs.get("strength", 0)), float(attrs.get("agility", 0)), float(attrs.get("intelligence", 0))], Rect2(18, 80, 348, 25), 14, SiegeStyle.MUTED, panel)
+	var grid := GridContainer.new()
+	grid.position = Vector2(18, 113)
+	grid.size = Vector2(348, 110)
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	panel.add_child(grid)
+	_stat_badge(grid, "hp", "heart", "生命", "%.0f" % float(calc.hp))
+	var healing: bool = str(calc.special.get("type", "")) == "heal"
+	var damage_name: String = {"physical":"物理", "magic":"魔法", "true":"真实"}.get(str(calc.damage_type), "物理")
+	_stat_badge(grid, "damage", "heal" if healing else "orb" if calc.damage_type == "magic" else "sword", "治疗" if healing else damage_name + "伤害", "%.0f" % float(calc.special.get("amount", 0) if healing else calc.damage))
+	_stat_badge(grid, "armor", "shield", "护甲", "%.0f" % float(calc.armor))
+	_stat_badge(grid, "magic_armor", "ward", "魔抗", "%.0f" % float(calc.magic_armor), Color("80679b"))
+	_stat_badge(grid, "range", "range", "射程", "%.0f" % float(calc.range))
+	_stat_badge(grid, "attack_interval", "clock", "攻击间隔", "%.2fs" % float(calc.attack_interval))
+	var skills := _label(_skill_focus(unit, calc), Rect2(18, 233, 348, 43), 14, SiegeStyle.TEAL, panel)
 	skills.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var rule := str(unit.get("counter_hint", "")) if gallery_kind == "enemies" else "已契约 · Lv.%d · %s" % [level, _study_name(id)] if owned else "通关 %s 后契约" % Catalog.unlock_stage(id)
-	if gallery_kind == "enemies" and unit.get("special") is Dictionary and unit.special.has("phase_threshold"):
-		rule = "P打断重击 · 晕眩1.2s · Boss推退仅25%"
-	var counter := _label(rule, Rect2(18, 346, 348, 41), 14, SiegeStyle.TEAL, panel)
-	counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var appearances := Catalog.appearances(id)
-	var context := "出现 · " + "、".join(appearances) if gallery_kind == "enemies" else "召唤冷却 %.1fs · %d能量" % [float(unit.get("cooldown", 0)), int(unit.get("cost", 0))]
-	var context_label := _label(context, Rect2(18, 387, 348, 31), 12, SiegeStyle.MUTED, panel)
-	context_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if gallery_kind == "enemies":
+		var special: Dictionary = calc.special
+		if special.has("phase_threshold"):
+			var phase := _panel(Rect2(18, 282, 348, 64), Color("efe1c2"), panel)
+			phase.name = "GalleryPhase"
+			var threshold := float(special.phase_threshold)
+			_label(("半血" if is_equal_approx(threshold, 0.5) else "%.0f%%生命" % (threshold * 100)) + " → " + str(special.get("phase_name", "强化阶段")), Rect2(10, 7, 328, 22), 16, Color("9a712d"), phase)
+			_label("伤害×%.2f · 间隔×%.2f · 移速×%.2f" % [float(special.get("phase_damage_mult", 1)), float(special.get("phase_attack_mult", 1)), float(special.get("phase_speed_mult", 1))], Rect2(10, 35, 328, 20), 12, SiegeStyle.INK, phase)
+		var terms: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://resources/briefings.json"))
+		var counters: Array = terms.get("enemies", {}).get(id, {}).get("counters", [])
+		var advice := " · ".join(counters)
+		if special.has("phase_threshold"): advice += " · 首领推退25%"
+		var counter := _label(advice, Rect2(18, 353, 348, 28), 13, SiegeStyle.TEAL, panel)
+		counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var context := _label("出现 · " + "、".join(Catalog.appearances(id)), Rect2(18, 385, 348, 32), 12, SiegeStyle.MUTED, panel)
+		context.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	else:
+		var rule := _label("已契约 · Lv.%d · %s" % [level, _study_name(id)] if owned else "通关 %s 后契约" % Catalog.unlock_stage(id), Rect2(18, 286, 348, 33), 15, SiegeStyle.TEAL, panel)
+		rule.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var summon := GridContainer.new()
+		summon.position = Vector2(18, 334)
+		summon.size = Vector2(348, 54)
+		summon.columns = 2
+		summon.add_theme_constant_override("h_separation", 8)
+		panel.add_child(summon)
+		_stat_badge(summon, "cost", "energy", "召唤能量", "%d" % int(unit.get("cost", 0)), Color("9a712d"))
+		_stat_badge(summon, "cooldown", "clock", "召唤冷却", "%.1fs" % float(unit.get("cooldown", 0)))
+	var glossary := _panel(Rect2(254, 642, 386, 55), Color("1c3a48"))
+	_label("魔法按魔抗减伤 · 真实无视护甲\n前摇是命中等待；间隔是两次出手节奏", Rect2(12, 7, 362, 43), 13, Color("d2e1d8"), glossary)
 	_label("星灯之友" if gallery_kind == "heroes" else "裂隙生物", Rect2(690, 107, 545, 39), 25, Color("f1e4c6"))
 	var frame := _panel(Rect2(671, 158, 583, 380), Color("1c3a48"))
 	frame.clip_contents = true
@@ -1132,8 +1182,13 @@ func _health_bar(rect: Rect2, color: Color) -> ProgressBar:
 	bar.position = rect.position
 	bar.size = rect.size
 	bar.show_percentage = false
-	bar.add_theme_stylebox_override("background", SiegeStyle.box(Color("162d38"), 7))
-	bar.add_theme_stylebox_override("fill", SiegeStyle.box(color, 7))
+	for entry: Array in [["background", Color("162d38")], ["fill", color]]:
+		var style := SiegeStyle.box(entry[1], 7)
+		style.content_margin_top = 0
+		style.content_margin_bottom = 0
+		style.content_margin_left = 0
+		style.content_margin_right = 0
+		bar.add_theme_stylebox_override(entry[0], style)
 	screen.add_child(bar)
 	return bar
 
@@ -1292,49 +1347,165 @@ func _floating_text(value: String, point: Vector2, color: Color) -> void:
 
 func _battle_finished(victory: bool) -> void:
 	if is_instance_valid(result_panel): return
+	if is_instance_valid(toast): toast.visible = false
+	toast_time = 0.0
 	GameAudio.play_cue("victory" if victory else "defeat")
 	paused = true
 	if battle.has_method("set_visual_playback"): battle.set_visual_playback(0.0)
-	var saved := false
-	if victory: saved = ProfileStore.win(run_token)
-	else: ProfileStore.abandon(run_token); run_token = ""
-	var shade := ColorRect.new()
-	shade.position = Vector2.ZERO
-	shade.size = Vector2(1280, 720)
-	shade.color = Color(0.03, 0.09, 0.13, 0.72)
-	screen.add_child(shade)
-	result_panel = _panel(Rect2(397, 176, 486, 364))
-	_label("星灯重燃" if victory else "微光尚未熄灭", Rect2(25, 20, 436, 58), 35, SiegeStyle.TEAL if victory else SiegeStyle.INK, result_panel)
-	var stage := Catalog.stage(active_stage)
-	var reward: Variant = stage.get("rewards", 80)
-	var earned := int(reward.get("credits", 80)) if reward is Dictionary else int(reward)
-	var text := "保存失败，请重试领取。" if victory else "尝试低费前排持续补线，再搭配范围输出或治疗。"
-	if victory and saved:
+	result_report = battle.get_battle_report()
+	result_victory = victory
+	result_saved = ProfileStore.win(run_token) if victory else false
+	result_award.clear()
+	if victory and result_saved:
+		result_award = ProfileStore.last_award.duplicate(true)
 		run_token = ""
-		var award: Dictionary = ProfileStore.last_award
-		earned = int(award.get("credits", earned))
-		text = "获得 %d 星砂" % earned
-		if bool(award.get("first_clear", false)): text += "（首通额外 %d）" % int(award.get("bonus_credits", 0))
-		var names: Array[String] = []
-		for id: String in award.get("unlock_units", []): names.append(str(Catalog.unit(id).get("name", id)))
-		text += "\n新契约 · " + "、".join(names) if not names.is_empty() else "\n到营地训练英魂，编队最多八人。"
-	var desc := _label(text, Rect2(25, 83, 436, 91), 19, SiegeStyle.MUTED, result_panel)
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	if victory and not saved:
-		_button("重试保存奖励", Rect2(25, 185, 436, 46), _retry_reward, result_panel, true)
+	elif not victory:
+		ProfileStore.abandon(run_token)
+		run_token = ""
+	if not is_instance_valid(result_shade):
+		result_shade = ColorRect.new()
+		result_shade.size = Vector2(1280, 720)
+		result_shade.color = Color(0.03, 0.09, 0.13, 0.82)
+		screen.add_child(result_shade)
+	_render_result()
+
+func _result_value(parent: Node, name: String, text: String, tint: Color = SiegeStyle.INK) -> Label:
+	var label := _briefing_line(text, parent, 16, tint)
+	label.name = name
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	return label
+
+func _render_result() -> void:
+	if result_report.is_empty() or str(result_report.get("outcome", "")) not in ["victory", "defeat"]: return
+	for layer in [exit_panel, settings_panel, guide_panel]:
+		if is_instance_valid(layer): return
+	if is_instance_valid(result_panel):
+		_unlock_modal_focus(result_panel)
+		screen.remove_child(result_panel)
+		result_panel.queue_free()
+	var previous_focus := get_viewport().gui_get_focus_owner()
+	result_panel = _panel(Rect2(224, 78, 832, 566))
+	result_panel.name = "BattleResult"
+	result_panel.z_index = 200
+	_label("星灯重燃" if result_victory else "微光尚未熄灭", Rect2(24, 13, 784, 42), 33, SiegeStyle.TEAL if result_victory else SiegeStyle.INK, result_panel)
+	var stage := Catalog.stage(str(result_report.get("stage_id", active_stage)))
+	var elapsed := maxi(0, int(result_report.get("elapsed", 0)))
+	_label("%s  ·  本场 %02d:%02d%s" % [str(stage.get("name", "远征")), elapsed / 60, elapsed % 60, " · 测试夹具" if bool(result_report.get("fixture", false)) else ""], Rect2(24, 58, 784, 27), 17, SiegeStyle.MUTED, result_panel)
+	var reward := _panel(Rect2(24, 100, 254, 354), Color("faf6eb"), result_panel)
+	reward.name = "ResultReward"
+	reward.set_meta("result_award", result_award.duplicate(true))
+	reward.set_meta("result_saved", result_saved)
+	_label("战利与保存" if result_victory else "下一次尝试", Rect2(14, 10, 226, 30), 22, SiegeStyle.TEAL, reward)
+	var retry: Button
+	if result_victory and result_saved:
+		var gain := GridContainer.new()
+		gain.position = Vector2(14, 55)
+		gain.size = Vector2(226, 54)
+		reward.add_child(gain)
+		_stat_badge(gain, "award_credits", "star", "获得星砂", "%d" % int(result_award.get("credits", 0)), Color("9a712d"))
+		_label("基础 %d · 首通额外 %d" % [int(result_award.get("base_credits", 0)), int(result_award.get("bonus_credits", 0))], Rect2(14, 118, 226, 26), 14, SiegeStyle.MUTED, reward)
+		var saved := _label("已保存 · " + ("首次点亮" if bool(result_award.get("first_clear", false)) else "重访奖励"), Rect2(14, 150, 226, 27), 16, SiegeStyle.TEAL, reward)
+		saved.name = "ResultSavedStatus"
+		var unlocks: Array = result_award.get("unlock_units", [])
+		if not unlocks.is_empty():
+			_portrait(str(unlocks[0]), Rect2(14, 190, 76, 104), reward)
+			var contract := _label("新契约\n" + _briefing_names(unlocks), Rect2(102, 192, 138, 104), 17, SiegeStyle.TEAL, reward)
+			contract.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		else:
+			var ready := _label("星砂可用于训练。\n也可结合敌情调整编队与研修。", Rect2(14, 198, 226, 87), 17, SiegeStyle.INK, reward)
+			ready.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	elif result_victory:
+		var pending := _label("奖励尚未保存", Rect2(14, 58, 226, 36), 22, Color("9a712d"), reward)
+		pending.name = "ResultPendingStatus"
+		var reason := _label("保存失败，请重试领取。\n" + ProfileStore.error_message, Rect2(14, 107, 226, 114), 16, SiegeStyle.INK, reward)
+		reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		retry = _button("重试保存奖励", Rect2(14, 253, 226, 45), _retry_reward, reward, true)
+		retry.name = "ResultRetry"
+		_label("战报可查看，保存后再继续。", Rect2(14, 312, 226, 27), 14, SiegeStyle.MUTED, reward)
 	else:
+		var advice := _label("本次未获得奖励。\n查看本关敌情，再考虑前排、治疗与召唤节奏。", Rect2(14, 59, 226, 110), 18, SiegeStyle.INK, reward)
+		advice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var options := _label("可直接再战，或先调整编队。\n这些操作不扣除星砂。", Rect2(14, 205, 226, 82), 16, SiegeStyle.TEAL, reward)
+		options.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var report := _panel(Rect2(298, 100, 510, 354), Color("faf6eb"), result_panel)
+	report.name = "ResultReport"
+	report.set_meta("battle_report", result_report.duplicate(true))
+	_label("本场有效贡献", Rect2(12, 9, 486, 30), 22, SiegeStyle.TEAL, report)
+	var totals: Dictionary = result_report.get("totals", {})
+	var grid := GridContainer.new()
+	grid.position = Vector2(12, 45)
+	grid.size = Vector2(486, 52)
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 6)
+	report.add_child(grid)
+	_stat_badge(grid, "report_damage", "sword", "对兵伤害", "%.0f" % float(totals.get("damage", 0)))
+	_stat_badge(grid, "report_healing", "heal", "有效治疗", "%.0f" % float(totals.get("healing", 0)))
+	_stat_badge(grid, "report_base_damage", "siege", "有效攻城", "%.0f" % float(totals.get("base_damage", 0)), Color("9a712d"))
+	_label("召唤 %d · 阵亡 %d · 支出 %.0f能量 · 英魂承伤 %.0f" % [int(totals.get("summons", 0)), int(totals.get("fallen", 0)), float(totals.get("energy_spent", 0)), float(totals.get("damage_taken", 0))], Rect2(12, 104, 486, 25), 13, SiegeStyle.MUTED, report)
+	var pulse := _label("脉冲 %d次 · 命中 %d人次 · 打断 %d次 · 有效伤害 %.0f" % [int(totals.get("pulse_uses", 0)), int(totals.get("pulse_targets", 0)), int(totals.get("pulse_interrupts", 0)), float(totals.get("pulse_damage", 0))], Rect2(12, 133, 486, 26), 14, Color("9a712d"), report)
+	pulse.name = "ResultPulse"
+	var scroll := ScrollContainer.new()
+	scroll.name = "ResultMemberScroll"
+	scroll.position = Vector2(12, 172)
+	scroll.size = Vector2(486, 168)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	report.add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 6)
+	scroll.add_child(rows)
+	for member: Dictionary in result_report.get("members", []):
+		var row := _briefing_card(rows)
+		row.get_parent().name = "ResultMember_" + str(member.id)
+		row.get_parent().set_meta("report_member", member.duplicate(true))
+		var columns := HBoxContainer.new()
+		columns.add_theme_constant_override("separation", 8)
+		row.add_child(columns)
+		var identity := VBoxContainer.new()
+		identity.custom_minimum_size.x = 142
+		identity.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		columns.add_child(identity)
+		_briefing_line("%s · %d级" % [str(member.name), int(member.level)], identity, 14)
+		var count := _briefing_line("未召唤" if int(member.summons) == 0 else "召唤 %d / 阵亡 %d" % [int(member.summons), int(member.fallen)], identity, 12, SiegeStyle.MUTED)
+		count.name = "SummonsValue"
+		for metric: Array in [["damage", "伤害", "DamageValue"], ["healing", "治疗", "HealingValue"], ["base_damage", "攻城", "BaseDamageValue"]]:
+			var cell := VBoxContainer.new()
+			cell.custom_minimum_size.x = 78
+			columns.add_child(cell)
+			var caption := _briefing_line(str(metric[1]), cell, 12, SiegeStyle.MUTED)
+			caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_result_value(cell, str(metric[2]), "%.0f" % float(member.get(str(metric[0]), 0)))
+	if result_report.get("members", []).is_empty(): _briefing_line("本场未携带英魂。", rows, 16, SiegeStyle.MUTED)
+	var can_leave: bool = not result_victory or result_saved
+	var next_id := active_stage
+	if result_victory:
 		var stages := Catalog.stages()
-		var next_id := ""
 		for i in stages.size():
 			if str(stages[i].id) == active_stage and i + 1 < stages.size(): next_id = str(stages[i + 1].id)
-		_button("继续远征" if victory and not next_id.is_empty() else "再战一次", Rect2(25, 185, 436, 46), start_stage.bind(next_id if victory and not next_id.is_empty() else active_stage), result_panel, true)
-	_button("返回营地 · 整备英魂", Rect2(25, 247, 436, 46), show_home.bind("英魂" if not victory else "远征"), result_panel)
-	var ending := _label(str(stage.get("story_outro", "每一次尝试，都让微光更近一步。")) if victory and saved else "每一次尝试，都让微光更近一步。", Rect2(25, 304, 436, 49), 14, SiegeStyle.MUTED, result_panel)
+	var next := _button("继续远征" if result_victory and next_id != active_stage else "再战一次", Rect2(24, 474, 240, 43), start_stage.bind(next_id), result_panel, can_leave)
+	next.name = "ResultContinue"
+	next.disabled = not can_leave or not ProfileStore.can_modify() or not ProfileStore.stage_unlocked(next_id)
+	var briefing := _button("本关敌情", Rect2(280, 474, 160, 43), _open_briefing.bind(active_stage), result_panel)
+	briefing.name = "ResultBriefing"
+	briefing.disabled = not can_leave
+	var squad := _button("调整编队", Rect2(456, 474, 160, 43), show_home.bind("编队"), result_panel)
+	squad.name = "ResultSquad"
+	squad.disabled = not can_leave
+	var home := _button("返回营地", Rect2(632, 474, 176, 43), show_home.bind("远征"), result_panel)
+	home.name = "ResultHome"
+	home.disabled = not can_leave
+	var ending_text := str(stage.get("story_outro", "每一次尝试，都让微光更近一步。")) if result_victory and result_saved else "统计有效生命变化；守线与控制价值还需结合战线判断。"
+	ending_text += "\n对兵总伤害含脉冲；英魂表只计各自贡献。"
+	var ending := _label(ending_text, Rect2(24, 523, 784, 40), 13, SiegeStyle.MUTED, result_panel)
 	ending.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_lock_modal_focus(result_panel, previous_focus, retry if is_instance_valid(retry) else next if not next.disabled else home)
 
 func _retry_reward() -> void:
+	if not result_victory or result_saved or run_token.is_empty(): return
 	if ProfileStore.win(run_token):
 		run_token = ""
-		show_home()
+		result_saved = true
+		result_award = ProfileStore.last_award.duplicate(true)
+		_render_result()
 		_message("奖励已保存。")
 	else: _message(ProfileStore.error_message)

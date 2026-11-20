@@ -3,17 +3,17 @@
   "state": "complete",
   "suite": "single",
   "selected_cases": [
-    "CampaignJourney"
+    "BriefingSmoke"
   ],
   "cases": [
     {
-      "case": "CampaignJourney",
+      "case": "BriefingSmoke",
       "passed": true,
       "errors": [],
       "exit_code": 0,
-      "started_at": "2026-11-19T09:31:13.828+00:00",
-      "started_ns": 1795080673828356200,
-      "report": "reports/campaign_journey.json",
+      "started_at": "2026-11-20T04:10:30.411+00:00",
+      "started_ns": 1795147830411935800,
+      "report": "reports/briefing_smoke.json",
       "program_version": "0.1.3.0",
       "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
       "launch_mode": "headless_verbose",
@@ -24,21 +24,34 @@
         "--verbose",
         "--headless",
         "--script",
-        "res://tests/CampaignJourney.gd"
+        "res://tests/BriefingSmoke.gd"
       ],
-      "artifact_sha256": {},
-      "finished_ns": 1795080793376454700,
-      "finished_at": "2026-11-19T09:33:13.376+00:00",
-      "duration_seconds": 119.5480985,
+      "artifact_sha256": {
+        "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+        "gdd_sha256": "254f826ef79919538fafc5e770e0541f1a0a0fd1c02b363bfc00fe6e9f81860d",
+        "briefings_sha256": "8380a5cd7ace1f485fc3e4e34e8b0a807fb4a34be7574b4e987b0111e4ae2267",
+        "studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+        "units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+        "stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+        "scripts_sha256": {
+          "scripts/core/BattleBriefing.gd": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+          "scripts/core/UnitStats.gd": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+          "scripts/combat/SiegeBattle.gd": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702"
+        },
+        "gdd_version": "0.5.7"
+      },
+      "finished_ns": 1795147831565497700,
+      "finished_at": "2026-11-20T04:10:31.565+00:00",
+      "duration_seconds": 1.1535619,
       "fatal_log_lines": [],
       "diagnostic_log_lines": [],
-      "report_mtime_ns": 1795080793099154800,
-      "report_sha256": "a4dbcde6d9e9195893e6ab35daf667b863bc8cd63b73f864e76af886aab14654",
-      "checks": 992
+      "report_mtime_ns": 1795147831473223600,
+      "report_sha256": "cc593ffb7edb2e26a495008f9e6482922a1766fe587efba6e6ea2dc119784a0f",
+      "checks": 2945
     }
   ],
   "errors": [],
-  "started_at": "2026-11-19T09:31:13.824+00:00",
+  "started_at": "2026-11-20T04:10:30.408+00:00",
   "project_root": "F:\\godotProject\\FantasySiege",
   "reject_script_errors": true,
   "reject_object_leaks": true,
@@ -48,5 +61,5 @@
   "rendered_launch_scope": "production startup logging",
   "program_version": "0.1.3.0",
   "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
-  "finished_at": "2026-11-19T09:33:13.382+00:00"
+  "finished_at": "2026-11-20T04:10:31.570+00:00"
 }

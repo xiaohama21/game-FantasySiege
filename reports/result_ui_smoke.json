@@ -1,0 +1,24 @@
+{
+	"briefings_sha256": "8380a5cd7ace1f485fc3e4e34e8b0a807fb4a34be7574b4e987b0111e4ae2267",
+	"checks": 221,
+	"defeats": 1,
+	"failures": [],
+	"gdd_sha256": "254f826ef79919538fafc5e770e0541f1a0a0fd1c02b363bfc00fe6e9f81860d",
+	"gdd_version": "0.5.7",
+	"isolation": "res://tests/.user/result_ui",
+	"passed": true,
+	"phase": "complete",
+	"program_version": "0.1.3.0",
+	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+	"scope": "Headless actual Main first-clear/revisit victories, no-summon defeat, visible effective contribution and reward save/retry/navigation with isolated files; no native rendering, foreground input or performance claim.",
+	"scripts_sha256": {
+		"scripts/combat/SiegeBattle.gd": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702",
+		"scripts/core/UnitStats.gd": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+		"scripts/ui/Main.gd": "8edfc333a58f83a4f3ce1f521c9dad0e28afb1403a6c06bd14087b88119ec8d2",
+		"scripts/ui/StatBadge.gd": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba"
+	},
+	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+	"units_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+	"victories": 3
+}

@@ -1,6 +1,7 @@
 # Windows本地学习版交付
 
-> v0.16 · 2026-11-19 · GDD v0.5.6 / 程序0.1.3.0
+> v0.17 · 2026-11-20 · GDD v0.5.7 / 程序0.1.3.0
+> v0.17：结算战报新增BattleReportSmoke/ResultUISmoke，CPU12/full14；Art54增加胜利/失败/未保存/恢复四种结算，验证战斗源码及UI指纹。总纲版本从当前同包文档解析，前台性能继续延期。
 > v0.16：用户反馈后统一19枚原创SVG和属性组件，敌情/英魂/研修/编队/HUD减少重复文本；Art50追加Main及StatBadge源码SHA，完整Python104项通过。当前生成candidate7，前台项延期。
 > v0.15：先登记敌情简报验收，再添加BriefingSmoke与BriefingUISmoke，当前CPU10/full12；ArtReview扩为50张，增加八关上下页与锁定/研修阵容18张必需取景。新增配置、总纲与程序指纹，candidate6仍冻结为GDD0.5.3/CPU8/Art32旧范围。
 > v0.14：FS-036统一所有阶段Art32完整门禁；FS-037补实际Vulkan及300帧正常窗口/完整分辨率；FS-038补MainFlow持续窗口/焦点与15张取景证据。仅强化验收，candidate6保持原冻结范围。
@@ -85,3 +86,11 @@ MainFlow实际展示三页引导、设置、敌军与Boss规则、训练和编�
 candidate7以GDD0.5.6冻结源码与文档，后台/离屏/旅程结果按实际新包登记；candidate6/GDD0.5.3及原32图证据不改写。两种包均不能以后台通过宣称delivery_ready或商业发行通过。
 
 candidate7实际验收完成：十项CPU8147，原生21来源220动作、十二肖像/完整payload，生产与非托管播放、2624次RGBA零差、Art50/6253及独立新档八关/重启/重访988项均通过。41份日志无致命错误或泄漏，50个核心源码/配置/图标字节与源项目一致。证据为reports/briefing_candidate_0.1.3.json与包内checks_background_frozen/checks_campaign_frozen、package_background/package_offscreen及各独立报告。正常前台MainFlow和Main24/Main64/Main64_2x继续按用户安排延期，delivery_ready=false；该结论为增量本地学习候选通过。
+
+## GDD0.5.7 结算战报验收设计
+
+结算复盘由实际命中、有效生命变化、成功动作与脉冲取消记录生成；BattleReportSmoke与ResultUISmoke将覆盖有效伤害/治疗/攻城、范围归属、召唤和阵亡、脉冲打断、暂停/倍速、结束冻结/重开归零，以及真实Main领奖失败/重试和后续导航。新用例进入CPU12，完整阶段为full14；只登记接口不等于运行通过，实际程序运行由本轮主任务统一安排。
+
+ArtReview由50增至54，新增art_result_victory、art_result_defeat、art_result_unsaved、art_result_recovered四个必需取景。图像需当前Main、StatBadge与SiegeBattle字节指纹一致，所有阶段复用图片完整性、零文字溢出与音频排空门禁。candidate7/GDD0.5.6保持冻结，新增源码不能承接其8147/6253/988通过结论；新候选包再次按后台、独立旅程与离屏范围运行。前台MainFlow、Main24/Main64/2×和商业许可范围仍独立。
+
+2026-11-20 candidate8实际验收：BattleReportSmoke190项、ResultUISmoke221项/3实际胜利与1失败，覆盖有效贡献/归因/结束冻结、领奖失败与成功重试回执、重复渲染不领奖、导航/模态/未来存档保护及图鉴语义。新包CPU12共8558项、Art54共6973项且零文字溢出，原生21/220、双播放和2624次像素零差，以及独立八关/重启/重访988项均通过。43份应用日志无致命错误或泄漏，核心源码/配置/图标与源项目逐字节匹配。证据reports/battle_report_candidate_0.1.3.json与包内frozen checks及各独立报告；candidate7原范围保留。正常前台MainFlow、Main24/Main64/2倍速以及full14仍按用户安排待验，delivery_ready=false。

@@ -57,7 +57,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
                     path = self.root / relative
                     if not path.exists():
                         path.parent.mkdir(parents=True, exist_ok=True)
-                        path.write_text('fixture input: ' + relative + '\n', encoding='utf-8')
+                        text = '> 文档 v0.5.7 · fixture\n' if relative == 'docs/GAME_DESIGN.md' else 'fixture input: ' + relative + '\n'
+                        path.write_text(text, encoding='utf-8')
                 context = verify_package.run_checks.case_artifact_context(case, self.root)
                 report = {'passed': True, 'checks': 1, 'failures': [], 'program_version': '0.1.3.0', **context, **dict(case.required_report_values)}
                 if case.final_phase:
@@ -93,7 +94,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def art_fixture(self):
         captures = []
-        names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES)
+        names = ['art_' + str(index) for index in range(22)] + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES)
         for name in names:
             path = self.root / 'reports/runtime' / (name + '.png')
             path.write_bytes(fixture_png())
@@ -104,7 +105,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
         study_path.write_text('{}', encoding='utf-8')
         extra_hashes = {}
         for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd'),
-                              ('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd')):
+                              ('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd'),
+                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd')):
             path = self.root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
@@ -173,6 +175,14 @@ class PackageVerificationBoundaries(unittest.TestCase):
         for output in ('COMPLETE {}\nerror: script failed\n', 'COMPLETE {}\nLeaked instance: audio\n', 'prefix COMPLETE {}\n'):
             with self.subTest(output=output):
                 self.assertFalse(self.execute({'passed': True}, output)['passed'])
+
+    def test_previous_suite_cannot_omit_new_battle_and_result_checks(self):
+        for suite_name in ('logic', 'full'):
+            with self.subTest(suite=suite_name):
+                suite = self.suite_fixture(suite_name)
+                suite['cases'] = [item for item in suite['cases'] if item['case'] not in ('BattleReportSmoke', 'ResultUISmoke')]
+                failures = verify_package.suite_check(suite, self.root, suite_name, '0.1.3.0')
+                self.assertTrue(any('completed' in item and '-case' in item for item in failures), failures)
 
     def test_partial_suite_cannot_be_package_pass(self):
         self.assertFalse(self.execute({'passed': True, 'state': 'complete', 'suite': 'single', 'cases': [{'case': 'MainFlow', 'passed': True}]}, name='checks')['passed'])
@@ -461,7 +471,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_offscreen_art_rejects_old_counts_and_missing_studied_views(self):
         good = self.art_fixture()
-        self.assertEqual(good['screenshots'], 50)
+        self.assertEqual(good['screenshots'], 54)
         for count in (22, 30, 32):
             with self.subTest(old_count=count):
                 old = {**good, 'screenshots': count, 'captures': good['captures'][:count]}
@@ -471,6 +481,22 @@ class PackageVerificationBoundaries(unittest.TestCase):
                 renamed = [{**item, 'name': 'replacement'} if item['name'] == name else item for item in good['captures']]
                 result = verify_package.offscreen_check({**good, 'captures': renamed}, 'art_review', self.root)
                 self.assertIn('Offscreen art must include all ten study-state and studied-hero captures', result)
+
+    def test_result_art_requires_all_four_outcome_and_recovery_views(self):
+        for name in verify_package.RESULT_ART_CAPTURES:
+            with self.subTest(capture=name):
+                good = self.art_fixture()
+                next(item for item in good['captures'] if item['name'] == name)['name'] = 'unrelated_result'
+                failures = verify_package.offscreen_check(good, 'art_review', self.root)
+                self.assertTrue(any('four result-report captures' in item for item in failures), failures)
+
+    def test_result_art_requires_the_current_battle_bookkeeping_script(self):
+        for value in (None, 'expired'):
+            with self.subTest(value=value):
+                good = self.art_fixture()
+                good['battle_script_sha256'] = value
+                failures = verify_package.offscreen_check(good, 'art_review', self.root)
+                self.assertTrue(any('battle_script_sha256' in item for item in failures), failures)
 
     def test_offscreen_art_requires_all_eighteen_briefing_views(self):
         good = self.art_fixture()

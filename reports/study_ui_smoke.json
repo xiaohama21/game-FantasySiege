@@ -8,7 +8,7 @@
 	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
 	"scope": "Headless actual Main study/hero bindings with six visible central-value SVG stat badges, isolated profile transactions and logical battle. No foreground input, native rendering or performance claim.",
 	"scripts_sha256": {
-		"scripts/ui/Main.gd": "ec4711899b4783c31804b152959b8c4fd9d6079f6cb0f6018fa3fe8e097dba1d",
+		"scripts/ui/Main.gd": "8edfc333a58f83a4f3ce1f521c9dad0e28afb1403a6c06bd14087b88119ec8d2",
 		"scripts/ui/StatBadge.gd": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba"
 	},
 	"studies_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",

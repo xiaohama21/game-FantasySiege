@@ -2,11 +2,11 @@
   "passed": true,
   "program_version": "0.1.3.0",
   "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
-  "tests_run": 104,
+  "gdd_sha256": "254f826ef79919538fafc5e770e0541f1a0a0fd1c02b363bfc00fe6e9f81860d",
+  "tests_run": 109,
   "failures": [],
   "failure_count": 0,
   "error_count": 0,
-  "exit_code": 0,
   "command_line": [
     "python",
     "-B",
@@ -18,41 +18,7 @@
     "-p",
     "test_*.py"
   ],
-  "scope": "All Python discovery: mocked CPU10/full12 boundaries, briefing GDD/configuration/nested script SHA and stage8/matrix108 contracts, shared StatBadge script provenance, universal Art50 with Main and StatBadge UI source SHA gates, shared MainFlow and Vulkan window/resolution contracts; no Godot, GPU, OS input, foreground or campaign execution",
-  "started_utc": "2026-11-19T09:32:10.277091+00:00",
-  "finished_utc": "2026-11-19T09:33:18.669101+00:00",
-  "duration_seconds": 68.39592000003904,
-  "gdd_version": "0.5.6",
-  "gdd_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
-  "scripts_sha256": {
-    "tools/run_checks.py": "207b7e44433748b7042769f12c28c27593d2da31d66de8f167a870ec7f3be74e",
-    "tools/verify_package.py": "60bb35aaf4a69a25847ea070b59f41cdac4f2d06772049eff33b7d34bc12923d",
-    "tests/test_run_checks.py": "c0ce9e0fde5462b14aaf99ad49c843f6cadc4846ea42b33bd78931a9d14d3a38",
-    "tests/test_verify_package.py": "f83f6d8b2a43d4524ac7da51c89b9a372fecde38d9f7554e14a6cd657e40ee18"
-  },
-  "previous_runs": [
-    {
-      "tests_run": 96,
-      "passed": true,
-      "started_utc": "2026-11-19T08:30:37.9449956Z",
-      "finished_utc": "2026-11-19T08:30:49.8347882Z",
-      "scope": "All Python unit-test discovery: mocked process boundaries, shared MainFlow host/capture/input-scope gates, real PNG metadata and completeness, universal Art32 gates, Vulkan and full-frame window/resolution gates, report/input SHA and 108 study matrices; no Godot, GPU, foreground input or campaign execution"
-    },
-    {
-      "tests_run": 102,
-      "passed": true,
-      "gdd_version": "0.5.5",
-      "started_utc": "2026-11-19T08:50:09.722138+00:00",
-      "finished_utc": "2026-11-19T08:50:32.347288+00:00",
-      "scope": "All Python discovery: mocked CPU10/full12 boundaries, briefing GDD/configuration/nested script SHA and stage8/matrix108 contracts, universal Art50 study/briefing image gates, shared MainFlow and Vulkan window/resolution contracts; no Godot, GPU, OS input, foreground or campaign execution"
-    },
-    {
-      "tests_run": 103,
-      "passed": true,
-      "gdd_version": "0.5.6",
-      "started_utc": "2026-11-19T09:15:04.167143+00:00",
-      "finished_utc": "2026-11-19T09:15:29.203948+00:00",
-      "scope": "All Python discovery: mocked CPU10/full12 boundaries, briefing GDD/configuration/nested script SHA and stage8/matrix108 contracts, shared StatBadge script provenance, universal Art50 study/briefing image gates, shared MainFlow and Vulkan window/resolution contracts; no Godot, GPU, OS input, foreground or campaign execution"
-    }
-  ]
+  "test_duration_seconds": 27.541,
+  "recorded_utc": "2026-11-20T04:00:40.7650673Z",
+  "scope": "All Python mock/process-boundary discovery: CPU12/full14, same-project dynamic GDD metadata, new battle/result report hashes, Art54 four result states and current battle/UI code, PNG completeness, production renderer/policy and existing regression boundaries. No Godot, GPU, OS input, campaign or performance execution."
 }

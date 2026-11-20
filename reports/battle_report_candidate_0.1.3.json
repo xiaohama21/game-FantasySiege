@@ -1,0 +1,370 @@
+{
+  "passed": true,
+  "scope": "Candidate8 effective battle report, saved reward receipt and encyclopedia increment; actual bundle CPU12, native/offscreen and independent campaign. Foreground/performance still deferred by user.",
+  "program_version": "0.1.3.0",
+  "gdd_version": "0.5.7",
+  "delivery_ready": false,
+  "foreground_verified": false,
+  "performance_verified": false,
+  "commercial_release_verified": false,
+  "package": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-8",
+  "start": "F:\\godotProject\\FantasySiege\\exports\\windows\\FantasySiege-0.1.3.0-candidate-8\\开始游戏.cmd",
+  "cpu_cases": 12,
+  "cpu_checks": 8558,
+  "case_checks": {
+    "BattleSmoke": 120,
+    "ProfileSmoke": 24,
+    "ProgressionSmoke": 34,
+    "PreferencesSmoke": 76,
+    "AudioShutdownSmoke": 6,
+    "StudyProfileSmoke": 470,
+    "StudyCombatSmoke": 1873,
+    "StudyUISmoke": 1180,
+    "BriefingSmoke": 2945,
+    "BriefingUISmoke": 1419,
+    "BattleReportSmoke": 190,
+    "ResultUISmoke": 221
+  },
+  "battle_report_checks": 190,
+  "result_ui_checks": 221,
+  "result_ui_victories": 3,
+  "result_ui_defeats": 1,
+  "campaign_checks": 988,
+  "ui_screenshots": 54,
+  "ui_checks": 6973,
+  "ui_text_overflows": [],
+  "native_resources": 21,
+  "native_animations": 220,
+  "pixel_comparisons": 2624,
+  "source_package_files": [
+    {
+      "path": "scripts/audio/GameAudio.gd",
+      "sha256": "4e94e9040812b161d286aa65be9877cb1d0f506be838d75b04ba3980b3433c09",
+      "package_sha256": "4e94e9040812b161d286aa65be9877cb1d0f506be838d75b04ba3980b3433c09",
+      "matches": true
+    },
+    {
+      "path": "scripts/combat/DamageTypes.gd",
+      "sha256": "411f74840d0ca7e4617cfdce180195fa1a729a15aa295eccbb1e23265bab4a55",
+      "package_sha256": "411f74840d0ca7e4617cfdce180195fa1a729a15aa295eccbb1e23265bab4a55",
+      "matches": true
+    },
+    {
+      "path": "scripts/combat/SiegeBattle.gd",
+      "sha256": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702",
+      "package_sha256": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/BattleBriefing.gd",
+      "sha256": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+      "package_sha256": "468568eba15b93d96ad8ffc24df6248452095309a9920622c5b662f617b9998d",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/Catalog.gd",
+      "sha256": "1c7abc8e8970e92b3bfccd739476418c9a026118aaea23ad06775b4345021f52",
+      "package_sha256": "1c7abc8e8970e92b3bfccd739476418c9a026118aaea23ad06775b4345021f52",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/ProfileStore.gd",
+      "sha256": "5df67e772e9f1168ffbeb0e649e5728905e667d9c50c7cd67b4d4c7115557318",
+      "package_sha256": "5df67e772e9f1168ffbeb0e649e5728905e667d9c50c7cd67b4d4c7115557318",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/UnitStats.gd",
+      "sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+      "package_sha256": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
+      "matches": true
+    },
+    {
+      "path": "scripts/core/UserPrefs.gd",
+      "sha256": "fe63bd8d5d5e6ac175a6e9492795bdba7522eef1badaa5c5f1c561d17a16abb9",
+      "package_sha256": "fe63bd8d5d5e6ac175a6e9492795bdba7522eef1badaa5c5f1c561d17a16abb9",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/GuidePanel.gd",
+      "sha256": "a8231cb7f30af1dba1f19d8c5326532127d39e805eba2c3d26cb2ff4fcfd8b37",
+      "package_sha256": "a8231cb7f30af1dba1f19d8c5326532127d39e805eba2c3d26cb2ff4fcfd8b37",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/Main.gd",
+      "sha256": "8edfc333a58f83a4f3ce1f521c9dad0e28afb1403a6c06bd14087b88119ec8d2",
+      "package_sha256": "8edfc333a58f83a4f3ce1f521c9dad0e28afb1403a6c06bd14087b88119ec8d2",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/PortraitFrame.gd",
+      "sha256": "e5c847f40a49beae89e645e7cd47151d99b79cb232e241898622ad59226ef8c6",
+      "package_sha256": "e5c847f40a49beae89e645e7cd47151d99b79cb232e241898622ad59226ef8c6",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/SettingsPanel.gd",
+      "sha256": "73e1d741ced14828be82b9aed275b079d3fb7cc4b60aabeb924b7b073016420b",
+      "package_sha256": "73e1d741ced14828be82b9aed275b079d3fb7cc4b60aabeb924b7b073016420b",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/StatBadge.gd",
+      "sha256": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba",
+      "package_sha256": "a28af0ad3dac226e504133af62c708300d4771540f9354a786a9b6b2809521ba",
+      "matches": true
+    },
+    {
+      "path": "scripts/ui/UIStyle.gd",
+      "sha256": "a8a0d2eae358931f0dce9a922210736c351ab1bba4b9e30fd7b84542eb8ad289",
+      "package_sha256": "a8a0d2eae358931f0dce9a922210736c351ab1bba4b9e30fd7b84542eb8ad289",
+      "matches": true
+    },
+    {
+      "path": "scripts/visuals/SpineActor.gd",
+      "sha256": "32106307bb9dbb53ea6a21ef46f56b95b4552c032b1f7b3454ad20e6d28710c7",
+      "package_sha256": "32106307bb9dbb53ea6a21ef46f56b95b4552c032b1f7b3454ad20e6d28710c7",
+      "matches": true
+    },
+    {
+      "path": "scripts/visuals/WorldBackdrop.gd",
+      "sha256": "d4099a1dbe1724d38d734e433d7fcf2ad7ef2f03defaf141a5b3bbae64b3e9ce",
+      "package_sha256": "d4099a1dbe1724d38d734e433d7fcf2ad7ef2f03defaf141a5b3bbae64b3e9ce",
+      "matches": true
+    },
+    {
+      "path": "scenes/Main.tscn",
+      "sha256": "67e7d31121fd4d08e0416bcac70c530d1fc48ddacddab1b682e076310bd8f1a3",
+      "package_sha256": "67e7d31121fd4d08e0416bcac70c530d1fc48ddacddab1b682e076310bd8f1a3",
+      "matches": true
+    },
+    {
+      "path": "resources/briefings.json",
+      "sha256": "8380a5cd7ace1f485fc3e4e34e8b0a807fb4a34be7574b4e987b0111e4ae2267",
+      "package_sha256": "8380a5cd7ace1f485fc3e4e34e8b0a807fb4a34be7574b4e987b0111e4ae2267",
+      "matches": true
+    },
+    {
+      "path": "resources/content_plan.json",
+      "sha256": "871597f44c13ae12ffb86097eb2e9ac6dcbb8aee34f801553716fa365ae0c1b0",
+      "package_sha256": "871597f44c13ae12ffb86097eb2e9ac6dcbb8aee34f801553716fa365ae0c1b0",
+      "matches": true
+    },
+    {
+      "path": "resources/stages.json",
+      "sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+      "package_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+      "matches": true
+    },
+    {
+      "path": "resources/studies.json",
+      "sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+      "package_sha256": "ccb4b579ed35fab25b2e5251a31ec30ac7d1830af3b50c18c4aa03bf2bbb4d9e",
+      "matches": true
+    },
+    {
+      "path": "resources/units.json",
+      "sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+      "package_sha256": "c3b81a688d0df4af07299645f29423791d0df53d2cee50ef9b7ea3bd96a3603c",
+      "matches": true
+    },
+    {
+      "path": "resources/visuals.json",
+      "sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+      "package_sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+      "matches": true
+    },
+    {
+      "path": "project.godot",
+      "sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "package_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+      "matches": true
+    },
+    {
+      "path": "docs/GAME_DESIGN.md",
+      "sha256": "254f826ef79919538fafc5e770e0541f1a0a0fd1c02b363bfc00fe6e9f81860d",
+      "package_sha256": "254f826ef79919538fafc5e770e0541f1a0a0fd1c02b363bfc00fe6e9f81860d",
+      "matches": true
+    },
+    {
+      "path": "tests/ArtReview.gd",
+      "sha256": "c73617d1f34ba51dffcd95f6d67bc50ce146475e40e6b0217f8109889dcd5bcd",
+      "package_sha256": "c73617d1f34ba51dffcd95f6d67bc50ce146475e40e6b0217f8109889dcd5bcd",
+      "matches": true
+    },
+    {
+      "path": "tests/BattleReportSmoke.gd",
+      "sha256": "45cf711f462866a77a4267cf3f90f194f5dd425b7e8b277efdcded422bd4a0f9",
+      "package_sha256": "45cf711f462866a77a4267cf3f90f194f5dd425b7e8b277efdcded422bd4a0f9",
+      "matches": true
+    },
+    {
+      "path": "tests/ResultUISmoke.gd",
+      "sha256": "717b650397e1226330161305c6593de9732682280ceb0d6600da85fd066e761d",
+      "package_sha256": "717b650397e1226330161305c6593de9732682280ceb0d6600da85fd066e761d",
+      "matches": true
+    },
+    {
+      "path": "tests/BriefingSmoke.gd",
+      "sha256": "c29ef367e489b05d84427457499cfa8018a762015ba2da4328e77297813f72bf",
+      "package_sha256": "c29ef367e489b05d84427457499cfa8018a762015ba2da4328e77297813f72bf",
+      "matches": true
+    },
+    {
+      "path": "tests/BriefingUISmoke.gd",
+      "sha256": "db180b28857f9ad2062d500d659cc9f269e8e3d835d446561e9faf4c12a374dd",
+      "package_sha256": "db180b28857f9ad2062d500d659cc9f269e8e3d835d446561e9faf4c12a374dd",
+      "matches": true
+    },
+    {
+      "path": "tools/run_checks.py",
+      "sha256": "05c9cc5aa2916aed6c1fccec89597341ce3640a1705ca149299dc52f19a64934",
+      "package_sha256": "05c9cc5aa2916aed6c1fccec89597341ce3640a1705ca149299dc52f19a64934",
+      "matches": true
+    },
+    {
+      "path": "tools/verify_package.py",
+      "sha256": "50d2064b2c0d34a8e4ef3ed42bcd3cd9f66a5fa9208910cfe50f3f2b8bc23ea7",
+      "package_sha256": "50d2064b2c0d34a8e4ef3ed42bcd3cd9f66a5fa9208910cfe50f3f2b8bc23ea7",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/agility.svg",
+      "sha256": "88b1d4d7a5e57adaec71543b86d260e75ed77e42ee8b1c391637a686a93cc6ec",
+      "package_sha256": "88b1d4d7a5e57adaec71543b86d260e75ed77e42ee8b1c391637a686a93cc6ec",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/boss.svg",
+      "sha256": "dde60aeaf2efa9d9bb6c4aafd508cbec716277c648aa70e199bafa90cdbc95dc",
+      "package_sha256": "dde60aeaf2efa9d9bb6c4aafd508cbec716277c648aa70e199bafa90cdbc95dc",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/clock.svg",
+      "sha256": "fe8d7f44951d6c9e8ffa30f6f498fa3b5ff590590198a5ca6dcda095193ae2af",
+      "package_sha256": "fe8d7f44951d6c9e8ffa30f6f498fa3b5ff590590198a5ca6dcda095193ae2af",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/energy.svg",
+      "sha256": "d12abb0cc28d33367f8fcba32f41f6791dc85a33286267cdb803df275dec8eae",
+      "package_sha256": "d12abb0cc28d33367f8fcba32f41f6791dc85a33286267cdb803df275dec8eae",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/group.svg",
+      "sha256": "d3f763030edb2ca102fa8420a80c7d8846ff003842cf93fc52115ce0e0a77d5d",
+      "package_sha256": "d3f763030edb2ca102fa8420a80c7d8846ff003842cf93fc52115ce0e0a77d5d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/heal.svg",
+      "sha256": "6d69ad055b6581261a1ca4ad6992575af5a50659ec6148bf92c7d89a7be5057c",
+      "package_sha256": "6d69ad055b6581261a1ca4ad6992575af5a50659ec6148bf92c7d89a7be5057c",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/heart.svg",
+      "sha256": "e49d587ae8f613b2fec7725d0daa170398420418f961e1f1f9c7a0096c2eb87d",
+      "package_sha256": "e49d587ae8f613b2fec7725d0daa170398420418f961e1f1f9c7a0096c2eb87d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/intelligence.svg",
+      "sha256": "528c8c1d4885ecd89bb8bf5af4493efc6fe5f0e19324fa2816f4ae39449eb825",
+      "package_sha256": "528c8c1d4885ecd89bb8bf5af4493efc6fe5f0e19324fa2816f4ae39449eb825",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/orb.svg",
+      "sha256": "e469d6f4daeb6bd541a840743726e55846d650721af7e7184cd17729654c8513",
+      "package_sha256": "e469d6f4daeb6bd541a840743726e55846d650721af7e7184cd17729654c8513",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/pulse.svg",
+      "sha256": "cc0bb5d68b82a7cf22936844116dc47b9ac560eccfca542e1e9dce18472483c5",
+      "package_sha256": "cc0bb5d68b82a7cf22936844116dc47b9ac560eccfca542e1e9dce18472483c5",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/range.svg",
+      "sha256": "64e220153583424207cf8cc46f71632c21e70dd02fefcf154f9b3cee1d69c297",
+      "package_sha256": "64e220153583424207cf8cc46f71632c21e70dd02fefcf154f9b3cee1d69c297",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/shield.svg",
+      "sha256": "389bbd8ac61fb8a42ca95c9e03b40e299ccf01e08a9a0b86cac687e527abf98d",
+      "package_sha256": "389bbd8ac61fb8a42ca95c9e03b40e299ccf01e08a9a0b86cac687e527abf98d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/siege.svg",
+      "sha256": "d86e334b48fdad8c3d5e7d5547dbcc3034908bc287b23fbf0a7d102dbb7c0a5d",
+      "package_sha256": "d86e334b48fdad8c3d5e7d5547dbcc3034908bc287b23fbf0a7d102dbb7c0a5d",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/slow.svg",
+      "sha256": "7e5fcfb71a82e2cd116e45aa0dd64257fd817677853f036654d56e50f71d33f5",
+      "package_sha256": "7e5fcfb71a82e2cd116e45aa0dd64257fd817677853f036654d56e50f71d33f5",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/star.svg",
+      "sha256": "e3fa92959a1d3a8146617ba07d01842ef5d9ec982e897d169730b1dfc2fb6e23",
+      "package_sha256": "e3fa92959a1d3a8146617ba07d01842ef5d9ec982e897d169730b1dfc2fb6e23",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/strength.svg",
+      "sha256": "9c90b9ce6018dcb75304ae83bd85a443ba56265e430134970b647ad09d334ea0",
+      "package_sha256": "9c90b9ce6018dcb75304ae83bd85a443ba56265e430134970b647ad09d334ea0",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/study.svg",
+      "sha256": "88aaba282d452640a513be81e5fd20333a5fae2c272180af0e2ea50e1f1eec81",
+      "package_sha256": "88aaba282d452640a513be81e5fd20333a5fae2c272180af0e2ea50e1f1eec81",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/sword.svg",
+      "sha256": "a5fd93abf87201fe16c072ae4cf731dadfd3eccac71ac46e17b2423f0e9443b3",
+      "package_sha256": "a5fd93abf87201fe16c072ae4cf731dadfd3eccac71ac46e17b2423f0e9443b3",
+      "matches": true
+    },
+    {
+      "path": "assets/ui/icons/ward.svg",
+      "sha256": "6e942cbafa5628a758b347376ee376a65d9173978d9d0781aaa0519234d1265a",
+      "package_sha256": "6e942cbafa5628a758b347376ee376a65d9173978d9d0781aaa0519234d1265a",
+      "matches": true
+    }
+  ],
+  "verified_log_count": 43,
+  "fatal_logs": [],
+  "source_guard": {
+    "passed": true,
+    "hashed_files": 336,
+    "changed_files": [],
+    "git_head_unchanged": true,
+    "git_branch_unchanged": true,
+    "git_status_unchanged": true
+  },
+  "report_sha256": {
+    "reports/build_manifest.json": "a09d6c6f846d4c02336e9363ff6e316e46ba6f60dc7778cd4f23f9ce58b86f5a",
+    "reports/checks_background_frozen.json": "cdd378376c182bd426151390ccf2711929f9bd3ae15beb6c1a17b745160f948a",
+    "reports/checks_campaign_frozen.json": "a3eb10199565f152771bcdd844443408c652d2b5cbcba063b0513b4557040377",
+    "reports/campaign_journey.json": "b0090c32202876fd88fcbd4336b55e5db73789abb2ac9c975c4a23bb58c28884",
+    "reports/package_background.json": "738dad946ae8febde4727691be68408dd357477b9a5bdb134f32dbe0f35bd3b1",
+    "reports/package_offscreen.json": "6e3b6f2fc924f6b036e7b87ef2c0397e79dff167572d3ffc9bbf45caa6e49990",
+    "reports/art_review_local.json": "9de3880862948527a199f139bebeff0029ae1f160e1602c219c6ddaf79b4c041",
+    "reports/battle_report_smoke.json": "8206886bdb887e55c6dec7607b83ba0035b123e0c09410c5a7b97bfa89cc81f9",
+    "reports/result_ui_smoke.json": "6fe5cad309ed7a4d11690a11dac8663914bda5b50a4210c67f4fbf4036043b44"
+  },
+  "failures": [],
+  "verified_utc": "2026-11-20T04:22:14.773387+00:00"
+}

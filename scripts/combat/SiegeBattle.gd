@@ -18,6 +18,12 @@ const PULSE_RADIUS := 180.0
 const PULSE_DAMAGE := 90.0
 const PULSE_STUN := 1.2
 const PULSE_PUSH := 60.0
+const REPORT_PULSE_SOURCE := "@pulse"
+const REPORT_TOTAL_DEFAULTS := {
+	"summons": 0, "fallen": 0, "damage": 0.0, "healing": 0.0,
+	"base_damage": 0.0, "damage_taken": 0.0, "energy_spent": 0.0,
+	"pulse_uses": 0, "pulse_damage": 0.0, "pulse_targets": 0, "pulse_interrupts": 0,
+}
 
 var auto_step := true
 var render_visuals := true
@@ -53,6 +59,11 @@ var _lines_valid := false
 var _pulse_cooldown := 0.0
 var _visual_rate_timer := 0.0
 var _defer_visual_positions := false
+var _report_opening: Dictionary = {}
+var _report_members: Dictionary = {}
+var _report_totals: Dictionary = REPORT_TOTAL_DEFAULTS.duplicate(true)
+var _report_frozen: Dictionary = {}
+var _report_fixture := false
 
 func _process(delta: float) -> void:
 	if auto_step:
@@ -107,6 +118,7 @@ func start(stage_id: String, roster: Array, levels: Dictionary = {}, study_modif
 	if render_visuals and ResourceLoader.exists("res://scripts/visuals/SpineActor.gd"):
 		_actor_script = load("res://scripts/visuals/SpineActor.gd")
 	_outcome = "running"
+	_reset_battle_report()
 	queue_redraw()
 
 func stop() -> void:
@@ -138,6 +150,11 @@ func stop() -> void:
 	_visual_rate_timer = 0.0
 	_defer_visual_positions = false
 	_outcome = "idle"
+	_report_opening.clear()
+	_report_members.clear()
+	_report_totals = REPORT_TOTAL_DEFAULTS.duplicate(true)
+	_report_frozen.clear()
+	_report_fixture = false
 	queue_redraw()
 
 func try_summon(id: String) -> bool:
@@ -154,6 +171,7 @@ func try_summon(id: String) -> bool:
 		return false
 	_energy = maxf(0.0, _energy - cost)
 	_cooldowns[id] = maxf(0.0, float(definition.get("cooldown", 1.0)))
+	_record_energy_spent(cost)
 	return true
 
 func try_pulse() -> bool:
@@ -173,10 +191,19 @@ func try_pulse() -> bool:
 			interrupted[int(actor.uid)] = true
 	_energy = maxf(0.0, _energy - PULSE_COST)
 	_pulse_cooldown = PULSE_COOLDOWN
-	_hits = _hits.filter(func(hit: Dictionary) -> bool: return not interrupted.has(int(hit.attacker)))
+	var cancelled_attacks: Dictionary = {}
+	_hits = _hits.filter(func(hit: Dictionary) -> bool:
+		var cancelled := interrupted.has(int(hit.attacker))
+		if cancelled and not bool(hit.get("heal", false)): cancelled_attacks[int(hit.attacker)] = true
+		return not cancelled)
+	_record_energy_spent(PULSE_COST)
+	if _battle_report_recording():
+		_report_totals.pulse_uses = int(_report_totals.pulse_uses) + 1
+		_report_totals.pulse_targets = int(_report_totals.pulse_targets) + affected.size()
+		_report_totals.pulse_interrupts = int(_report_totals.pulse_interrupts) + cancelled_attacks.size()
 	combat_event.emit("pulse", Vector2(center_x, GROUND_Y - 45.0), PULSE_RADIUS, 1)
 	for actor: Dictionary in affected:
-		_damage_unit(actor, PULSE_DAMAGE, "true", 1)
+		_damage_unit(actor, PULSE_DAMAGE, "true", 1, REPORT_PULSE_SOURCE)
 		if not bool(actor.alive):
 			continue
 		actor.stun_timer = maxf(float(actor.stun_timer), PULSE_STUN)
@@ -211,6 +238,68 @@ func get_snapshot() -> Dictionary:
 		"pulse_cooldown": _pulse_cooldown, "pulse_cost": PULSE_COST, "pulse_max_cooldown": PULSE_COOLDOWN,
 		"wave_pending": _waves.size(), "outcome": _outcome}
 
+func get_battle_report() -> Dictionary:
+	# All values are data snapshots; callers never receive live actor dictionaries.
+	return _report_frozen.duplicate(true) if not _report_frozen.is_empty() else _build_battle_report()
+
+func _reset_battle_report(fixture: bool = false) -> void:
+	_report_opening = {"stage_id": str(_stage.get("id", "")), "roster": _roster.duplicate(),
+		"levels": _levels.duplicate(true), "study_modifiers": _study_modifiers.duplicate(true)}
+	_report_members.clear()
+	for id: String in _roster:
+		_report_members[id] = {"id": id, "name": str(Catalog.unit(id).get("name", id)),
+			"level": clampi(int(_levels.get(id, 1)), 1, 20), "summons": 0, "fallen": 0,
+			"damage": 0.0, "healing": 0.0, "base_damage": 0.0, "damage_taken": 0.0}
+	_report_totals = REPORT_TOTAL_DEFAULTS.duplicate(true)
+	_report_frozen.clear()
+	_report_fixture = fixture
+
+func _build_battle_report() -> Dictionary:
+	var members: Array[Dictionary] = []
+	for id: String in _report_opening.get("roster", []):
+		if _report_members.has(id): members.append(_report_members[id].duplicate(true))
+	return {"stage_id": str(_report_opening.get("stage_id", "")), "outcome": _outcome,
+		"elapsed": _elapsed, "roster": _report_opening.get("roster", []).duplicate(),
+		"levels": _report_opening.get("levels", {}).duplicate(true),
+		"study_modifiers": _report_opening.get("study_modifiers", {}).duplicate(true),
+		"members": members, "totals": _report_totals.duplicate(true), "fixture": _report_fixture}
+
+func _battle_report_recording() -> bool:
+	return _outcome == "running" and _report_frozen.is_empty()
+
+func _record_energy_spent(amount: float) -> void:
+	if _battle_report_recording():
+		_report_totals.energy_spent = float(_report_totals.energy_spent) + maxf(0.0, amount)
+
+func _record_member_amount(id: String, key: String, amount: float) -> void:
+	if not _battle_report_recording() or not _report_members.has(id) or amount <= 0.0: return
+	var member: Dictionary = _report_members[id]
+	member[key] = float(member[key]) + amount
+	_report_totals[key] = float(_report_totals[key]) + amount
+
+func _record_player_spawn(actor: Dictionary) -> void:
+	if not _battle_report_recording() or int(actor.team) != 1 or not _report_members.has(str(actor.id)): return
+	var member: Dictionary = _report_members[str(actor.id)]
+	member.summons = int(member.summons) + 1
+	_report_totals.summons = int(_report_totals.summons) + 1
+
+func _record_player_fallen(actor: Dictionary) -> void:
+	if not _battle_report_recording() or int(actor.team) != 1 or not _report_members.has(str(actor.id)): return
+	var member: Dictionary = _report_members[str(actor.id)]
+	member.fallen = int(member.fallen) + 1
+	_report_totals.fallen = int(_report_totals.fallen) + 1
+
+func _record_effective_damage(target: Dictionary, amount: float, attacker_team: int, source_id: String) -> void:
+	if not _battle_report_recording() or amount <= 0.0: return
+	if int(target.team) == 1:
+		_record_member_amount(str(target.id), "damage_taken", amount)
+	elif attacker_team == 1:
+		if source_id == REPORT_PULSE_SOURCE:
+			_report_totals.damage = float(_report_totals.damage) + amount
+			_report_totals.pulse_damage = float(_report_totals.pulse_damage) + amount
+		else:
+			_record_member_amount(source_id, "damage", amount)
+
 func _frontline_x() -> float:
 	var player_front := player_x
 	var enemy_front := INF
@@ -233,6 +322,7 @@ func seed_performance_units(count: int = 24) -> bool:
 			enemies.append(id)
 	if enemies.is_empty():
 		return false
+	_reset_battle_report(true)
 	for actor: Dictionary in units:
 		if is_instance_valid(actor.visual):
 			actor.visual.free()
@@ -378,6 +468,7 @@ func _spawn(id: String, team: int, wave: Dictionary = {}) -> Dictionary:
 	_next_uid += 1
 	units.append(actor)
 	_unit_lookup[int(actor.uid)] = actor
+	_record_player_spawn(actor)
 	_lines_valid = false
 	if render_visuals and _actor_script != null:
 		var visual: Node2D = _actor_script.new()
@@ -483,10 +574,13 @@ func _resolve_hits() -> void:
 			continue
 		if bool(hit.base):
 			var amount := float(attacker.damage) * maxf(0.0, float(attacker.special.get("base_damage_multiplier", 1.0)))
+			var previous_base_hp := _player_hp if int(hit.target_team) == 1 else _enemy_hp
 			if int(hit.target_team) == 1:
 				_player_hp = maxf(0.0, _player_hp - amount)
 			else:
 				_enemy_hp = maxf(0.0, _enemy_hp - amount)
+			if int(attacker.team) == 1 and int(hit.target_team) == -1:
+				_record_member_amount(str(attacker.id), "base_damage", maxf(0.0, previous_base_hp - _enemy_hp))
 			combat_event.emit("base_hit", Vector2(player_x if int(hit.target_team) == 1 else enemy_x, GROUND_Y - 70.0), amount, int(attacker.team))
 			_check_finish()
 			continue
@@ -499,6 +593,8 @@ func _resolve_hits() -> void:
 			var amount := maxf(0.0, float(attacker.special.get("amount", attacker.damage)))
 			var restored := minf(amount, float(target.max_hp) - float(target.hp))
 			target.hp = minf(float(target.max_hp), float(target.hp) + amount)
+			if int(attacker.team) == 1:
+				_record_member_amount(str(attacker.id), "healing", maxf(0.0, restored))
 			combat_event.emit("heal", Vector2(float(target.x), GROUND_Y - 70.0), restored, int(attacker.team))
 			continue
 		var radius := float(attacker.aoe_radius)
@@ -509,7 +605,7 @@ func _resolve_hits() -> void:
 				if bool(other.alive) and int(other.team) != int(attacker.team) and absf(float(other.x) - float(target.x)) <= radius:
 					targets.append(other)
 		for victim: Dictionary in targets:
-			_damage_unit(victim, float(attacker.damage), str(attacker.damage_type), int(attacker.team))
+			_damage_unit(victim, float(attacker.damage), str(attacker.damage_type), int(attacker.team), str(attacker.id))
 			if bool(victim.alive) and str(attacker.special.get("type", "")) == "slow":
 				_apply_slow(victim, attacker)
 
@@ -539,16 +635,19 @@ func _refresh_slow_summary(actor: Dictionary) -> void:
 	actor.slow_ratio = ratio
 	actor.slow_timer = remaining
 
-func _damage_unit(target: Dictionary, raw: float, damage_type: String, attacker_team: int) -> float:
+func _damage_unit(target: Dictionary, raw: float, damage_type: String, attacker_team: int, report_source_id: String = "") -> float:
 	if not bool(target.get("alive", false)):
 		return 0.0
 	var effective_armor := float(target.get("magic_armor", float(target.armor) * 0.5)) if damage_type == "magic" else maxf(0.0, float(target.armor) * DamageTypes.armor_factor(StringName(damage_type)))
 	var amount := maxf(0.0, raw) * 50.0 / (50.0 + effective_armor)
+	var previous_hp := float(target.hp)
 	target.hp = maxf(0.0, float(target.hp) - amount)
+	_record_effective_damage(target, maxf(0.0, previous_hp - float(target.hp)), attacker_team, report_source_id)
 	combat_event.emit("hit", Vector2(float(target.x), GROUND_Y - 60.0), amount, attacker_team)
 	if float(target.hp) <= 0.0:
 		target.alive = false
 		target.corpse_timer = CORPSE_DURATION
+		_record_player_fallen(target)
 		_set_visual_state(target, "death", CORPSE_DURATION)
 		combat_event.emit("death", Vector2(float(target.x), GROUND_Y - 15.0), 0.0, int(target.team))
 		_visual_rate_timer = 0.0
@@ -580,6 +679,7 @@ func _check_finish() -> void:
 		for actor: Dictionary in units:
 			if bool(actor.alive):
 				_set_visual_state(actor, "idle")
+		_report_frozen = _build_battle_report()
 		battle_finished.emit(_outcome == "victory")
 
 func _unit_by_uid(uid: int) -> Dictionary:

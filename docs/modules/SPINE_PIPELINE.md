@@ -173,3 +173,7 @@ Godot主Window禁止set visible=false，后台工具也不能调用它（FS-024�
 复现使用F:/godotProject/FantasySiege/build下的新Git检出，起点记录实际HEAD；初始不得有.godot、assets/actors、assets/portraits或bin。明确只读D69源与原生库捐赠目录；不借主项目缓存、已派生角色或肖像。完成全流程后，在检出自己的exports/windows下创建新空学习包，包内后台/离屏/完整旅程验证；旧项目/D69读取前后校验，受限依赖和衍生文件不入Git。纯Python临时目录验证转换拒绝、清单不一致、缺ID/失败ID、步骤顺序与失败停止；实际Godot由root串行调度。资源盘点/转换/原生/图像/性能范围仍分开，前台Main24/64/2倍速保持用户延期。
 
 制作导入也须复用严格致命错误/退出泄漏日志判断；退出码0不能掩盖ObjectDB泄漏。写入角色和本地源档案之前先验证解析后的目标仍在本项目的对应目录，拒绝目录链接把写入转到旧工程或外部源包。
+
+2026-11-20干净检出实际验收完成：从本项目Git提交04244668创建build/repro-04244668，初始.godot、actors、portraits和bin全部不存在。完整bootstrap十阶段成功，21套作者探针更新后冻结配方，十二肖像重新制作/导入及只读复核通过。当前atlas实际引用的84份派生资源与主项目逐字节一致，105个D69原始输入和4个捐赠运行库文件前后SHA不变，档案/来源哈希105项相符；旧工程336文件与Git状态保持不变。21完整配方语义一致，原字节差异实证仅LF/CRLF，两个真实SHA各自保留，未为凑哈希重写资源。主项目097旧纹理别名未被图集引用，未借入新检出。
+
+该检出自行构建exports/windows/FantasySiege-0.1.3.0-rebuilt-1，无主项目缓存/肖像复制。包CPU12/8558、21来源/220原始动作、十二肖像、双播放模式、2624零差像素、Art54/6973零文字溢出和独立完整旅程988均通过；80份当前运行日志无致命错误或泄漏。Python全量130项中129通过、1因Windows符号链接创建权限跳过，5类目录junction和9类hardlink哨兵测试实测通过。报告reports/rebuild_candidate_0.1.3.json，详细原文件/阶段/快照SHA证据本地保留。首次独立汇总把builder新生成reports/.gdignore误认为复制来源文件，失败报告保留；修正来源分类后重核，包及载荷manifest门禁未更改。foreground/performance/commercial/delivery_ready仍false。

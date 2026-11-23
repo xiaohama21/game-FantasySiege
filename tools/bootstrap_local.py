@@ -7,6 +7,9 @@ import qa_launch
 from run_checks import fatal_lines, joined_output
 ROOT = Path(__file__).resolve().parents[1]
 IDS = '097,312,314,072,163,084,018,168,253,254,046,285,271,110,023,147,069,057,059,036,094'
+IMPORT_TOOLS = ('bootstrap_local.py', 'spine_pipeline.py', 'spine_upgrade_38_to_43.py',
+                'run_checks.py', 'qa_launch.py')
+AUTHORING_TOOLS = IMPORT_TOOLS + ('tune_visuals.py', 'verify_spine.py', 'generate_portraits.py')
 
 
 class BootstrapError(RuntimeError):
@@ -21,6 +24,19 @@ def _output_text(value):
 
 def _sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def tool_dependency_context(project, full_authoring=True):
+    """Validate the actual executable dependency closure before any build writes."""
+    project = Path(project).absolute()
+    required = AUTHORING_TOOLS if full_authoring else IMPORT_TOOLS
+    result = {}
+    for filename in required:
+        path = qa_launch.assert_safe_path(project/'tools'/filename, project, 'tools')
+        if not path.is_file():
+            raise ValueError('Missing bootstrap tool dependency: tools/' + filename)
+        result['tools/' + filename] = _sha(path)
+    return result
 
 def _editor_import(godot, phase):
     qa_launch.preflight_project(ROOT, gameplay=False)
@@ -216,6 +232,10 @@ def main(argv=None):
     parser.add_argument('--import-only',action='store_true',help='Only two-phase import of assets already copied into this project/package')
     args = parser.parse_args(argv)
     qa_launch.preflight_project(ROOT, gameplay=False)
+    try:
+        tool_dependencies = tool_dependency_context(ROOT, not args.import_only)
+    except (OSError, ValueError) as failure:
+        parser.error(str(failure))
     for name in ('source_root','runtime_from','godot'):
         value = getattr(args,name)
         if value is not None: setattr(args,name,value.resolve())
@@ -235,6 +255,7 @@ def main(argv=None):
               'mode':'import_only' if args.import_only else ('full_authoring' if args.godot else 'conversion_only'),
               'run_directory':str(run_directory.resolve()),'status':'running','ready':False,'passed':False,
               'frozen_visuals_sha256':None,'stages':[],'error':None,
+              'tool_dependencies_sha256':tool_dependencies,
               'scope':'Local restricted dependencies only; foreground play and performance are separate acceptance items'}
     _write_report(report)
     command = lambda filename,*options: [sys.executable,str(ROOT/'tools'/filename),*options]

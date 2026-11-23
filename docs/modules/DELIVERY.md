@@ -1,6 +1,7 @@
 # Windows本地学习版交付
 
-> v0.22 · 2026-11-23 · GDD v0.5.12 / 程序0.1.3.0
+> v0.23 · 2026-11-23 · GDD v0.5.13 / 程序0.1.3.0
+> v0.23：统一当前与历史入口，明确源码/包内命令，补完整制作工具闭包及当前无缓存制作验证。
 > v0.22：candidate12后台通过、离屏首窗无效拒绝并冻结；新候选核对后台初始化/助手SHA后独立复验。
 > v0.21：首次启动隔离和独立引擎日志纳入包门禁；新进程初读/拒绝及真实用户目录哈希待验，candidate11冻结。
 > v0.20：Art56新设置失败/临时返回两图与SettingsPanel指纹，增加列表/事务/槽位/冷重读回归；candidate9冻结。
@@ -34,7 +35,7 @@
 
 verify_package的background阶段运行本包十CPU、21/220原生探针与静态payload检查；报告单独写package_background.json，并明确delivery_ready=false，不冒充最终包验证。隐藏窗口可用于离屏肖像/界面图像生成，不能作为性能数据。完整验收render命令读取本包project.godot实际默认backend，不能硬编码GL代替最终生产配置；Main24/64报告须核对采样300帧、完整焦点/正常窗口、真显卡/可见/存活/native/HUD和当前backend。
 
-offscreen阶段单独写package_offscreen.json，串行执行本包生产SpinePlayback background、非托管对照unmanaged background、SpineMeshRedraw background和隐藏ArtReview；全部图形子进程SW_HIDE，不激活桌面。初始及结束均复核payload与十二肖像哈希。两套Playback须background=true、performance_measured=false、真实Vulkan驱动、主窗/DisplayServer均MODE_MINIMIZED且21来源验证期间保持此状态；Mesh还须全部2624次取景均在有效最小化主窗中完成、两1000×760透明2D子视口、21来源220动作及RGBA零差异。ArtReview须主窗最小化、50份1280×720取景与对应文件哈希、十二肖像、零文字溢出和音频排空；八张art_study_locked/unowned/ready/base/sweep/heal/siege/slow以及art_hero_studied、art_gallery_studied必须分别存在，核对研修后英雄详情和图鉴同源属性、技能读数，新增18张敌情取景要求见下文。只检查本阶段生成的日志和报告，不要求未执行的完整runner或MainFlow；已有background原生探针可另行审计并明确标作未重跑证据。
+offscreen阶段单独写package_offscreen.json，串行执行本包生产SpinePlayback background、非托管对照unmanaged background、SpineMeshRedraw background和隐藏ArtReview；全部图形子进程请求SW_HIDE启动，并在原生窗口就绪后确认最小化再取景；这不证明操作系统焦点在启动全程未变。初始及结束均复核payload与十二肖像哈希。两套Playback须background=true、performance_measured=false、真实Vulkan驱动、主窗/DisplayServer均MODE_MINIMIZED且21来源验证期间保持此状态；Mesh还须全部2624次取景均在有效最小化主窗中完成、两1000×760透明2D子视口、21来源220动作及RGBA零差异。ArtReview须主窗最小化、50份1280×720取景与对应文件哈希、十二肖像、零文字溢出和音频排空；八张art_study_locked/unowned/ready/base/sweep/heal/siege/slow以及art_hero_studied、art_gallery_studied必须分别存在，核对研修后英雄详情和图鉴同源属性、技能读数，新增18张敌情取景要求见下文。只检查本阶段生成的日志和报告，不要求未执行的完整runner或MainFlow；已有background原生探针可另行审计并明确标作未重跑证据。
 
 研修养成阶段将candidate4/GDD0.4.9/schema2及其22图、五CPU和988项旅程结果作为旧基线冻结，不就地改包。GDD0.5.4/schema3研修源码验收范围为八CPU（原五项加StudyProfileSmoke、StudyCombatSmoke、StudyUISmoke）及十full（八CPU、MainFlow、CampaignJourney）。研修用例报告同时核对studies.json、UnitStats/SiegeBattle/单位配置或UI脚本指纹，开跑前后这些输入不得变化，包内再次核对报告与真实bundle字节。构建仍复制整个resources/scripts/tests，因此研修配置、实现和专用用例随新包提供；没有构建和运行的增量不承接candidate4通过结论。该增量曾运行的30图报告保留原范围，追加详情/图鉴取景后以新32图报告重验，不改写旧通过依据；新敌情增量采用下文CPU10/full12/Art50范围。
 
@@ -150,3 +151,12 @@ candidate11自行导入并验包：CPU12/8919、StudyUI1514（导航327、6种to
 窗口设置在root ready后的唯一请求完成，原生两API确认后才取景，清理等待也纳入监控。12肖像在源码重新渲染24/24最小化取景通过，PNG不变；新制作manifest随包冻结，包内只读检查不重写资产。候选12因首窗0/0被拒绝，包与全部失败资料保留，未放宽门禁。993与复跑997差异来自四个原本不存在的测试档清理项，实际九战和养成结果一致。
 
 启动“开始游戏.cmd”可体验本地学习版。保存位置%APPDATA%\FantasySiege；QA独立tests/.user和引擎日志。代码/设计/工具在0.1.3同步，未合并main。此增量已关闭首次隔离缺口，完整前台MainFlow/24/64/2倍速及商业许可仍未验收，不能称最终交付或商业就绪。总证据reports/startup_candidate_0.1.3.json；本节是冻结包之后的验收记录，包内原设计源字节不改。
+
+
+## 当前交付入口与制作闭包
+
+当前可运行候选13，历史基础包/候选及失败证据只保留历史标签；README区分源码PS命令和包内Python命令。源码默认build_local会拒绝已有非空目标，须指定新空Destination，不能覆盖任何冻结候选。
+
+完整bootstrap实际调用spine_pipeline、spine_upgrade、tune_visuals、verify_spine、generate_portraits以及run_checks/qa_launch辅助器，显式构建清单必须形成这一闭包；缺工具在首个制作写入前失败。当前待验增量将tune_visuals补入新包，并从无actors/bin/portraits/.godot的Git检出完整制作，记录来源/原生库哈希、作者冻结SHA、24次肖像取景、第三编辑器导入及只读复核。旧转换器两个文件未变，既有105输入/84派生证据仍有效，新的组合绑定必须实际验证。
+
+后台宿主初始化前可能显示/聚焦普通窗口，现有隐藏启动请求不构成全程无焦点变化的证据；只能按确认后的采样窗口状态报告最小化通过。前台与人工操作仍延期。

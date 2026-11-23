@@ -3,17 +3,17 @@
   "state": "complete",
   "suite": "single",
   "selected_cases": [
-    "CampaignJourney"
+    "GuideUISmoke"
   ],
   "cases": [
     {
-      "case": "CampaignJourney",
+      "case": "GuideUISmoke",
       "passed": true,
       "errors": [],
       "exit_code": 0,
-      "started_at": "2026-11-23T06:18:20.967+00:00",
-      "started_ns": 1795414700967192000,
-      "report": "reports/campaign_journey.json",
+      "started_at": "2026-11-23T08:38:15.493+00:00",
+      "started_ns": 1795423095493356200,
+      "report": "reports/guide_ui_smoke.json",
       "program_version": "0.1.3.0",
       "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
       "launch_mode": "headless_verbose",
@@ -24,47 +24,54 @@
         "--verbose",
         "--headless",
         "--script",
-        "res://tests/CampaignJourney.gd",
+        "res://tests/GuideUISmoke.gd",
         "--log-file",
-        "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\CampaignJourney-20261123T061821125268-2dde5ac626eb\\engine.log",
+        "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\GuideUISmoke-20261123T083815564551-8f103a9d08b2\\engine.log",
         "--",
         "--qa-save-root",
-        "F:\\godotProject\\FantasySiege\\tests\\.user\\qa\\CampaignJourney-20261123T061821125268-2dde5ac626eb",
+        "F:\\godotProject\\FantasySiege\\tests\\.user\\qa\\GuideUISmoke-20261123T083815564551-8f103a9d08b2",
         "--qa-startup-report",
-        "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\CampaignJourney-20261123T061821125268-2dde5ac626eb\\startup.json",
+        "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\GuideUISmoke-20261123T083815564551-8f103a9d08b2\\startup.json",
         "--qa-background"
       ],
-      "artifact_sha256": {},
-      "finished_ns": 1795414796844508500,
-      "finished_at": "2026-11-23T06:19:56.844+00:00",
-      "duration_seconds": 95.8773165,
+      "artifact_sha256": {
+        "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+        "gdd_sha256": "5dd426f62c1315b5c7a9bb96598b265eb65be7207a9f7f57da439ea4d45b1daa",
+        "main_sha256": "81a3355d69c050cb45288beed6c9f609c40a60ede61e677d4929afbe1f1951a8",
+        "guide_panel_sha256": "0f037d816f492a3d103021a41886bc3b4e9e0bd4ce5f514e0d8db7ce965ce88b",
+        "user_prefs_sha256": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a",
+        "gdd_version": "0.5.13"
+      },
+      "finished_ns": 1795423099440392400,
+      "finished_at": "2026-11-23T08:38:19.440+00:00",
+      "duration_seconds": 3.9470362,
       "qa_startup": {
         "gameplay": true,
         "project_root": "F:\\godotProject\\FantasySiege",
-        "save_root": "F:\\godotProject\\FantasySiege\\tests\\.user\\qa\\CampaignJourney-20261123T061821125268-2dde5ac626eb",
-        "startup_report": "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\CampaignJourney-20261123T061821125268-2dde5ac626eb\\startup.json",
-        "engine_log": "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\CampaignJourney-20261123T061821125268-2dde5ac626eb\\engine.log",
-        "started_ns": 1795414701255646300,
+        "save_root": "F:\\godotProject\\FantasySiege\\tests\\.user\\qa\\GuideUISmoke-20261123T083815564551-8f103a9d08b2",
+        "startup_report": "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\GuideUISmoke-20261123T083815564551-8f103a9d08b2\\startup.json",
+        "engine_log": "F:\\godotProject\\FantasySiege\\reports\\qa_startup\\GuideUISmoke-20261123T083815564551-8f103a9d08b2\\engine.log",
+        "started_ns": 1795423095634805400,
         "script_sha256": {
           "scripts/core/QAStartupContext.gd": "fee68d14c5d2432cd6259b07b3b25ebe4a7b4962c2635b631fcfeed3925ec49f",
           "scripts/core/UserPrefs.gd": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a",
           "scripts/core/ProfileStore.gd": "9eba24d0dbc3d7a459710a8f762b7bc5c43450dccee0ef7b4bd7cb467cf751b4"
         },
-        "startup_report_sha256": "e1f89b74005af155227a90277128be59691b1e878f11537d646d4ce0eec04c08",
-        "engine_log_sha256": "560b7c92a2a71b2c5c1d52be679ed9814ac8d4aef1d34d93411b89f620886330",
+        "startup_report_sha256": "035427bafc6dddbd751e12450bc81a74b6449e480b7ea2b2064141ef841d7a41",
+        "engine_log_sha256": "29c58407d79618c647bff4f92060d22aee731afe27fb23f65929edadf50ff6b8",
         "engine_fatal_log_lines": [],
         "errors": [],
         "passed": true
       },
       "fatal_log_lines": [],
       "diagnostic_log_lines": [],
-      "report_mtime_ns": 1795414796699741700,
-      "report_sha256": "7b564f84c338aaf3379450760f646e13b90d04c057ef4bb35079fbb9fb8c5075",
-      "checks": 997
+      "report_mtime_ns": 1795423099336729000,
+      "report_sha256": "2b7ffe734f9144f2f477dd3d11988b4b9b42d93180d7d5f551888cfb0f806fec",
+      "checks": 137
     }
   ],
   "errors": [],
-  "started_at": "2026-11-23T06:18:20.835+00:00",
+  "started_at": "2026-11-23T08:38:15.421+00:00",
   "project_root": "F:\\godotProject\\FantasySiege",
   "reject_script_errors": true,
   "reject_object_leaks": true,
@@ -74,5 +81,5 @@
   "rendered_launch_scope": "production startup logging",
   "program_version": "0.1.3.0",
   "project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
-  "finished_at": "2026-11-23T06:19:57.302+00:00"
+  "finished_at": "2026-11-23T08:38:19.551+00:00"
 }

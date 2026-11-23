@@ -41,6 +41,10 @@ class PackageVerificationBoundaries(unittest.TestCase):
                                'visuals/frame_group_count=2\nvisuals/critical_instance_limit=12\n')
         (self.root / 'project.godot').write_text(self.project_source)
         qa_mock.scripts(self.root)
+        for filename in verify_package.bootstrap_local.AUTHORING_TOOLS:
+            path = self.root / 'tools' / filename
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('mock bootstrap dependency: ' + filename, encoding='utf-8')
 
     def suite_fixture(self, suite='full'):
         cases = []
@@ -130,7 +134,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
                       'rune_medic', 'rivet_gunner', 'moon_mage', 'star_hammer', 'spirit_beast']
         base = ['art_camp'] + ['art_hero_' + key for key in identities] + ['art_hero_collection_lower', 'art_squad', 'art_squad_lower',
                 'art_chapter_1_left', 'art_chapter_1_right', 'art_chapter_2_left', 'art_chapter_2_right', 'art_gallery_hero', 'art_gallery_boss']
-        names = base + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES) + list(verify_package.SETTINGS_ART_CAPTURES)
+        names = base + list(verify_package.STUDY_ART_CAPTURES) + list(verify_package.BRIEFING_ART_CAPTURES) + list(verify_package.RESULT_ART_CAPTURES) + list(verify_package.SETTINGS_ART_CAPTURES) + list(verify_package.GUIDE_ART_CAPTURES)
         units_path = self.root / 'resources/units.json'
         units_path.parent.mkdir(parents=True, exist_ok=True)
         units_path.write_text(json.dumps({key: {'playable': True} for key in identities}), encoding='utf-8')
@@ -145,14 +149,31 @@ class PackageVerificationBoundaries(unittest.TestCase):
         extra_hashes = {}
         for key, relative in (('briefings_sha256', 'resources/briefings.json'), ('briefing_script_sha256', 'scripts/core/BattleBriefing.gd'),
                               ('main_sha256', 'scripts/ui/Main.gd'), ('stat_badge_sha256', 'scripts/ui/StatBadge.gd'),
-                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd'), ('settings_panel_sha256', 'scripts/ui/SettingsPanel.gd')):
+                              ('battle_script_sha256', 'scripts/combat/SiegeBattle.gd'), ('settings_panel_sha256', 'scripts/ui/SettingsPanel.gd'),
+                              ('guide_panel_sha256', 'scripts/ui/GuidePanel.gd')):
             path = self.root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
             extra_hashes[key] = verify_package.sha(path)
         return {'root_window_mode': 1, 'display_window_mode': 1, 'background_host_setup': qa_mock.background_setup(self.root), 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2, 'background_capture_attempts': len(captures), 'background_host_valid_captures': len(captures), 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
                 'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes,
-                **self.font_fixture(), **self.navigation_fixture(captures, identities)}
+                **self.font_fixture(), **self.navigation_fixture(captures, identities),
+                'guide_art_verified': True, 'guide_capture_records': self.guide_fixture()}
+
+    def guide_fixture(self):
+        controls = {'heading': [358, 192, 563, 44], 'counter': [358, 235, 562, 25],
+                    'body': [358, 271, 564, 153], 'story': [358, 429, 564, 43],
+                    'previous': [358, 485, 145, 39], 'skip': [565, 485, 145, 39],
+                    'next': [757, 485, 165, 39]}
+        text = {key: [rect[0], rect[1], rect[2], 25] for key, rect in controls.items() if key in ('heading', 'counter', 'body', 'story')}
+        return [{'capture': name, 'page': page, 'title': 'Visible guide title',
+                 'body': 'Visible guide rule', 'counter': '操作指南 %d / 3' % (page + 1),
+                 'story': 'Visible stage story', 'starting': True, 'paused': True,
+                 'heading_weight': 600, 'body_weight': 400, 'guide_controls_fit_verified': True,
+                 'no_overlap_verified': True, 'panel_rect': [330, 170, 620, 370],
+                 'control_rects': controls, 'text_rects': text,
+                 'button_rects': {key: controls[key] for key in ('previous', 'skip', 'next')}}
+                for page, name in enumerate(verify_package.GUIDE_ART_CAPTURES)]
 
     def background_smoke_fixture(self):
         document = self.root / 'docs/GAME_DESIGN.md'
@@ -561,9 +582,34 @@ class PackageVerificationBoundaries(unittest.TestCase):
         (self.root / 'reports/runtime/art_camp.png').write_bytes(b'changed')
         self.assertTrue(verify_package.offscreen_check(good, 'art_review', self.root))
 
+    def test_first_visit_guide_art_requires_three_pages_current_script_and_native_weights(self):
+        good = self.art_fixture()
+        self.assertEqual(verify_package.guide_art_check(good, self.root), [])
+        for key, value in (('guide_panel_sha256', 'old'), ('guide_art_verified', False), ('guide_capture_records', [])):
+            with self.subTest(key=key):
+                self.assertTrue(verify_package.guide_art_check({**good, key: value}, self.root))
+        for key, value in (('page', 1.0), ('paused', False), ('starting', False), ('heading_weight', 400),
+                           ('body_weight', 600), ('counter', '操作指南1/2'), ('story', ''), ('no_overlap_verified', False)):
+            with self.subTest(key=key):
+                good = self.art_fixture()
+                good['guide_capture_records'][0][key] = value
+                self.assertTrue(verify_package.guide_art_check(good, self.root))
+
+    def test_guide_art_rectangles_cannot_hide_clipped_or_overlapping_content(self):
+        for group, key, value in (('text_rects', 'story', [358, 271, 100, 20]),
+                                  ('button_rects', 'next', [1250, 485, 165, 39]),
+                                  ('control_rects', 'body', [358, 271, float('nan'), 153])):
+            with self.subTest(group=group, key=key):
+                good = self.art_fixture()
+                good['guide_capture_records'][0][group][key] = value
+                self.assertTrue(verify_package.guide_art_check(good, self.root))
+        good = self.art_fixture()
+        bad = {**good, 'screenshots': 56, 'captures': good['captures'][:56]}
+        self.assertTrue(verify_package.offscreen_check(bad, 'art_review', self.root))
+
     def test_offscreen_art_rejects_old_counts_and_missing_studied_views(self):
         good = self.art_fixture()
-        self.assertEqual(good['screenshots'], 56)
+        self.assertEqual(good['screenshots'], 59)
         for count in (22, 30, 32, 50, 54):
             with self.subTest(old_count=count):
                 old = {**good, 'screenshots': count, 'captures': good['captures'][:count]}

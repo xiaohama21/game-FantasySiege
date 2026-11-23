@@ -96,6 +96,30 @@ class StrictRunnerBoundaries(unittest.TestCase):
         with patch.object(run_checks.subprocess, "run", side_effect=callback or self.success):
             return run_checks.run_case(run_checks.CASES[name], Path("mock-godot.exe"), run_checks.project_context(), verbose_render_diagnostics)
 
+    def test_guide_case_is_in_cpu_suite_and_requires_current_binding_and_no_foreground_claim(self):
+        self.assertIn('GuideUISmoke', run_checks.CPU_CASES)
+        case = run_checks.CASES['GuideUISmoke']
+        result = self.run_case(name=case.name)
+        self.assertTrue(result['passed'], result['errors'])
+        self.assertEqual(case.final_phase, 'complete')
+        self.assertEqual(set(result['artifact_sha256']), {'project_sha256', 'gdd_sha256', 'gdd_version', 'main_sha256', 'guide_panel_sha256', 'user_prefs_sha256'})
+
+    def test_guide_missing_rules_or_preference_guard_cannot_pass(self):
+        case = run_checks.CASES['GuideUISmoke']
+        for key, value in (('pages_verified', 2), ('guide_preference_failure_verified', False),
+                           ('guide_cold_reload_verified', False), ('guide_exit_layer_verified', False),
+                           ('foreground_verified', True), ('input_device_verified', True),
+                           ('guide_panel_sha256', 'stale'), ('gdd_sha256', 'stale')):
+            with self.subTest(key=key):
+                def callback(command, **kwargs):
+                    qa_mock.emit(command, self.root)
+                    data = self.payload(case)
+                    data[key] = value
+                    self.write_report(case, data)
+                    return subprocess.CompletedProcess(command, 0, stdout=case.marker + ' completed\n', stderr='')
+                result = self.run_case(callback, name=case.name)
+                self.assertFalse(result['passed'])
+
     def run_main(self, arguments, callback=None):
         with patch.object(run_checks.subprocess, "run", side_effect=callback or self.success), redirect_stdout(io.StringIO()):
             code = run_checks.main(["--godot", "mock-godot.exe", *arguments])
@@ -450,7 +474,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         self.assertFalse(summary["passed"])
         self.assertTrue(summary["errors"])
 
-    def test_default_suite_is_all_ten_cpu_cases_and_running_summary_is_not_passed(self):
+    def test_default_suite_is_all_thirteen_cpu_cases_and_running_summary_is_not_passed(self):
         names = []
         def inspect(command, **kwargs):
             case = self.case_for(command)
@@ -464,7 +488,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         code, summary = self.run_main([], inspect)
         self.assertEqual(code, 0, summary)
         self.assertEqual(tuple(names), run_checks.CPU_CASES)
-        self.assertEqual(len(names), 12)
+        self.assertEqual(len(names), 13)
         self.assertEqual(summary["suite"], "logic")
 
     def test_visual_suite_adds_mainflow_and_headless_campaign(self):

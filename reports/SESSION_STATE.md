@@ -102,3 +102,14 @@ Python84项PASS；旧项目336文件/Git状态核验PASS。前台MainFlow、Main
 先设计GDD0.5.7/BATTLE_REPORT0.1/CORE0.18/EXPERIENCE0.11/UI_ART0.19/ROADMAP0.9，再实现实际有效对兵/治疗/攻城、召唤/阵亡/英魂承伤、成功支出与脉冲人次/真实打断记录；结束冻结、开局深拷贝、新局归零，不改战斗数值/存档schema。结算同屏奖励/贡献，重试成功留完整回执，下一关/本关敌情/编队安全导航；图鉴最终治疗/间隔/魔抗/首领phase名称比例三倍率及准确词条、选择器模态/细生命条与旧toast修复。BUGS0.25 FS041–046已记。
 Source新战报190与ResultUI221 PASS，首次非class测试推断类型编译错误日志保留，修test类型后通过；sourceCPU12唯一旧Briefing硬编码0.5.6失败报告保留，改动态同项目版本后2945复测PASS。Python109PASS，SourceArt54/6973/零溢出通过。干净candidate8双导入、包内CPU12/8558、native21/220/肖像/payload、双播放/2624零差/Art54-6973、独立旅程988全部PASS。43日志无致命/泄漏，source/package核心字节匹配，旧项目336哈希/Git状态不变。
 当前包 F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-8/开始游戏.cmd，证据reports/battle_report_candidate_0.1.3.json与包内checks_background_frozen/checks_campaign_frozen等。candidate7及旧包均保留。准备提交推0.1.3；同步最终SHA见remote_sync_latest_local.json及Git，不把交付作为合并main时机。本轮未CUA/未前台性能；MainFlow/Main24/Main64/2x/full14仍延期，继续原目标，不能标完整学习版或商用发行已完成。
+
+
+## 2026-11-23 候选13与当前完整覆盖补验
+
+持续目标active，分支0.1.3/程序0.1.3.0；候选13来源0d601c0/GDD0.5.12，已冻结并通过后台CPU12/8919、QA8/98、窗口时序9、21来源220动作、2624零差像素、Art56/13642和独立九战旅程993。177 Python测试176通过/1文件symlink权限跳过；真实junction/hardlink都过。12肖像新宿主24/24取景、清理音频均过，PNG与旧字节一致；105包内日志无致命错误/泄漏，旧工程336/Git与main5340a0b不变。候选12首窗失败和历史报告保持冻结。
+
+当前启动F:/godotProject/FantasySiege/exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd。程序修复0d601c0已推送；后补文档f83c809的push先reset后连接失败，尚未确认远程；本次proxy pull失败、direct pull Empty reply，ls-remote也连接失败，不能虚称拉取成功。
+
+当前设计推进GDD0.5.13：原完整目标审计确认包漏tune_visuals（FS064），需补制作工具闭包；当前完整空检出bootstrap尚缺组合证据；首关三页指南在CPU12/Art56中跳过，需GuideUISmoke/Art59补当前字体和保存保护。真实前台MainFlow/24/64/2倍速及人工听感仍按用户延期，不再反复请求、不将后台证据升级。
+
+后台运行统一tools/run_checks.py（QA初读与--log-file）及verify_package.py --phase background/offscreen，不要直接使用历史未隔离Godot --script命令。完整检出制作使用bootstrap_local.py --source-root <只读D69> --runtime-from <只读bin> --godot <控制台exe>；需保持转换、作者、配方冻结、肖像和只读复核顺序。暂无GPU进程在运行，新测试代码仍由代理实现，之后所有Godot/GPU由root串行。

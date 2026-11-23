@@ -11,6 +11,7 @@ var counter: Label
 var previous: Button
 var next: Button
 var closing := false
+var input_allowed: Callable
 const TITLES := ["点亮第一支队伍", "巡视更远的战场", "抓住反攻的窗口"]
 const TEXTS := [
 	"能量会自动恢复。先召唤低费前排，再补远程伙伴。\n英魂会自行前进与交战，同一英魂可以重复召唤。\n点击下方卡片，或按 1—8 召唤对应位置的英魂。",
@@ -73,15 +74,20 @@ func refresh() -> void:
 	next.text = "开始远征" if page == 2 and starting else "关闭指南" if page == 2 else "下一页"
 
 func _step(direction: int) -> void:
+	if not _can_interact(): return
 	page = clampi(page + direction, 0, 2)
 	refresh()
 
 func _next() -> void:
+	if not _can_interact(): return
 	if page < 2: _step(1)
 	else: close()
 
 func close() -> void:
-	if closing: return
+	if not _can_interact(): return
 	closing = true
 	closed.emit()
 	queue_free()
+
+func _can_interact() -> bool:
+	return not closing and (not input_allowed.is_valid() or bool(input_allowed.call()))

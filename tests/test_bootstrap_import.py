@@ -6,12 +6,20 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 import bootstrap_local
 
+
+def mock_tools(project):
+    for filename in bootstrap_local.AUTHORING_TOOLS:
+        path = project/'tools'/filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text('mock tool dependency: '+filename, encoding='utf-8')
+
 class BootstrapImportRestore(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.actor = self.root/'assets/actors/084'
         self.actor.mkdir(parents=True)
+        mock_tools(self.root)
         self.native = ['actor.atlas','actor.spine-json','actor-data.tres']
         for name in self.native: (self.actor/name).write_text('original-'+name)
         (self.actor/'body.png').write_text('texture-input')
@@ -101,6 +109,7 @@ class BootstrapFullAuthoring(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.source = self.root/'read-only-source'
         self.source.mkdir()
+        mock_tools(self.root)
         (self.root/'resources').mkdir()
         (self.root/'reports').mkdir()
         self.ids = bootstrap_local.IDS.split(',')

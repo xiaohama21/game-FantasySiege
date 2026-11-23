@@ -4,9 +4,9 @@
 
 ## 当前状态
 
-- GDD v0.5.12；程序0.1.3.0在分支0.1.3持续开发。candidate13已通过首次启动隔离8进程/98项、后台CPU12/8919、窗口启动9项、21来源220动作、2624零差像素、Art56/13642及独立旅程993项；Noto Sans SC实际400/600和12张同源肖像不变。原目标保持运行，前台MainFlow/24/64/2倍速性能仍延期。
+- GDD v0.5.13（设计待验增量）；程序0.1.3.0在分支0.1.3持续开发。candidate13已通过首次启动隔离8进程/98项、后台CPU12/8919、窗口启动9项、21来源220动作、2624零差像素、Art56/13642及独立旅程993项；Noto Sans SC实际400/600和12张同源肖像不变。原目标保持运行，前台MainFlow/24/64/2倍速性能仍延期。
 
-- 当前本地学习包：exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd。程序存档位于%APPDATA%\FantasySiege；QA首次自动加载即使用项目tests/.user，全部验收引擎日志独立。代码/工具/设计已同步0.1.3，main未推进；受限素材和原生库仍仅本地。报告reports/startup_candidate_0.1.3.json。candidate12首窗失效及所有历史候选/失败证据冻结保留。
+- 当前本地学习包：exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd。程序存档位于%APPDATA%\FantasySiege；QA首次自动加载即使用项目tests/.user，全部验收引擎日志独立。程序修复已同步0.1.3，最后文档/报告提交的远程状态因网络失败待确认；main未推进；受限素材和原生库仍仅本地。报告reports/startup_candidate_0.1.3.json。candidate12首窗失效及所有历史候选/失败证据冻结保留。
 - 保留关羽、赵云、诸葛亮、貂蝉、吕布；其他角色及敌人从Spine重新设计。
 - 十二英魂、九种敌军、两章八关；四次首通解锁、首通/重访收益、三属性训练、八人编队、schema1/2至3迁移与独立存档已完成。
 - 星灯远征美术体系；所有角色拥有力量、敏捷、智力与一个主属性。
@@ -17,9 +17,9 @@
 
 - 干净检出04244668已从源包完整重建角色/十二头像并自行构建学习包：CPU12/8558、Art54/6973、旅程988通过。105原文件、4运行库和旧工程336文件保持不变；证据见reports/rebuild_candidate_0.1.3.json，前台/性能仍延期。
 
-- 字体按用户反馈改为Noto Sans SC正文400、标题/按钮/数字600。candidate-9包内CPU12/8558、Art54/13087零缺字溢出、旅程988及原生/像素检查通过，启动exports/windows/FantasySiege-0.1.3.0-candidate-9/开始游戏.cmd；证据reports/font_candidate_0.1.3.json。当前网络同步失败，代码与报告已本地提交，前台/性能仍延期。
+- 历史字体增量（candidate9）：按用户反馈改为Noto Sans SC正文400、标题/按钮/数字600。candidate-9包内CPU12/8558、Art54/13087零缺字溢出、旅程988及原生/像素检查通过，启动exports/windows/FantasySiege-0.1.3.0-candidate-9/开始游戏.cmd；证据reports/font_candidate_0.1.3.json。该次网络同步失败，之后的程序修复已同步，前台/性能仍延期。
 
-- 界面导航增量candidate11：CPU12/8919、Art56/13639、旅程988及原生/像素范围通过，当前启动exports/windows/FantasySiege-0.1.3.0-candidate-11/开始游戏.cmd。证据reports/navigation_candidate_0.1.3.json；首次自动加载/引擎日志隔离缺口已发现并待补，前台与性能未验收。
+- 历史界面导航增量（candidate11）：CPU12/8919、Art56/13639、旅程988及原生/像素范围通过，历史启动exports/windows/FantasySiege-0.1.3.0-candidate-11/开始游戏.cmd。证据reports/navigation_candidate_0.1.3.json；该候选首次自动加载/引擎日志隔离缺口当时待补，candidate13已补齐，前台与性能未验收。
 
 总纲：[docs/GAME_DESIGN.md](docs/GAME_DESIGN.md)，排期：[ROADMAP](docs/modules/ROADMAP.md)，角色/敌人/素材/关卡关联：[CONTENT_PLAN](docs/modules/CONTENT_PLAN.md)，双路线规则：[TRAINING](docs/modules/TRAINING.md)，战前准备：[BATTLE_BRIEFING](docs/modules/BATTLE_BRIEFING.md)。0.1.3继续完整体验开发及学习包验收。
 
@@ -29,9 +29,11 @@
 
 完整重建须提供Godot：`python tools/bootstrap_local.py --source-root <本地D69目录> --runtime-from <只读Spine运行库bin目录> --godot <Godot控制台exe>`。工具完成21套转换、原生作者验证、十二透明肖像制作/导入及冻结后的只读复核，任何一步失败均停止并保留reports/bootstrap_local.json证据。省略--godot只完成转换；--import-only只导入已经存在的素材。生成完成后执行`tools/build_local.ps1 -Destination <本项目exports/windows下的新空目录>`，包使用自己的缓存，保留旧候选。
 
-本机便携学习包：`exports/windows/FantasySiege-0.1.1.2/开始游戏.cmd`，自带Godot，无需另装引擎。重新生成执行`tools/build_local.ps1`，包仅本地保留。使用0.1.1.2，旧0.1.1.0/0.1.1.1目录为问题复现副本。
+当前运行入口：`exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd`。自带Godot，可直接双击；无需Python、Godot编辑器或网络。保持整个包目录，存档在`%APPDATA%\FantasySiege`。这是已验证后台范围的本地学习候选，前台/性能仍待后续。
 
-当前战报/图鉴候选为`exports/windows/FantasySiege-0.1.3.0-candidate-8/开始游戏.cmd`，已完成包内后台、离屏和独立进程完整旅程验收；正常前台流程与战斗性能按用户安排留待后续。候选包保留构建时文档快照，新增验收范围由包内reports及根项目reports/battle_report_candidate_0.1.3.json记录；candidate-6/7基线继续保留。
+历史基础包`0.1.1.2`以及candidate4至12均只保留各自范围；不作为当前启动入口，失败副本和历史证据不删除。
+
+源码工程包含`play.ps1`、`bootstrap_local.ps1`及`build_local.ps1`；这些源码命令不是包内启动步骤。包内`tools`提供Python制作/验收工具，完整制作需要另提供本地学习源包/运行库，运行游戏无需调用。后台复验可在本包根目录执行`python tools/verify_package.py --package <本包绝对目录> --phase background`或`--phase offscreen`；不得把这两个阶段当作前台完整验收。
 
 战场宽2560px、视野1280px；鼠标左键拖动、边缘移动或←/→巡视，点击“跟随战线”恢复自动跟随。1—8召唤、P释放星灯脉冲、空格暂停、F切换1×/2×、Esc返回营地。营地可训练、调整编队和查看已导入素材动作。第2/4/6/8关首通各契约一名新英魂；通关依次解锁下一关；新存档有300星砂，训练只在写盘成功后扣除。
 

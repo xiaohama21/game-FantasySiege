@@ -11,10 +11,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 import run_checks
 import qa_launch
+import bootstrap_local
 
 ROOT = Path(__file__).resolve().parents[1]
 BAD_LOG = ('CrashHandler',)
-ART_CAPTURE_COUNT = 56
+ART_CAPTURE_COUNT = 59
 STUDY_ART_CAPTURES = ('art_study_locked', 'art_study_unowned', 'art_study_ready', 'art_study_base',
                       'art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow',
                       'art_hero_studied', 'art_gallery_studied')
@@ -22,6 +23,7 @@ BRIEFING_ART_CAPTURES = tuple('art_briefing_stage_%02d' % index for index in ran
     'art_briefing_stage_%02d_lower' % index for index in range(1, 9)) + ('art_briefing_locked', 'art_briefing_studied')
 RESULT_ART_CAPTURES = ('art_result_victory', 'art_result_defeat', 'art_result_unsaved', 'art_result_recovered')
 SETTINGS_ART_CAPTURES = ('art_settings_save_failed', 'art_settings_temporary_return')
+GUIDE_ART_CAPTURES = ('art_guide_summon', 'art_guide_camera', 'art_guide_pulse')
 NAVIGATION_ART_CAPTURES = ('art_hero_spirit_beast', 'art_study_siege', 'art_squad', 'art_squad_lower')
 STUDY_NOTICE_CAPTURES = ('art_study_sweep', 'art_study_heal', 'art_study_siege', 'art_study_slow')
 FONT_ART_HASHES = (('ui_style_sha256', 'scripts/ui/UIStyle.gd'),
@@ -45,6 +47,10 @@ def sha(path):
 
 def payload_check(package, manifest):
     failures = []
+    try:
+        bootstrap_local.tool_dependency_context(package)
+    except (OSError, ValueError) as failure:
+        failures.append(str(failure))
     for entry in manifest['files']:
         path = (package / entry['path']).resolve()
         try:
@@ -451,6 +457,66 @@ def navigation_art_check(detail, package):
     return failures
 
 
+def guide_art_check(detail, package):
+    failures = []
+    if detail.get('guide_panel_sha256') != sha(package / 'scripts/ui/GuidePanel.gd'):
+        failures.append('Guide art panel SHA differs from this package')
+    if detail.get('guide_art_verified') is not True:
+        failures.append('Guide art semantic verification missing')
+    records = detail.get('guide_capture_records')
+    if not isinstance(records, list) or len(records) != len(GUIDE_ART_CAPTURES) or any(not isinstance(item, dict) for item in records):
+        return failures + ['Guide art requires all three page observations']
+    names = [record.get('capture') for record in records]
+    if any(type(name) is not str for name in names):
+        return failures + ['Guide art page identity must be a string']
+    if len(set(names)) != 3 or set(names) != set(GUIDE_ART_CAPTURES):
+        failures.append('Guide art page identities differ')
+    for record in records:
+        name = record.get('capture')
+        if name not in GUIDE_ART_CAPTURES:
+            continue
+        page = GUIDE_ART_CAPTURES.index(name)
+        if type(record.get('page')) is not int or record['page'] != page:
+            failures.append('Guide art page index differs: ' + name)
+        for key in ('title', 'body', 'counter', 'story'):
+            if type(record.get(key)) is not str or not record[key].strip():
+                failures.append('Guide art visible text missing: ' + name + '/' + key)
+        if type(record.get('counter')) is str and re.sub(r'\s+', '', record['counter']) != '操作指南%d/3' % (page + 1):
+            failures.append('Guide art page counter differs: ' + name)
+        for key in ('starting', 'paused', 'guide_controls_fit_verified', 'no_overlap_verified'):
+            if record.get(key) is not True:
+                failures.append('Guide art required modal/layout state missing: ' + name + '/' + key)
+        for key, expected in (('heading_weight', 600), ('body_weight', 400)):
+            if not isinstance(record.get(key), (int, float)) or isinstance(record.get(key), bool) or record[key] != expected:
+                failures.append('Guide art actual font weight differs: ' + name + '/' + key)
+        panel = record.get('panel_rect')
+        groups = [(record.get('control_rects'), ('heading', 'counter', 'body', 'story', 'previous', 'skip', 'next')),
+                  (record.get('text_rects'), ('heading', 'counter', 'body', 'story')),
+                  (record.get('button_rects'), ('previous', 'skip', 'next'))]
+        valid_rect = lambda rect: isinstance(rect, list) and len(rect) == 4 and all(isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) for value in rect) and rect[2] > 0 and rect[3] > 0
+        if not valid_rect(panel) or not (panel[0] >= 0 and panel[1] >= 0 and panel[0] + panel[2] <= 1280 and panel[1] + panel[3] <= 720):
+            failures.append('Guide art panel bounds invalid: ' + name)
+            continue
+        contained = lambda rect: panel[0] - 0.01 <= rect[0] and panel[1] - 0.01 <= rect[1] and rect[0] + rect[2] <= panel[0] + panel[2] + 0.01 and rect[1] + rect[3] <= panel[1] + panel[3] + 0.01
+        rects_ok = True
+        for mapping, keys in groups:
+            if not isinstance(mapping, dict) or set(mapping) != set(keys):
+                failures.append('Guide art control rectangle identities missing: ' + name)
+                rects_ok = False
+                continue
+            for key in keys:
+                if not valid_rect(mapping[key]) or not contained(mapping[key]):
+                    failures.append('Guide art control is outside panel: ' + name + '/' + key)
+                    rects_ok = False
+        if rects_ok:
+            visible = list(record['text_rects'].items()) + list(record['button_rects'].items())
+            for index, (key, rect) in enumerate(visible):
+                for other_key, other in visible[index + 1:]:
+                    if min(rect[0] + rect[2], other[0] + other[2]) - max(rect[0], other[0]) > 0.01 and min(rect[1] + rect[3], other[1] + other[3]) - max(rect[1], other[1]) > 0.01:
+                        failures.append('Guide art visible content overlaps: ' + name + '/' + key + '/' + other_key)
+    return failures
+
+
 def offscreen_check(detail, name, package):
     failures = qa_launch.background_host_check(detail.get('background_host_setup'), package)
     if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
@@ -464,6 +530,7 @@ def offscreen_check(detail, name, package):
     if name == 'art_review':
         failures.extend(font_art_check(detail, package))
         failures.extend(navigation_art_check(detail, package))
+        failures.extend(guide_art_check(detail, package))
         captures = detail.get('captures', [])
         if not isinstance(captures, list) or any(not isinstance(item, dict) or type(item.get('name')) is not str for item in captures):
             return failures + ['Offscreen art capture metadata invalid']
@@ -480,6 +547,8 @@ def offscreen_check(detail, name, package):
             failures.append('Offscreen art must include all four result-report captures')
         if not set(SETTINGS_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include both failed-settings and temporary-return captures')
+        if not set(GUIDE_ART_CAPTURES).issubset(names):
+            failures.append('Offscreen art must include all three first-visit guide captures')
         if not set(NAVIGATION_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include selected lower-list and actual squad-slot captures')
         if detail.get('studies_sha256') != sha(package / 'resources/studies.json'):

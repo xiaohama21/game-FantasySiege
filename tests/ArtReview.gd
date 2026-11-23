@@ -3,6 +3,7 @@ extends SceneTree
 ## Real Main composition in a hidden offscreen viewport. Never measures performance.
 const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 const HOST = preload("res://scripts/core/QABackgroundHost.gd")
+const GUIDE = preload("res://scripts/ui/GuidePanel.gd")
 var background_host := HOST.new()
 const SIZE := Vector2i(1280, 720)
 const DIRECTORY := "res://tests/.user/art_review"
@@ -34,6 +35,9 @@ var font_glyph_characters: Dictionary = {}
 var font_glyph_cache: Dictionary = {}
 var font_glyph_missing: Array[String] = []
 var settings_navigation: Dictionary = {}
+var guide_panel_sha256 := ""
+var guide_capture_records: Array[Dictionary] = []
+var guide_art_verified := false
 var background_first_invalid_sample: Dictionary = {}
 var background_started_usec := 0
 var background_monitor_started := false
@@ -269,10 +273,109 @@ func capture(filename: String) -> void:
 	check(colors.size() >= 12, filename + ": composition is rendered rather than an empty surface")
 	var path := OUTPUT + "/" + filename + ".png"
 	check(picture.save_png(path) == OK, filename + ": save real Main composition")
-	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename), "study_notice": audit_study_notice(filename), "background_host_valid": host_valid, "root_window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode()})
+	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename), "study_notice": audit_study_notice(filename), "guide": audit_guide(filename), "background_host_valid": host_valid, "root_window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode()})
 
 func rect_data(rect: Rect2) -> Array:
 	return [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+
+func audit_guide(context: String) -> Dictionary:
+	var pages := {"art_guide_summon": 0, "art_guide_camera": 1, "art_guide_pulse": 2}
+	if not pages.has(context): return {}
+	var before := failures.size()
+	var guide = app.guide_panel
+	check(is_instance_valid(guide) and app._active_modal() == guide, context + ": real first-stage guide is the active modal")
+	if not is_instance_valid(guide): return {}
+	var page: int = int(pages[context])
+	check(guide.page == page and guide.starting and app.paused, context + ": actual guide page belongs to the paused starting battle")
+	check(guide.heading.text == GUIDE.TITLES[page] and guide.body.text == GUIDE.TEXTS[page] and guide.counter.text == "操作指南  %d / 3" % (page + 1), context + ": all necessary Chinese guide rules and page counter match production")
+	check(guide.story == str(Catalog.stage("stage_01").get("story_intro", "")), context + ": narrative comes from the actual first stage")
+	var heading_font: Font = guide.heading.get_theme_font("font")
+	var body_font: Font = guide.body.get_theme_font("font")
+	check(is_current_font(heading_font, 600) and is_current_font(body_font, 400), context + ": guide title and body use actual current 600/400 font coordinates")
+	var panel: Control = guide.heading.get_parent()
+	var panel_rect := panel.get_global_rect()
+	var content_rects: Array[Rect2] = []
+	var control_rects: Dictionary = {}
+	var text_rects: Dictionary = {}
+	var button_rects: Dictionary = {}
+	var narrative_text := ""
+	check(Rect2(Vector2.ZERO, Vector2(SIZE)).encloses(panel_rect), context + ": guide paper panel fits the full viewport")
+	for control: Node in panel.get_children():
+		if not control is Control or not canvas_visible(control): continue
+		var rect: Rect2 = control.get_global_rect()
+		var key := ""
+		if control is Label:
+			key = "heading" if control == guide.heading else "body" if control == guide.body else "counter" if control == guide.counter else "story"
+			if key == "story": narrative_text = str(control.text)
+			var font: Font = control.get_theme_font("font")
+			var size_at: int = control.get_theme_font_size("font_size")
+			var lines: int = control.get_line_count()
+			var measured_height: float = font.get_height(size_at) * lines + control.get_theme_constant("line_spacing") * maxi(0, lines - 1)
+			check(measured_height <= rect.size.y + 2.0, context + ": guide " + key + " text fits its allocated height")
+			control_rects[key] = rect_data(rect)
+			# Allocated title/counter boxes touch by one pixel in GuidePanel.
+			# Check occupied line regions using the same measurement as audit_text;
+			# the current font's actual height determines whether they overlap.
+			rect.size.y = measured_height
+			text_rects[key] = rect_data(rect)
+		elif control is Button:
+			key = "previous" if control == guide.previous else "next" if control == guide.next else "skip"
+			var font: Font = control.get_theme_font("font")
+			var size_at: int = control.get_theme_font_size("font_size")
+			var text_size := font.get_string_size(str(control.text), HORIZONTAL_ALIGNMENT_LEFT, -1, size_at)
+			var style: StyleBox = control.get_theme_stylebox("normal")
+			var margins := style.get_minimum_size()
+			check(text_size.x + margins.x <= rect.size.x + 1.0 and font.get_height(size_at) + margins.y <= rect.size.y + 2.0, context + ": guide " + key + " action fits without text clipping")
+			button_rects[key] = rect_data(rect)
+			control_rects[key] = rect_data(rect)
+		else: continue
+		check(panel_rect.encloses(rect), context + ": guide " + key + " content stays inside its paper panel")
+		for existing: Rect2 in content_rects:
+			check(not rect.intersects(existing), context + ": guide visible text and action regions do not overlap")
+		content_rects.append(rect)
+	check(narrative_text == guide.story and not narrative_text.is_empty(), context + ": first-stage story remains visible in the guide")
+	check(button_rects.size() == 3 and control_rects.size() == 7, context + ": all four text regions and three actions received layout audits")
+	check(guide.previous.disabled == (page == 0) and guide.next.text == ("开始远征" if page == 2 else "下一页"), context + ": previous and completion buttons show the correct page actions")
+	var record := {"capture": context, "page": page, "title": str(guide.heading.text), "body": str(guide.body.text), "counter": str(guide.counter.text), "story": narrative_text, "starting": bool(guide.starting), "paused": bool(app.paused), "heading_weight": int(native_font_weight(heading_font)), "body_weight": int(native_font_weight(body_font)), "panel_rect": rect_data(panel_rect), "control_rects": control_rects, "text_rects": text_rects, "button_rects": button_rects, "text_rect_measurement": "TextServer font height times actual laid-out lines plus line spacing; button regions use allocated bounds", "guide_controls_fit_verified": failures.size() == before, "no_overlap_verified": failures.size() == before}
+	guide_capture_records.append(record)
+	return record
+
+func guide_art() -> void:
+	var prefs = root.get_node("UserPrefs")
+	var profile = root.get_node("ProfileStore")
+	var original_values: Dictionary = prefs._values.duplicate(true)
+	var profile_before := FileAccess.get_sha256(profile.save_path)
+	var before_failures := failures.size()
+	var before_captures := captures.size()
+	app.show_home("远征")
+	check(prefs.set_value("tutorial_seen", false) and prefs.flush(), "save an isolated unseen-guide preference before the real first stage")
+	app.start_stage("stage_01")
+	app.set_process(false)
+	check(is_instance_valid(app.battle) and is_instance_valid(app.guide_panel) and app.paused, "first-stage Main automatically opens and pauses its actual guide")
+	if not is_instance_valid(app.battle) or not is_instance_valid(app.guide_panel): return
+	app.battle.set_process(false)
+	var before_battle: Dictionary = app.battle.get_snapshot().duplicate(true)
+	await capture("art_guide_summon")
+	app.guide_panel.next.pressed.emit()
+	check(app.guide_panel.page == 1 and not app.guide_panel.previous.disabled, "real guide next control shows the camera page")
+	app.guide_panel.previous.pressed.emit()
+	check(app.guide_panel.page == 0, "real guide previous control returns to the first page")
+	app.guide_panel.next.pressed.emit()
+	await capture("art_guide_camera")
+	app.guide_panel.next.pressed.emit()
+	await capture("art_guide_pulse")
+	check(app.battle.get_snapshot() == before_battle and app.paused, "three guide captures do not advance battle or spend resources")
+	app.guide_panel.next.pressed.emit()
+	await process_frame
+	check(not is_instance_valid(app.guide_panel) and not app.paused, "actual guide completion resumes the originally running battle")
+	check(bool(prefs.get_value("tutorial_seen")) and not prefs.dirty, "actual guide completion persists the seen preference")
+	check(prefs._values == original_values, "guide art restores the original isolated preference values")
+	check(FileAccess.get_sha256(profile.save_path) == profile_before, "guide browsing and completion do not write progression")
+	check(captures.size() - before_captures == 3 and guide_capture_records.size() == 3, "three current first-stage guide compositions were captured")
+	app.show_home("远征")
+	await process_frame
+	check(not is_instance_valid(app.battle), "guide art cleans the real battle before subsequent gallery/result captures")
+	guide_art_verified = failures.size() == before_failures
 
 func audit_study_notice(context: String) -> Dictionary:
 	if is_instance_valid(app.battle) or app.tab != "研修": return {}
@@ -435,6 +538,7 @@ func result_battle(stage_id: String, summon: bool, fail_save: bool = false) -> v
 func run() -> void:
 	project_sha256 = FileAccess.get_sha256("res://project.godot")
 	settings_panel_sha256 = FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd")
+	guide_panel_sha256 = FileAccess.get_sha256("res://scripts/ui/GuidePanel.gd")
 	check(QA_CONTEXT.enabled() and QA_CONTEXT.valid(), "offscreen art requires a valid isolated first-autoload startup")
 	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid():
 		await finish()
@@ -549,6 +653,7 @@ func run() -> void:
 		app._set_view_position(app.view_max)
 		await capture("art_chapter_%d_right" % chapter)
 	await settings_return_art()
+	await guide_art()
 	app.show_home("图鉴")
 	app.set_process(true)
 	await process_frame
@@ -574,6 +679,7 @@ func run() -> void:
 	check(text_labels_audited > 0, "real Main labels received readability audits")
 	check(font_input_context() == font_context, "font binary, variants, manifest and UI theme remain frozen throughout all captures")
 	check(FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd") == settings_panel_sha256, "settings panel source remains frozen throughout all captures")
+	check(FileAccess.get_sha256("res://scripts/ui/GuidePanel.gd") == guide_panel_sha256 and guide_art_verified, "current first-stage guide source and all three real guide captures were verified")
 	await finish()
 
 func finish() -> void:
@@ -591,12 +697,13 @@ func finish() -> void:
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
 	check(background_first_invalid_sample.is_empty() and background_host_valid_captures == background_capture_attempts and background_capture_attempts == captures.size(), "every actual art capture and monitored frame kept the host minimized")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
-	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery, fully visible selected card lists and actual saved summon slots, two failed-settings/temporary-return states and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
+	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery, fully visible selected card lists and actual saved summon slots, two failed-settings/temporary-return states four actual battle-result states and three first-stage guide pages with visible production rules and story. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	report.merge(font_context)
 	report.merge({"qa_startup": QA_CONTEXT.snapshot(), "background_host_setup": background_host.snapshot(), "background_first_invalid_sample": background_first_invalid_sample,
 		"background_window_frame_samples": background_frame_samples, "background_capture_attempts": background_capture_attempts,
 		"background_host_valid_captures": background_host_valid_captures, "display_window_mode": DisplayServer.window_get_mode()})
 	report.merge({"settings_panel_sha256": settings_panel_sha256, "settings_navigation": settings_navigation})
+	report.merge({"guide_panel_sha256": guide_panel_sha256, "guide_capture_records": guide_capture_records, "guide_art_verified": guide_art_verified})
 	var glyph_characters: Array = font_glyph_characters.keys()
 	glyph_characters.sort()
 	report.merge({"ui_font_family": font_family, "font_engine_families": font_engine_families, "font_engine_weights": font_engine_weights, "font_engine_coordinates": font_engine_coordinates, "body_weight": int(font_weights.get("body", 0)), "emphasis_weight": int(font_weights.get("emphasis", 0)), "font_glyph_check": font_contract_passed and font_glyph_missing.is_empty(), "font_glyph_characters": "".join(PackedStringArray(glyph_characters)), "font_glyph_missing": font_glyph_missing, "font_glyph_variants": [400, 600] if font_contract_passed else []})

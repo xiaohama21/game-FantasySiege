@@ -1,0 +1,1156 @@
+{
+	"bindings_verified": true,
+	"checks": 137,
+	"cold_read_scope": "New preference Node instances in this engine; independent engine startup isolation is covered by QAStartupSmoke",
+	"engine_input_dispatch_verified": true,
+	"failure_evidence": {
+		"backup_sha256": "95566c3393bf2adfa29213afa4b72eaceeb99e9d85dfca57dd05903a7b781efd",
+		"cold_seen_after_failure": false,
+		"dirty_before_retry": true,
+		"exit_guide_button_blocked": true,
+		"exit_guide_press": {
+			"active_modal_is_exit": true,
+			"blocked": true,
+			"guide_retained": true,
+			"page_after": 0,
+			"page_before": 0
+		},
+		"primary_sha256": "a74d3bd9c1028e98d12c88aee79fbe2179f65a4abf0debb311114065970b1399",
+		"runtime_seen": true
+	},
+	"failures": [],
+	"fixture_sha256": "005c93ad3506f75a3391deaebb642c49e82a30d834389ec36a877f45a38a04a5",
+	"foreground_verified": false,
+	"gdd_sha256": "5dd426f62c1315b5c7a9bb96598b265eb65be7207a9f7f57da439ea4d45b1daa",
+	"gdd_version": "0.5.13",
+	"guide_cold_reload_verified": true,
+	"guide_exit_layer_verified": true,
+	"guide_first_visit_verified": true,
+	"guide_future_protection_verified": true,
+	"guide_panel_sha256": "0f037d816f492a3d103021a41886bc3b4e9e0bd4ce5f514e0d8db7ce965ce88b",
+	"guide_pause_restore_verified": true,
+	"guide_preference_failure_verified": true,
+	"guide_skip_verified": true,
+	"input_device_verified": false,
+	"isolation": "res://tests/.user/guide_ui",
+	"main_sha256": "81a3355d69c050cb45288beed6c9f609c40a60ede61e677d4929afbe1f1951a8",
+	"native_rendered": false,
+	"pages": [
+		{
+			"body": "能量会自动恢复。先召唤低费前排，再补远程伙伴。\n英魂会自行前进与交战，同一英魂可以重复召唤。\n点击下方卡片，或按 1—8 召唤对应位置的英魂。",
+			"counter": "操作指南  1 / 3",
+			"heading": "点亮第一支队伍",
+			"next": "下一页",
+			"page": 0,
+			"paused": true,
+			"previous_disabled": true,
+			"starting": true,
+			"story": "第一盏星灯在断桥尽头等待。洛恩举起盾牌：先守住前线，再让伙伴抵达。"
+		},
+		{
+			"body": "战场有两屏宽。按住左键拖动，或按 ← / → 巡视两侧；鼠标移到边缘也能移动。\n点击“跟随战线”回到交战处。空格可暂停观察，再按继续；暂停时不能召唤或释放脉冲。",
+			"counter": "操作指南  2 / 3",
+			"heading": "巡视更远的战场",
+			"next": "下一页",
+			"page": 1,
+			"paused": true,
+			"previous_disabled": false,
+			"starting": true,
+			"story": "第一盏星灯在断桥尽头等待。洛恩举起盾牌：先守住前线，再让伙伴抵达。"
+		},
+		{
+			"body": "按 P 释放星灯脉冲：消耗80能量，冷却35秒。它震击最前敌军一带，晕眩并打断尚未命中的攻击。\n重击预警时留好能量，保护前排与远程。摧毁右方基地即可获胜；胜利后用星砂训练和整备编队。",
+			"counter": "操作指南  3 / 3",
+			"heading": "抓住反攻的窗口",
+			"next": "开始远征",
+			"page": 2,
+			"paused": true,
+			"previous_disabled": false,
+			"starting": true,
+			"story": "第一盏星灯在断桥尽头等待。洛恩举起盾牌：先守住前线，再让伙伴抵达。"
+		}
+	],
+	"pages_verified": 3,
+	"passed": true,
+	"performance_measured": false,
+	"phase": "complete",
+	"program_version": "0.1.3.0",
+	"project_sha256": "41a44052452d385c706438247aec87a89f0b224dde881268a008acc88ad3d4fc",
+	"qa_startup": {
+		"atomic_filesystem_sandbox": false,
+		"background": true,
+		"first_loads": {
+			"preferences": {
+				"blocked": false,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/preferences.json",
+				"summary": {
+					"blocked": false,
+					"dirty": false,
+					"error_message": "",
+					"values": {
+						"damage_numbers": true,
+						"edge_scroll": true,
+						"fullscreen": false,
+						"master_volume": 0.8,
+						"music_volume": 0.45,
+						"sfx_volume": 0.7,
+						"tutorial_seen": false
+					}
+				},
+				"ticks_usec": 394382
+			},
+			"profile": {
+				"blocked": false,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/profile.json",
+				"summary": {
+					"blocked": false,
+					"cleared": [],
+					"credits": 300,
+					"error_message": "",
+					"levels": {
+						"diaochan": 1,
+						"ember_archer": 1,
+						"guanyu": 1,
+						"iron_guard": 1,
+						"lubu": 1,
+						"rune_medic": 1,
+						"zhaoyun": 1,
+						"zhugeliang": 1
+					},
+					"owned": [
+						"guanyu",
+						"zhaoyun",
+						"zhugeliang",
+						"diaochan",
+						"lubu",
+						"iron_guard",
+						"ember_archer",
+						"rune_medic"
+					],
+					"roster": [
+						"guanyu",
+						"zhaoyun",
+						"zhugeliang",
+						"diaochan",
+						"lubu",
+						"iron_guard",
+						"ember_archer",
+						"rune_medic"
+					],
+					"study_routes": {}
+				},
+				"ticks_usec": 446972
+			}
+		},
+		"operations": [
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/preferences.json",
+				"ticks_usec": 379165
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/preferences.json.bak",
+				"ticks_usec": 385953
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/profile.json",
+				"ticks_usec": 419976
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/profile.json",
+				"ticks_usec": 421882
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/profile.json.bak",
+				"ticks_usec": 429879
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2/profile.json.bak",
+				"ticks_usec": 437972
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json",
+				"ticks_usec": 458720
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json",
+				"ticks_usec": 465644
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.bak",
+				"ticks_usec": 473546
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.bak",
+				"ticks_usec": 475397
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json",
+				"ticks_usec": 490472
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.tmp",
+				"ticks_usec": 498057
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.bak",
+				"ticks_usec": 506425
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.tmp",
+				"ticks_usec": 514018
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.tmp",
+				"ticks_usec": 521568
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json.tmp",
+				"ticks_usec": 534536
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/profile.json",
+				"ticks_usec": 541697
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 552271
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 559977
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 578171
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 580211
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 588511
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 598599
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 606614
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 615898
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 624086
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 632299
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 640818
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1585247
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1588243
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1600535
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1604193
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1617329
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1620931
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1633949
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1648764
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1661177
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1674159
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1676954
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1691374
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1700506
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1767282
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1771896
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1774616
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1790699
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1793778
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1807806
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1811828
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1821138
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1834761
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1846359
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1860123
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1922712
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1925437
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1938201
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1948813
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1951738
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 1964324
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1974023
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 1984973
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 1999961
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2009095
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2019771
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2140301
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2142394
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2150680
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2159752
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2170108
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2182157
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2194181
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2207068
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2217189
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2233128
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2240624
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2301127
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2303990
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2317217
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2329997
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2340971
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2356256
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2369934
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2374336
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2389556
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2406498
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2409837
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2496288
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2499535
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2509459
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2524907
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2533984
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2544012
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2554979
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2568328
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2578805
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2590716
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2604017
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2663805
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2666894
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2678204
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2691501
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2704925
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2714738
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2725909
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2736635
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2745648
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2756949
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2768913
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2842035
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2846754
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2850969
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2855018
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 2859991
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 2875270
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 2879248
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3052111
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3059790
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3063601
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3069397
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3084371
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3118431
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3123181
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3131962
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3148527
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3165892
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3211053
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3214576
+			},
+			{
+				"action": "check",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3229194
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3233180
+			},
+			{
+				"action": "write",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3245947
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3251876
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3267697
+			},
+			{
+				"action": "copy_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3282346
+			},
+			{
+				"action": "copy_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3286071
+			},
+			{
+				"action": "rename_source",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.tmp",
+				"ticks_usec": 3292166
+			},
+			{
+				"action": "rename_destination",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3309626
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3332289
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3344804
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3416890
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3420857
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json",
+				"ticks_usec": 3523764
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/guide_ui/preferences.json.bak",
+				"ticks_usec": 3528407
+			}
+		],
+		"program_version": "0.1.3.0",
+		"project_root": "F:/godotProject/FantasySiege",
+		"qa_enabled": true,
+		"refused_operations": [],
+		"report_path": "F:/godotProject/FantasySiege/reports/qa_startup/GuideUISmoke-20261123T083815564551-8f103a9d08b2/startup.json",
+		"runtime_path_check": "project containment and DirAccess.is_link for existing components; launcher resolved-path/reparse/hard-link preflight required",
+		"save_root": "F:/godotProject/FantasySiege/tests/.user/qa/GuideUISmoke-20261123T083815564551-8f103a9d08b2",
+		"script_sha256": {
+			"scripts/core/ProfileStore.gd": "9eba24d0dbc3d7a459710a8f762b7bc5c43450dccee0ef7b4bd7cb467cf751b4",
+			"scripts/core/QAStartupContext.gd": "fee68d14c5d2432cd6259b07b3b25ebe4a7b4962c2635b631fcfeed3925ec49f",
+			"scripts/core/UserPrefs.gd": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a"
+		},
+		"started_ticks_usec": 374380,
+		"started_unix_time": 1795423096.056,
+		"valid": true,
+		"window_policy_reason": "background QA must not apply fullscreen or restore the host window",
+		"window_policy_skipped": true
+	},
+	"scope": "Headless Main guide bindings, isolated preference transactions and Godot-internal input events; no OS devices, foreground, native rendering, audio listening or performance claim",
+	"user_prefs_sha256": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a"
+}

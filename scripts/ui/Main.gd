@@ -389,7 +389,7 @@ func _close_settings() -> void:
 	_update_hud()
 
 func _open_guide() -> void:
-	if is_instance_valid(guide_panel) or is_instance_valid(settings_panel): return
+	if is_instance_valid(exit_panel) or is_instance_valid(guide_panel) or is_instance_valid(settings_panel) or quitting: return
 	var previous_focus: Control = get_viewport().gui_get_focus_owner()
 	guide_was_paused = paused
 	if is_instance_valid(battle):
@@ -397,6 +397,7 @@ func _open_guide() -> void:
 		battle.set_visual_playback(0.0)
 	var script: Script = load("res://scripts/ui/GuidePanel.gd")
 	guide_panel = script.new()
+	guide_panel.input_allowed = func() -> bool: return _active_modal() == guide_panel and not quitting
 	guide_panel.starting = is_instance_valid(battle)
 	guide_panel.story = str(Catalog.stage(active_stage).get("story_intro", "循光而行，重燃诸岛。"))
 	screen.add_child(guide_panel)

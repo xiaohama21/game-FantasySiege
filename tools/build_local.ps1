@@ -40,6 +40,12 @@ if (-not (Test-Path -LiteralPath $GodotPath -PathType Leaf)) { throw 'Godot exec
 if (-not (Test-Path -LiteralPath (Join-Path $projectRoot 'assets\actors') -PathType Container)) { throw 'Run bootstrap_local.ps1 first' }
 if (-not (Test-Path -LiteralPath (Join-Path $projectRoot 'assets\portraits\manifest.json') -PathType Leaf)) { throw 'Generate and validate the twelve local character portraits before building this version' }
 if (-not (Get-Command $PythonPath -ErrorAction SilentlyContinue)) { throw 'Python is required only for building/importing this package' }
+$payloadTools = @('bootstrap_local.py', 'spine_pipeline.py', 'spine_upgrade_38_to_43.py', 'tune_visuals.py', 'verify_spine.py', 'run_checks.py', 'verify_package.py', 'generate_portraits.py', 'qa_launch.py', 'verify_qa_startup.py')
+foreach ($name in $payloadTools) {
+    if (-not (Test-Path -LiteralPath (Join-Path $PSScriptRoot $name) -PathType Leaf)) {
+        throw ('Missing package tool dependency: tools/' + $name)
+    }
+}
 
 function Copy-PayloadTree([string]$Name) {
     $sourceRoot = Join-Path $projectRoot $Name
@@ -59,7 +65,7 @@ foreach ($name in @('scripts', 'scenes', 'resources', 'bin', 'assets\actors', 'a
     Copy-PayloadTree $name
 }
 New-Item -ItemType Directory -Path (Join-Path $packageRoot 'tools') -Force | Out-Null
-foreach ($name in @('bootstrap_local.py', 'spine_pipeline.py', 'spine_upgrade_38_to_43.py', 'verify_spine.py', 'run_checks.py', 'verify_package.py', 'generate_portraits.py', 'qa_launch.py', 'verify_qa_startup.py')) {
+foreach ($name in $payloadTools) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot $name) -Destination (Join-Path $packageRoot 'tools') -Force
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'project.godot') -Destination $packageRoot -Force

@@ -42,6 +42,8 @@ candidate12后台阶段通过，两个Playback在run_start/sample0即Window与Di
 
 2026-11-23真实启动探针已复现：legacy_initialize_after时root_ready=false、节点mode=MINIMIZED但DisplayServer仍WINDOWED；run_start时root_ready=true且两者均WINDOWED。ready后共享助手只请求一次，立即得到两者MINIMIZED，下一帧确认后开始监控。最终9项检查、三帧实际监控以及当前GDD/fixture/helper SHA门禁均通过。原生API验证表明早期请求没有改变真实窗口，新请求在窗口准备后生效；不把历史中途变化归于这个已确认的初始时序。
 
+监控保持到视口释放与音频关闭等待结束，随后采终态、停止监控并生成最终报告和退出码。不得先写passed再忽略清理阶段新增失败，末尾真实无效样本继续进入first-invalid证据。
+
 ## 源码验证进度
 
 2026-11-23恢复开发后，8个真实新进程模式共98项通过，正常预置音量0.23、全屏偏好与关羽Lv7/731星砂均在首次自动加载时读到；future初读保护和六类非法参数拒绝通过，真实用户目录已有文件/日志哈希不变。CPU12/8919及各用例初读路径/操作证据通过。旅程修复FS061后997项通过，独立resume首次即读到完整checkpoint，末关重访后十二英魂/八关/2840星砂；checks为整数、program_version及子日志SHA独立复核通过。

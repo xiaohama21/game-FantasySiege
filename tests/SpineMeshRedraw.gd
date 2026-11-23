@@ -179,15 +179,43 @@ func _run() -> void:
 	await _complete(report)
 
 func _complete(report: Dictionary) -> void:
+	# Keep monitoring enabled until all deferred native/audio cleanup finishes.
+	# A late invalid frame must affect the published report and exit status.
+	for viewport: SubViewport in viewports:
+		if is_instance_valid(viewport): viewport.queue_free()
+	await process_frame
+	var audio_shutdown_clean := true
+	if root.has_node("GameAudio"):
+		var audio = root.get_node("GameAudio")
+		await audio.shutdown()
+		audio_shutdown_clean = bool(audio.shutdown_clean)
+		if not audio_shutdown_clean: failures.append("audio cleanup did not finish before mesh report publication")
+	var monitor_stopped_ticks_usec := 0
+	if background_monitor_started:
+		_record_background_sample("cleanup_complete", background_frame_sample + 1)
+		background_monitor_started = false
+		monitor_stopped_ticks_usec = Time.get_ticks_usec()
+	report["failures"] = failures.duplicate()
+	report["passed"] = bool(report.get("passed", false)) and failures.is_empty()
 	report.qa_startup = QA_CONTEXT.snapshot()
 	report.background_host_setup = background_host.snapshot()
 	report.background_first_invalid_sample = background_first_invalid_sample
 	report.background_window_frame_samples = background_frame_sample
+	report.background_monitor_stopped_ticks_usec = monitor_stopped_ticks_usec
+	report.background_monitor_complete = monitor_stopped_ticks_usec > 0
+	report.background_host_valid_captures = background_host_valid_captures
+	report.root_window_mode = root.mode
+	report.display_window_mode = DisplayServer.window_get_mode()
+	report.root_visible = root.visible
+	report.root_focused = root.has_focus()
+	report.audio_shutdown_clean = audio_shutdown_clean
 	var file := FileAccess.open(folder+"/mesh_redraw.json",FileAccess.WRITE)
+	if file == null:
+		push_error("could not publish the final mesh report after cleanup")
+		quit(2)
+		return
 	file.store_string(JSON.stringify(report,"\t"))
 	file.close()
-	for viewport: SubViewport in viewports: viewport.queue_free()
-	await process_frame
 	print("SPINE_MESH_REDRAW_COMPLETE ",JSON.stringify(report))
 	quit(0 if report.passed else 1)
 

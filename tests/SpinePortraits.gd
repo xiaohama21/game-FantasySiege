@@ -105,6 +105,21 @@ func _run() -> void:
 	await _finish()
 
 func _finish() -> void:
+	# Publish only after deferred actor/audio cleanup. Monitoring remains active
+	# through these awaits so a late restoration cannot leave a stale PASS.
+	if is_instance_valid(viewport): viewport.queue_free()
+	await process_frame
+	var audio_shutdown_clean := true
+	if root.has_node("GameAudio"):
+		var audio = root.get_node("GameAudio")
+		await audio.shutdown()
+		audio_shutdown_clean = bool(audio.shutdown_clean)
+		if not audio_shutdown_clean: failures.append("audio cleanup did not finish before portrait manifest publication")
+	var monitor_stopped_ticks_usec := 0
+	if background_monitor_started:
+		_record_background_sample("cleanup_complete", background_frame_samples + 1)
+		background_monitor_started = false
+		monitor_stopped_ticks_usec = Time.get_ticks_usec()
 	var adapter := RenderingServer.get_video_adapter_name()
 	if adapter.is_empty(): failures.append("real offscreen renderer required")
 	if entries.size()!=12: failures.append("expected twelve native portraits, got "+str(entries.size()))
@@ -115,6 +130,11 @@ func _finish() -> void:
 	report.background_captures = background_captures
 	report.background_host_valid_captures = background_host_valid_captures
 	report.background_window_frame_samples = background_frame_samples
+	report.background_monitor_stopped_ticks_usec = monitor_stopped_ticks_usec
+	report.background_monitor_complete = monitor_stopped_ticks_usec > 0
+	report.root_window_mode = root.mode
+	report.display_window_mode = DisplayServer.window_get_mode()
+	report.audio_shutdown_clean = audio_shutdown_clean
 	var file := FileAccess.open(DIRECTORY+"/manifest.json",FileAccess.WRITE)
 	if file!=null:
 		file.store_string(JSON.stringify(report,"\t"))
@@ -122,9 +142,6 @@ func _finish() -> void:
 	else:
 		report.passed = false
 		report.failures.append("could not write portrait manifest")
-	if is_instance_valid(viewport): viewport.queue_free()
-	await process_frame
-	if root.has_node("GameAudio"): await root.get_node("GameAudio").shutdown()
 	print("SPINE_PORTRAITS_COMPLETE ",JSON.stringify(report))
 	quit(0 if report.passed else 1)
 

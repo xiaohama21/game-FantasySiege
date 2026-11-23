@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 const SIZE := Vector2i(1000,760)
 var failures: Array = []
 var records: Array = []
@@ -13,19 +14,42 @@ var actors: Array[SpineActor] = []
 var folder := "res://reports/performance_0.1.3"
 var background := false
 var background_host_valid_captures := 0
+var background_first_invalid_sample: Dictionary = {}
+var background_started_usec := 0
+var background_monitor_started := false
+var background_frame_sample := 0
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	background = args.has("background") or args.has("--background")
+	background_started_usec = Time.get_ticks_usec()
 	if background: root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
 
+func _process(_delta: float) -> bool:
+	if background and background_monitor_started:
+		background_frame_sample += 1
+		_record_background_sample("process_frame", background_frame_sample)
+	return false
+
+func _record_background_sample(stage: String, sample: int, label: String = "") -> void:
+	if not background or (root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED): return
+	if background_first_invalid_sample.is_empty():
+		background_first_invalid_sample = {"stage": stage, "sample": sample, "capture_label": label,
+			"ticks_usec": Time.get_ticks_usec(), "elapsed_usec": Time.get_ticks_usec() - background_started_usec,
+			"window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode(),
+			"cause": "unknown"}
+	if not failures.has("background host window was restored during capture"):
+		failures.append("background host window was restored during capture")
+
 func _run() -> void:
+	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native mesh comparison requires a valid isolated QA startup")
+	background_monitor_started = background
+	_record_background_sample("run_start", 0)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports/spine_visuals/mesh_redraw"))
 	root.size = Vector2i(1280,720)
 	if background:
-		root.mode = Window.MODE_MINIMIZED
 		if DisplayServer.get_name()=="headless" or RenderingServer.get_video_adapter_name().is_empty() or _rendering_driver()!="vulkan":
 			failures.append("background pixel comparison requires a real Vulkan renderer")
 			await _complete({"program_version":str(ProjectSettings.get_setting("application/config/version","unknown")),"passed":false,"failures":failures,"background":true,"performance_measured":false,"actual_rendering_method":_rendering_method(),"actual_rendering_driver":_rendering_driver(),"rendering_adapter":RenderingServer.get_video_adapter_name(),"resource_count":0,"raw_animation_count":0,"comparisons":0,"background_host_valid_captures":0,"scope":"Background Vulkan offscreen pixel verification could not start; no performance measured"})
@@ -146,6 +170,9 @@ func _run() -> void:
 	await _complete(report)
 
 func _complete(report: Dictionary) -> void:
+	report.qa_startup = QA_CONTEXT.snapshot()
+	report.background_first_invalid_sample = background_first_invalid_sample
+	report.background_window_frame_samples = background_frame_sample
 	var file := FileAccess.open(folder+"/mesh_redraw.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"\t"))
 	file.close()
@@ -186,8 +213,7 @@ func _compare(id: String,skin: String,animation: String,direction: int,fraction:
 		RenderingServer.force_draw(false)
 		if root.mode==Window.MODE_MINIMIZED and DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_MINIMIZED:
 			background_host_valid_captures += 1
-		elif not failures.has("background host window was restored during capture"):
-			failures.append("background host window was restored during capture")
+		else: _record_background_sample("rgba_capture", comparisons + 1, "%s/%s/%s/%s/%s" % [id,skin,animation,direction,fraction])
 	else:
 		await RenderingServer.frame_post_draw
 	var original := viewports[0].get_texture().get_image()

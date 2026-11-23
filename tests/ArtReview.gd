@@ -1,6 +1,7 @@
 extends SceneTree
 
 ## Real Main composition in a hidden offscreen viewport. Never measures performance.
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 const SIZE := Vector2i(1280, 720)
 const DIRECTORY := "res://tests/.user/art_review"
 const OUTPUT := "res://reports/runtime"
@@ -31,6 +32,12 @@ var font_glyph_characters: Dictionary = {}
 var font_glyph_cache: Dictionary = {}
 var font_glyph_missing: Array[String] = []
 var settings_navigation: Dictionary = {}
+var background_first_invalid_sample: Dictionary = {}
+var background_started_usec := 0
+var background_monitor_started := false
+var background_frame_samples := 0
+var background_capture_attempts := 0
+var background_host_valid_captures := 0
 
 func font_input_context() -> Dictionary:
 	return {"ui_style_sha256": FileAccess.get_sha256("res://scripts/ui/UIStyle.gd"), "font_manifest_sha256": FileAccess.get_sha256(FONT_MANIFEST), "font_binary_sha256": FileAccess.get_sha256(FONT_FILE), "font_body_sha256": FileAccess.get_sha256("res://resources/ui_font_body.tres"), "font_emphasis_sha256": FileAccess.get_sha256("res://resources/ui_font_emphasis.tres")}
@@ -132,8 +139,23 @@ func audit_ui_fonts(context: String) -> void:
 		audit_font_glyphs(font, value, context)
 
 func _initialize() -> void:
+	background_started_usec = Time.get_ticks_usec()
 	root.mode = Window.MODE_MINIMIZED
 	call_deferred("run")
+
+func _process(_delta: float) -> bool:
+	if background_monitor_started:
+		background_frame_samples += 1
+		_record_background_sample("process_frame", background_frame_samples)
+	return false
+
+func _record_background_sample(stage: String, sample: int, capture_name: String = "") -> void:
+	if root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED: return
+	if background_first_invalid_sample.is_empty():
+		background_first_invalid_sample = {"stage": stage, "sample": sample, "capture_name": capture_name,
+			"ticks_usec": Time.get_ticks_usec(), "elapsed_usec": Time.get_ticks_usec() - background_started_usec,
+			"window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode(), "cause": "unknown"}
+		check(false, "background art host window was restored")
 
 func check(condition: bool, message: String) -> void:
 	checks += 1
@@ -229,7 +251,11 @@ func capture(filename: String) -> void:
 				if not is_instance_valid(list) or list.get_meta("list_restore_ready", false) == true: break
 				await process_frame
 	RenderingServer.force_draw(false)
-	check(root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED, filename + ": actual host window stays minimized")
+	background_capture_attempts += 1
+	var host_valid := root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED
+	if host_valid: background_host_valid_captures += 1
+	else: _record_background_sample("art_capture", background_capture_attempts, filename)
+	check(host_valid, filename + ": actual host window stays minimized")
 	audit_portraits(filename)
 	audit_ui_fonts(filename)
 	audit_text(filename)
@@ -242,7 +268,7 @@ func capture(filename: String) -> void:
 	check(colors.size() >= 12, filename + ": composition is rendered rather than an empty surface")
 	var path := OUTPUT + "/" + filename + ".png"
 	check(picture.save_png(path) == OK, filename + ": save real Main composition")
-	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename), "study_notice": audit_study_notice(filename)})
+	captures.append({"name": filename, "path": path, "sha256": FileAccess.get_sha256(path), "sampled_colors": colors.size(), "size": [SIZE.x, SIZE.y], "tab": app.tab, "stage": app.active_stage if is_instance_valid(app.battle) else "", "view_x": app.view_x, "navigation": audit_list_navigation(filename), "study_notice": audit_study_notice(filename), "background_host_valid": host_valid, "root_window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode()})
 
 func rect_data(rect: Rect2) -> Array:
 	return [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
@@ -408,6 +434,12 @@ func result_battle(stage_id: String, summon: bool, fail_save: bool = false) -> v
 func run() -> void:
 	project_sha256 = FileAccess.get_sha256("res://project.godot")
 	settings_panel_sha256 = FileAccess.get_sha256("res://scripts/ui/SettingsPanel.gd")
+	check(QA_CONTEXT.enabled() and QA_CONTEXT.valid(), "offscreen art requires a valid isolated first-autoload startup")
+	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid():
+		await finish()
+		return
+	background_monitor_started = true
+	_record_background_sample("run_start", 0)
 	if DisplayServer.get_name() == "headless":
 		check(false, "ArtReview requires a real renderer for offscreen images; omit --headless")
 		await finish()
@@ -426,8 +458,6 @@ func run() -> void:
 	prefs.set_value("tutorial_seen", true)
 	prefs.set_value("edge_scroll", false)
 	check(prefs.flush(), "write isolated silent art preferences")
-	# configure_path applies window preferences; hide it again before any rendering awaits.
-	root.mode = Window.MODE_MINIMIZED
 	profile.configure_path(DIRECTORY + "/profile.json")
 	profile.load_profile()
 	var fixture: Dictionary = profile.data.duplicate(true)
@@ -552,9 +582,13 @@ func finish() -> void:
 	var audio = root.get_node("GameAudio")
 	await audio.shutdown()
 	check(audio.shutdown_clean, "offscreen art run drains actual audio playback before exit")
+	check(background_first_invalid_sample.is_empty() and background_host_valid_captures == background_capture_attempts and background_capture_attempts == captures.size(), "every actual art capture and monitored frame kept the host minimized")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
 	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery, fully visible selected card lists and actual saved summon slots, two failed-settings/temporary-return states and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	report.merge(font_context)
+	report.merge({"qa_startup": QA_CONTEXT.snapshot(), "background_first_invalid_sample": background_first_invalid_sample,
+		"background_window_frame_samples": background_frame_samples, "background_capture_attempts": background_capture_attempts,
+		"background_host_valid_captures": background_host_valid_captures, "display_window_mode": DisplayServer.window_get_mode()})
 	report.merge({"settings_panel_sha256": settings_panel_sha256, "settings_navigation": settings_navigation})
 	var glyph_characters: Array = font_glyph_characters.keys()
 	glyph_characters.sort()

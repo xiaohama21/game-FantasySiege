@@ -8,6 +8,7 @@ const PROFILE_PATH := DIRECTORY + "/profile.json"
 const PREFS_PATH := DIRECTORY + "/preferences.json"
 const REPORT_PATH := "res://reports/campaign_journey.json"
 const GDD_PATH := "res://docs/GAME_DESIGN.md"
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 const CORE := ["iron_guard", "ember_archer", "rune_medic", "guanyu"]
 const STEP := 0.2
 const MAX_TICKS := 3000
@@ -109,8 +110,11 @@ func _gdd_metadata() -> Dictionary:
 func _fresh_report() -> Dictionary:
 	var gdd := _gdd_metadata()
 	_check(not gdd.is_empty(), "same-project GDD header/version/hash is readable")
+	var startup := QA_CONTEXT.snapshot()
+	_check(bool(startup.get("qa_enabled", false)) and bool(startup.get("valid", false)) and startup.get("refused_operations", []).is_empty(), "fresh campaign first-autoload startup is isolated and valid")
 	return {
 		"version": str(ProjectSettings.get_setting("application/config/version")),
+		"program_version": str(ProjectSettings.get_setting("application/config/version")),
 		"gdd_version": gdd.get("gdd_version", ""),
 		"gdd_header": gdd.get("gdd_header", ""),
 		"gdd_sha256": gdd.get("gdd_sha256", ""),
@@ -130,6 +134,7 @@ func _fresh_report() -> Dictionary:
 		"battle_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"),
 		"journey_sha256": FileAccess.get_sha256("res://tests/CampaignJourney.gd"),
 		"fresh_process_id": OS.get_process_id(), "phase": "fresh_running",
+		"startup_context": startup,
 		"training": [], "roster_changes": [], "stages": [], "restart": {}, "audio_shutdowns": []
 	}
 
@@ -351,6 +356,13 @@ func _resume() -> void:
 	_check(not gdd.is_empty() and str(report.get("gdd_version", "")) == str(gdd.get("gdd_version", "")) and str(report.get("gdd_header", "")) == str(gdd.get("gdd_header", "")) and str(report.get("gdd_sha256", "")) == str(gdd.get("gdd_sha256", "")), "same-package GDD header/version/hash unchanged across restart")
 	_check(str(report.units_sha256) == FileAccess.get_sha256("res://resources/units.json") and str(report.stages_sha256) == FileAccess.get_sha256("res://resources/stages.json"), "content unchanged across process restart")
 	_check(str(report.restart.profile_sha256) == FileAccess.get_sha256(PROFILE_PATH), "restart reads exact fresh checkpoint bytes")
+	var startup := QA_CONTEXT.snapshot()
+	report.restart.startup_context = startup
+	_check(bool(startup.get("qa_enabled", false)) and bool(startup.get("valid", false)) and startup.get("refused_operations", []).is_empty(), "resume first-autoload startup is isolated and valid")
+	var initial_profile = root.get_node_or_null("ProfileStore")
+	var initial_prefs = root.get_node_or_null("UserPrefs")
+	_check(initial_profile != null and _same_saved_value(initial_profile.data, report.restart.profile_checkpoint), "resume autoload already restored checkpoint before fixture configure")
+	_check(initial_prefs != null and is_zero_approx(float(initial_prefs.get_value("master_volume"))) and bool(initial_prefs.get_value("tutorial_seen")) and not bool(initial_prefs.get_value("damage_numbers")), "resume autoload already restored saved preferences before fixture configure")
 	if not failures.is_empty():
 		report.phase = "resume_failed"
 		await _dispose_app()
@@ -435,7 +447,39 @@ func _run() -> void:
 		return
 	# OS.execute waits for an entirely new runtime; no in-memory profile survives.
 	var output: Array = []
-	var args := PackedStringArray(["--headless", "--path", ProjectSettings.globalize_path("res://"), "--script", "res://tests/CampaignJourney.gd", "--", "--journey-resume"])
+	var context := QA_CONTEXT.snapshot()
+	var launch_folder := str(context.get("report_path", "")).get_base_dir()
+	var reports_root := ProjectSettings.globalize_path("res://reports").replace("\\", "/").simplify_path()
+	_check(bool(context.get("qa_enabled", false)) and bool(context.get("valid", false)) and launch_folder.replace("\\", "/").simplify_path().to_lower().begins_with(reports_root.to_lower() + "/"), "resume log/report directory belongs to validated parent QA launch")
+	if not failures.is_empty():
+		report.phase = "fresh_failed"
+		_save_report()
+		quit(1)
+		return
+	var child_tag := "journey_resume_%d_%d" % [OS.get_process_id(), Time.get_ticks_usec()]
+	var child_engine_log := launch_folder.path_join(child_tag + ".engine.log")
+	var child_startup_report := launch_folder.path_join(child_tag + ".startup.json")
+	var child_save_root := ProjectSettings.globalize_path(DIRECTORY).trim_suffix("/")
+	var child_project := ProjectSettings.globalize_path("res://").trim_suffix("/")
+	var child_scripts := {}
+	for relative: String in ["scripts/core/QAStartupContext.gd", "scripts/core/UserPrefs.gd", "scripts/core/ProfileStore.gd"]:
+		child_scripts[relative] = FileAccess.get_sha256("res://" + relative)
+	var args := PackedStringArray(["--headless", "--path", child_project, "--script", "res://tests/CampaignJourney.gd",
+		"--log-file", child_engine_log, "--", "--journey-resume", "--qa-save-root", child_save_root,
+		"--qa-startup-report", child_startup_report, "--qa-background"])
+	# The wall clock is a double. Store its millisecond precision explicitly;
+	# nanoseconds below that precision are units for the launcher's 1 ms gate.
+	var child_started_unix_msec := int(Time.get_unix_time_from_system() * 1000.0)
+	report.restart.qa_startup = {"gameplay": true, "project_root": child_project, "save_root": child_save_root,
+		"startup_report": child_startup_report, "engine_log": child_engine_log,
+		"started_ns": child_started_unix_msec * 1000000, "started_unix_msec": child_started_unix_msec,
+		"started_precision_ns": 1000000, "started_clock": "Time.get_unix_time_from_system quantized down to milliseconds",
+		"script_sha256": child_scripts,
+		"startup_report_sha256": "", "engine_log_sha256": ""}
+	report.restart.command_line = [OS.get_executable_path()] + Array(args)
+	if not _save_report():
+		quit(1)
+		return
 	var exit_code := OS.execute(OS.get_executable_path(), args, output, true)
 	for line: Variant in output: print(str(line))
 	var final_result: Variant = JSON.parse_string(FileAccess.get_file_as_string(REPORT_PATH))
@@ -443,5 +487,27 @@ func _run() -> void:
 		push_error("CampaignJourney independent resume phase failed; exit=%d" % exit_code)
 		quit(1)
 		return
+	final_result.restart.qa_startup.startup_report_sha256 = FileAccess.get_sha256(child_startup_report)
+	final_result.restart.qa_startup.engine_log_sha256 = FileAccess.get_sha256(child_engine_log)
+	final_result.restart.qa_startup.exit_code = exit_code
+	# JSON.parse_string returns floating numbers. Restore only the report's
+	# integer contract before appending evidence; combat values stay unchanged.
+	final_result["checks"] = int(final_result["checks"])
+	final_result["fresh_process_id"] = int(final_result["fresh_process_id"])
+	final_result["restart"]["resume_process_id"] = int(final_result["restart"]["resume_process_id"])
+	for shutdown: Dictionary in final_result.get("audio_shutdowns", []):
+		shutdown["process_id"] = int(shutdown["process_id"])
+	# Reuse the parent's original integer instead of round-tripping a >2^53
+	# timestamp through the JSON parser's double representation.
+	final_result["restart"]["qa_startup"]["started_ns"] = child_started_unix_msec * 1000000
+	final_result["restart"]["qa_startup"]["started_unix_msec"] = child_started_unix_msec
+	final_result["restart"]["qa_startup"]["started_precision_ns"] = 1000000
+	var final_file := FileAccess.open(REPORT_PATH, FileAccess.WRITE)
+	if final_file == null:
+		push_error("CampaignJourney could not finalize independent resume evidence")
+		quit(1)
+		return
+	final_file.store_string(JSON.stringify(final_result, "\t"))
+	final_file.close()
 	print("CAMPAIGN_JOURNEY_COMPLETE separate_process=true credits=%d owned=%d cleared=%d" % [int(final_result.final_profile.credits), final_result.final_profile.owned.size(), final_result.final_profile.cleared.size()])
 	quit(0)

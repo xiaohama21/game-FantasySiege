@@ -17,6 +17,8 @@ try:
 except ImportError:
     from run_checks import fatal_lines, diagnostic_lines
 
+import qa_launch
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_GODOT = Path("F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64.exe")
 MARKER = "SPINE_PORTRAITS_COMPLETE "
@@ -156,7 +158,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout",type=int,default=300)
     parser.add_argument("--check",action="store_true",help="validate existing PNGs without starting Godot")
     args = parser.parse_args(argv)
-    report_path = ROOT / "reports" / "portraits_local.json"
+    qa_launch.preflight_project(ROOT, gameplay=not args.check)
+    manifest_path = qa_launch.assert_safe_path(ROOT / "assets" / "portraits" / "manifest.json", ROOT, "assets/portraits")
+    qa_launch.inspect_existing_tree(manifest_path.parent)
+    report_path = qa_launch.assert_safe_path(ROOT / "reports" / "portraits_local.json", ROOT, "reports")
     report_path.parent.mkdir(parents=True,exist_ok=True)
     report_path.unlink(missing_ok=True)
     if args.check:
@@ -165,7 +170,6 @@ def main(argv: list[str] | None = None) -> int:
         godot = args.godot or (ROOT / "FantasySiege.exe" if (ROOT / "FantasySiege.exe").exists() else DEFAULT_GODOT)
         if godot.name.endswith("_console.exe") and godot.with_name(godot.name.replace("_console.exe",".exe")).exists():
             godot = godot.with_name(godot.name.replace("_console.exe",".exe"))
-        manifest_path = ROOT / "assets" / "portraits" / "manifest.json"
         manifest_path.unlink(missing_ok=True)
         command = [str(godot),"--path",str(ROOT),"--script","res://tests/SpinePortraits.gd","--render-thread","safe"]
         if args.rendering_method: command.extend(["--rendering-method",args.rendering_method])
@@ -176,7 +180,10 @@ def main(argv: list[str] | None = None) -> int:
             startupinfo.wShowWindow = subprocess.SW_HIDE
             flags = subprocess.CREATE_NO_WINDOW
         started = time.time_ns()
+        evidence = None
         try:
+            evidence = qa_launch.prepare_launch(command, ROOT, "portrait_render", background=True)
+            command = evidence.command
             completed = subprocess.run(command,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
                                        timeout=args.timeout,startupinfo=startupinfo,creationflags=flags)
             stdout = completed.stdout.decode("utf-8",errors="replace")
@@ -187,10 +194,14 @@ def main(argv: list[str] | None = None) -> int:
             report.update({"command":command,"exit_code":completed.returncode,"diagnostics":diagnostic_lines(stdout+"\n"+stderr),"offscreen_only":True})
             if completed.returncode != 0: report["failures"].append(f"Godot exit {completed.returncode}")
             if not any(line.startswith(MARKER) for line in stdout.splitlines()): report["failures"].append("native completion marker missing")
+            report["qa_startup"] = qa_launch.validate_evidence(evidence, fatal_lines)
+            report["failures"].extend(report["qa_startup"]["errors"])
             report["failures"].extend(fatal_lines(stdout+"\n"+stderr))
             report["passed"] = report["passed"] and not report["failures"]
-        except (OSError,subprocess.TimeoutExpired) as exc:
+        except (OSError,ValueError,subprocess.TimeoutExpired) as exc:
             report = {"program_version":project_version(ROOT),"passed":False,"failures":[str(exc)],"entries":[],"offscreen_only":True}
+            if evidence is not None:
+                report["qa_startup"] = qa_launch.validate_evidence(evidence, fatal_lines)
     report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("PORTRAITS_CHECK_COMPLETE "+json.dumps({"passed":report["passed"],"portraits":len(report["entries"]),"failures":report["failures"],"report":str(report_path)},ensure_ascii=False))
     return 0 if report["passed"] else 1

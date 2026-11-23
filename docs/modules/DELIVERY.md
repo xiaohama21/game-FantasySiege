@@ -1,6 +1,7 @@
 # Windows本地学习版交付
 
-> v0.20 · 2026-11-20 · GDD v0.5.10 / 程序0.1.3.0
+> v0.21 · 2026-11-20 · GDD v0.5.11 / 程序0.1.3.0
+> v0.21：首次启动隔离和独立引擎日志纳入包门禁；新进程初读/拒绝及真实用户目录哈希待验，candidate11冻结。
 > v0.20：Art56新设置失败/临时返回两图与SettingsPanel指纹，增加列表/事务/槽位/冷重读回归；candidate9冻结。
 > v0.19：字体调整后Art54增加UI主题/字体文件/manifest指纹与实际字形/字重门禁，旧GDD0.5.8重建包冻结不改。
 > v0.18：从干净Git检出完整bootstrap到干净学习包的复现验收，补齐肖像与依赖制作阶段；旧候选包冻结，新增管线必须实证，不替代前台性能。
@@ -135,3 +136,8 @@ candidate9已完成自己的纹理/原生导入及包内CPU12/8558、21来源/22
 candidate11自行导入并验包：CPU12/8919、StudyUI1514（导航327、6种toast矩形）、Prefs103、Art56/13639零缺字/文字溢出，21来源/220原始动作、十二头像、双播放、2624零差像素、独立完整旅程988全部通过；实际字体400/600不变。144个Python用例143通过/1符号链接权限跳过；49份日志（含保留窗口失效历史）严格致命错误/泄漏审计无异常。代码7e50d61及reports/navigation_candidate_0.1.3.json记录真实范围。candidate10保留旧研修toast与unmanaged窗口失效，candidate11首轮mesh仅2513/2624有效最小化捕获被拒绝，报告保留offscreen_first，标准离屏重跑后全部2624有效，不放宽门禁。首次列表/属性夹具失败和首次自动溢出门禁未发现toast遮挡的图/报告均保留。
 
 上述范围证明显式fixture路径、事务、实际布局及像素与窗口条件；另一次只读审计证实Spine启动夹具未在首次autoload读取前隔离默认user://，引擎日志也仍落入APPDATA/FantasySiege，文档的Godot/app_userdata路径不准确。当前真实目录没有profile/prefs文件，不能声称已读取真实进度，也不能将窗口变化归因于偏好或用户。known_startup_isolation_gap=true，下一轮补首次启动QA路径、独立--log-file、窗口状态转变证据及真实保存位置说明。前台MainFlow/Main24/Main64/2倍速、完整full14与商业许可仍未验收，delivery_ready=false；持续目标保持运行，不以本轮图形/UI通过缩小完成定义。
+
+
+## 首次启动隔离增量
+
+设计与验收协议见[QA_STARTUP.md](QA_STARTUP.md)。当前登记设计，运行结果和新候选证据另记；candidate11已通过范围及known_startup_isolation_gap=true保持冻结。

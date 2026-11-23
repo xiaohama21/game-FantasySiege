@@ -16,6 +16,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import verify_package
+import qa_mock
 
 
 @lru_cache(maxsize=None)
@@ -39,13 +40,20 @@ class PackageVerificationBoundaries(unittest.TestCase):
                                'driver/threads/thread_model=1\n[fantasy_siege]\nvisuals/managed_mesh_redraw=true\n'
                                'visuals/frame_group_count=2\nvisuals/critical_instance_limit=12\n')
         (self.root / 'project.godot').write_text(self.project_source)
+        qa_mock.scripts(self.root)
 
     def suite_fixture(self, suite='full'):
         cases = []
         names = verify_package.run_checks.CPU_CASES if suite == 'logic' else verify_package.run_checks.CASES
         for name in names:
             case = verify_package.run_checks.CASES[name]
-            record = {'case': name, 'passed': True}
+            record = {'case': name, 'passed': True, 'qa_startup': qa_mock.record(self.root, 'suite_' + name)}
+            if name == 'CampaignJourney':
+                report = {'passed': True, 'checks': 1, 'failures': [], 'program_version': '0.1.3.0', 'phase': 'complete',
+                          'restart': {'qa_startup': qa_mock.record(self.root, 'campaign_resume')}}
+                path = self.root / 'reports/campaign_journey.json'
+                path.write_text(json.dumps(report), encoding='utf-8')
+                record['report_sha256'] = verify_package.sha(path)
             if name == 'MainFlow':
                 report = self.main_flow_fixture()
                 path = self.root / 'reports/main_flow.json'
@@ -130,7 +138,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
             path = self.root / 'reports/runtime' / (name + '.png')
             path.write_bytes(fixture_png())
             captures.append({'name': name, 'path': 'res://reports/runtime/' + name + '.png',
-                             'sha256': verify_package.sha(path), 'size': [1280, 720]})
+                             'sha256': verify_package.sha(path), 'size': [1280, 720], 'background_host_valid': True, 'root_window_mode': 1, 'display_window_mode': 1})
         study_path = self.root / 'resources/studies.json'
         study_path.parent.mkdir(parents=True, exist_ok=True)
         study_path.write_text('{}', encoding='utf-8')
@@ -142,7 +150,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
             extra_hashes[key] = verify_package.sha(path)
-        return {'root_window_mode': 1, 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
+        return {'root_window_mode': 1, 'display_window_mode': 1, 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2, 'background_capture_attempts': len(captures), 'background_host_valid_captures': len(captures), 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
                 'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes,
                 **self.font_fixture(), **self.navigation_fixture(captures, identities)}
 
@@ -473,7 +481,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_native_total_cannot_replace_unique_ids_or_each_raw_animation_count(self):
         visual_ids, models, _ = self.native_fixture()
-        results = [{'visual_id': visual_id, 'passed': True, 'animation_count': model['raw_actions']}
+        results = [{'visual_id': visual_id, 'passed': True, 'animation_count': model['raw_actions'], 'qa_startup': qa_mock.record(self.root, visual_id)}
                    for visual_id, model in zip(visual_ids, models)]
         config_sha = verify_package.sha(self.root / 'resources/visuals.json')
         report = {'results': results, 'selected_visual_ids': visual_ids, 'config_unchanged': True,
@@ -493,7 +501,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_offscreen_playback_requires_minimized_vulkan_without_performance(self):
         good = {'background': True, 'performance_measured': False, 'root_window_mode': 1,
-                'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'background_host_valid_resources': 21}
+                'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'background_host_valid_resources': 21, 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2}
         self.assertEqual(verify_package.offscreen_check(good, 'playback', self.root), [])
         for key, value in [('background', False), ('performance_measured', True), ('root_window_mode', 0),
                            ('display_window_mode', 0), ('actual_rendering_driver', 'opengl3'),
@@ -505,7 +513,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
         viewport = {'size': [1000, 760], 'transparent_bg': True, 'disable_3d': True}
         good = {'background': True, 'performance_measured': False, 'root_window_mode': 1,
                 'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'comparisons': 2624,
-                'background_host_valid_captures': 2624, 'viewports': [viewport, viewport.copy()]}
+                'background_host_valid_captures': 2624, 'viewports': [viewport, viewport.copy()], 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2}
         self.assertEqual(verify_package.offscreen_check(good, 'mesh_redraw', self.root), [])
         for key, value in [('background_host_valid_captures', 2623), ('comparisons', 220),
                            ('viewports', [viewport]), ('viewports', [viewport, {**viewport, 'transparent_bg': False}])]:
@@ -891,6 +899,31 @@ class PackageVerificationBoundaries(unittest.TestCase):
         logic = self.suite_fixture('logic')
         self.assertTrue(self.execute(logic, name='checks_background')['passed'])
         self.assertFalse(self.execute({**logic, 'cases': logic['cases'][:-1]}, name='checks_background')['passed'])
+
+    def test_campaign_reaudit_rejects_child_engine_log_removed_or_changed(self):
+        suite = self.suite_fixture('full')
+        report = json.loads((self.root / 'reports/campaign_journey.json').read_text(encoding='utf-8'))
+        child_engine = Path(report['restart']['qa_startup']['engine_log'])
+        self.assertEqual(verify_package.suite_check(suite, self.root, 'full', '0.1.3.0'), [])
+        child_engine.write_text('changed child evidence\n', encoding='utf-8')
+        errors = verify_package.suite_check(suite, self.root, 'full', '0.1.3.0')
+        self.assertIn('QA engine log SHA differs', errors)
+        child_engine.unlink()
+        errors = verify_package.suite_check(suite, self.root, 'full', '0.1.3.0')
+        self.assertIn('QA engine log missing or empty', errors)
+
+    def test_campaign_reaudit_rejects_child_startup_report_removed(self):
+        suite = self.suite_fixture('full')
+        report = json.loads((self.root / 'reports/campaign_journey.json').read_text(encoding='utf-8'))
+        Path(report['restart']['qa_startup']['startup_report']).unlink()
+        self.assertIn('QA first-autoload report missing', verify_package.suite_check(suite, self.root, 'full', '0.1.3.0'))
+
+    def test_campaign_reaudit_requires_positive_integer_check_count(self):
+        for value in (1.0, 0, True):
+            with self.subTest(value=value):
+                suite = self.suite_fixture('full')
+                self.change_study_report(suite, 'CampaignJourney', 'checks', value)
+                self.assertIn('CampaignJourney structured report failed', verify_package.suite_check(suite, self.root, 'full', '0.1.3.0'))
 
 
 if __name__ == '__main__':

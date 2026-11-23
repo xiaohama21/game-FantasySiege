@@ -3,8 +3,8 @@
 	"checks": 221,
 	"defeats": 1,
 	"failures": [],
-	"gdd_sha256": "f86025a28a4969d5ea54c58c66553e446a834b780a1973871731ee2ff148e1b9",
-	"gdd_version": "0.5.10",
+	"gdd_sha256": "cec87bec5d226206998eb707df8546eb80455b367a558f1a09dc582b91ef8ea8",
+	"gdd_version": "0.5.11",
 	"isolation": "res://tests/.user/result_ui",
 	"passed": true,
 	"phase": "complete",
@@ -14,7 +14,7 @@
 	"scripts_sha256": {
 		"scripts/combat/SiegeBattle.gd": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702",
 		"scripts/core/UnitStats.gd": "6ec86f52b96f33a8aacacbbb543579ef547f451820e4791743f904e541febc9e",
-		"scripts/ui/Main.gd": "d86ac1f74ecd5b819caa66c7e2c924938f2b77e072549f778b9bba5a7d5dce81",
+		"scripts/ui/Main.gd": "fe2f21ec754605f2e4f79b1e2c14723d9f4a9ec26d0784656187611dbb876dcd",
 		"scripts/ui/StatBadge.gd": "0c6ba342c23ade0a685885349e3b2a5db74c6f4e59a09fcfce1f52056547182a"
 	},
 	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",

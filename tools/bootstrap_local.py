@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse, hashlib, json, shutil, subprocess, sys, tempfile, time
 from datetime import datetime, timezone
 import spine_pipeline
+import qa_launch
 from run_checks import fatal_lines, joined_output
 ROOT = Path(__file__).resolve().parents[1]
 IDS = '097,312,314,072,163,084,018,168,253,254,046,285,271,110,023,147,069,057,059,036,094'
@@ -22,11 +23,13 @@ def _sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def _editor_import(godot, phase):
+    qa_launch.preflight_project(ROOT, gameplay=False)
     folder = ROOT/'reports'
     folder.mkdir(parents=True,exist_ok=True)
     log = folder/('bootstrap_'+phase+'.log')
+    evidence = qa_launch.prepare_launch([str(godot),'--headless','--path',str(ROOT),'--editor','--quit'], ROOT, 'import_' + phase, gameplay=False)
     try:
-        run = subprocess.run([str(godot),'--headless','--path',str(ROOT),'--editor','--quit'],cwd=ROOT,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=120)
+        run = subprocess.run(evidence.command,cwd=ROOT,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=120)
     except subprocess.TimeoutExpired as failure:
         log.write_text(joined_output(failure.stdout,failure.stderr),encoding='utf-8')
         raise BootstrapError('Godot '+phase+' import timed out; see '+str(log)) from failure
@@ -35,11 +38,14 @@ def _editor_import(godot, phase):
         raise BootstrapError('Godot '+phase+' could not start; see '+str(log)) from failure
     output = joined_output(run.stdout,run.stderr)
     log.write_text(output,encoding='utf-8')
-    if run.returncode != 0 or fatal_lines(output) or 'CrashHandler' in output:
+    startup = qa_launch.validate_evidence(evidence, fatal_lines)
+    (folder/('bootstrap_'+phase+'_startup.json')).write_text(json.dumps(startup,ensure_ascii=False,indent=2),encoding='utf-8')
+    if run.returncode != 0 or fatal_lines(output) or 'CrashHandler' in output or not startup['passed']:
         raise BootstrapError('Godot '+phase+' import failed; see '+str(log),run.returncode)
 
 def import_runtime_assets(godot):
     """Import PNGs at their final paths before loading native atlas importers."""
+    qa_launch.preflight_project(ROOT, gameplay=False)
     project_root = ROOT.resolve()
     actors = (ROOT/'assets/actors').resolve()
     actors.relative_to(project_root)
@@ -187,11 +193,19 @@ def _stage(report, name, command=None, action=None, validate=None, evidence=()):
 
 
 def _copy_runtime(donor):
-    (ROOT/'bin/windows').mkdir(parents=True,exist_ok=True)
-    shutil.copy2(donor/'spine_godot_extension.gdextension',ROOT/'bin/spine_godot_extension.gdextension')
+    target = qa_launch.assert_safe_path(ROOT/'bin', ROOT, 'bin')
+    windows = qa_launch.assert_safe_path(ROOT/'bin/windows', ROOT, 'bin')
+    qa_launch.inspect_existing_tree(target)
+    # Validate every destination before the first mkdir or copy, including the
+    # root extension file and the three native libraries.
+    qa_launch.assert_safe_path(target/'spine_godot_extension.gdextension', ROOT, 'bin')
+    for name in ('editor','template_debug','template_release'):
+        qa_launch.assert_safe_path(windows/('libspine_godot.windows.'+name+'.x86_64.dll'), ROOT, 'bin')
+    windows.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(donor/'spine_godot_extension.gdextension',target/'spine_godot_extension.gdextension')
     for name in ('editor','template_debug','template_release'):
         filename='libspine_godot.windows.'+name+'.x86_64.dll'
-        shutil.copy2(donor/'windows'/filename,ROOT/'bin/windows'/filename)
+        shutil.copy2(donor/'windows'/filename,windows/filename)
 
 
 def main(argv=None):
@@ -201,6 +215,7 @@ def main(argv=None):
     parser.add_argument('--godot',type=Path,help='Optional Godot console executable: complete native authoring, portraits and read-only verification')
     parser.add_argument('--import-only',action='store_true',help='Only two-phase import of assets already copied into this project/package')
     args = parser.parse_args(argv)
+    qa_launch.preflight_project(ROOT, gameplay=False)
     for name in ('source_root','runtime_from','godot'):
         value = getattr(args,name)
         if value is not None: setattr(args,name,value.resolve())

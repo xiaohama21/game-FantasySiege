@@ -3,25 +3,25 @@
 	"audio_shutdowns": [
 		{
 			"phase": "fresh_complete",
-			"process_id": 29188.0,
+			"process_id": 20256,
 			"shutdown_clean": true,
-			"wait_seconds": 0.112
+			"wait_seconds": 0.027
 		},
 		{
 			"phase": "complete",
-			"process_id": 18968,
+			"process_id": 2160,
 			"shutdown_clean": true,
-			"wait_seconds": 0.057
+			"wait_seconds": 0.077
 		}
 	],
-	"battle_sha256": "dee994731e3cfcb1c0edce4dc1b949ff59cffab84f43afd21873315c2344bbb0",
+	"battle_sha256": "1e2d890dedd61c6b16405f7dc504fced23410f28cb163bc1aa73c1de0da75702",
 	"battle_step_seconds": 0.2,
-	"checks": 992,
+	"checks": 997,
 	"economy": {
-		"earned_credits": 3500,
-		"final_credits": 2840,
-		"initial_credits": 300,
-		"training_spend": 960
+		"earned_credits": 3500.0,
+		"final_credits": 2840.0,
+		"initial_credits": 300.0,
+		"training_spend": 960.0
 	},
 	"failures": [],
 	"final_profile": {
@@ -35,7 +35,7 @@
 			"stage_07",
 			"stage_08"
 		],
-		"credits": 2840,
+		"credits": 2840.0,
 		"levels": {
 			"diaochan": 1.0,
 			"ember_archer": 4.0,
@@ -74,25 +74,25 @@
 			"moon_mage",
 			"spirit_beast"
 		],
-		"schema": 3,
+		"schema": 3.0,
 		"study_routes": {},
 		"transactions": [
-			"stage_01-1139861-2457961876",
-			"stage_02-7819970-2352167117",
-			"stage_03-16423705-3452129620",
-			"stage_04-24792920-1213455909",
-			"stage_05-32790054-1231026024",
-			"stage_06-43309717-1245540635",
-			"stage_07-52367577-1339510680",
-			"stage_08-69793645-3666185154",
-			"stage_08-3471788-2297096538"
+			"stage_01-3204312-4238611145",
+			"stage_02-8934248-3169478880",
+			"stage_03-17650776-2242647521",
+			"stage_04-29382589-4150851051",
+			"stage_05-40112530-2219685029",
+			"stage_06-49316490-1396583313",
+			"stage_07-58239293-379109793",
+			"stage_08-70832213-2689581418",
+			"stage_08-2331674-2900220476"
 		]
 	},
 	"forbidden_shortcuts_used": [],
-	"fresh_process_id": 29188.0,
-	"gdd_header": "> 文档 v0.5.6 · 2026-11-19 · 目标程序 0.1.3.0",
-	"gdd_sha256": "234fd8f2753701221f84109d69f162f0335fbe01bc6f8ff6c20237ff66c9d462",
-	"gdd_version": "0.5.6",
+	"fresh_process_id": 20256,
+	"gdd_header": "> 文档 v0.5.11 · 2026-11-20 · 目标程序 0.1.3.0",
+	"gdd_sha256": "cec87bec5d226206998eb707df8546eb80455b367a558f1a09dc582b91ef8ea8",
+	"gdd_version": "0.5.11",
 	"initial_profile": {
 		"cleared": [],
 		"credits": 300.0,
@@ -143,9 +143,9 @@
 		"preferences": "res://tests/.user/campaign_journey/preferences.json",
 		"profile": "res://tests/.user/campaign_journey/profile.json"
 	},
-	"journey_sha256": "51d8f22727c4c30ddba5a1b75f9173b9027b7cd09cad603057cd49c7d694186a",
+	"journey_sha256": "003b20584ca4c625db1532ed47e2bd8e897293fc7aab6ff2a6489822c2cef0e6",
 	"logic_step_seconds": 0.0166666666666667,
-	"main_sha256": "32a17d86aee9047c132224b2b7ace8371944afa505e832cae8101d9ac7a02a1f",
+	"main_sha256": "fe2f21ec754605f2e4f79b1e2c14723d9f4a9ec26d0784656187611dbb876dcd",
 	"manual_input_verified": false,
 	"native_acceptance": "Rendered native Spine, actual audio, clean portable package, and full-scene performance are verified separately.",
 	"native_spine_verified": false,
@@ -160,7 +160,25 @@
 		"master_volume": 0.0,
 		"tutorial_seen": true
 	},
+	"program_version": "0.1.3.0",
 	"restart": {
+		"command_line": [
+			"F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64.exe",
+			"--headless",
+			"--path",
+			"F:/godotProject/FantasySiege",
+			"--script",
+			"res://tests/CampaignJourney.gd",
+			"--log-file",
+			"F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/journey_resume_20256_80286083.engine.log",
+			"--",
+			"--journey-resume",
+			"--qa-save-root",
+			"F:/godotProject/FantasySiege/tests/.user/campaign_journey",
+			"--qa-startup-report",
+			"F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/journey_resume_20256_80286083.startup.json",
+			"--qa-background"
+		],
 		"profile_checkpoint": {
 			"cleared": [
 				"stage_01",
@@ -214,14 +232,14 @@
 			"schema": 3.0,
 			"study_routes": {},
 			"transactions": [
-				"stage_01-1139861-2457961876",
-				"stage_02-7819970-2352167117",
-				"stage_03-16423705-3452129620",
-				"stage_04-24792920-1213455909",
-				"stage_05-32790054-1231026024",
-				"stage_06-43309717-1245540635",
-				"stage_07-52367577-1339510680",
-				"stage_08-69793645-3666185154"
+				"stage_01-3204312-4238611145",
+				"stage_02-8934248-3169478880",
+				"stage_03-17650776-2242647521",
+				"stage_04-29382589-4150851051",
+				"stage_05-40112530-2219685029",
+				"stage_06-49316490-1396583313",
+				"stage_07-58239293-379109793",
+				"stage_08-70832213-2689581418"
 			]
 		},
 		"profile_reloaded": {
@@ -274,21 +292,173 @@
 				"rivet_gunner",
 				"moon_mage"
 			],
-			"schema": 3,
+			"schema": 3.0,
 			"study_routes": {},
 			"transactions": [
-				"stage_01-1139861-2457961876",
-				"stage_02-7819970-2352167117",
-				"stage_03-16423705-3452129620",
-				"stage_04-24792920-1213455909",
-				"stage_05-32790054-1231026024",
-				"stage_06-43309717-1245540635",
-				"stage_07-52367577-1339510680",
-				"stage_08-69793645-3666185154"
+				"stage_01-3204312-4238611145",
+				"stage_02-8934248-3169478880",
+				"stage_03-17650776-2242647521",
+				"stage_04-29382589-4150851051",
+				"stage_05-40112530-2219685029",
+				"stage_06-49316490-1396583313",
+				"stage_07-58239293-379109793",
+				"stage_08-70832213-2689581418"
 			]
 		},
-		"profile_sha256": "bce711e486f2cd0ee7cfa73f9076e83ac62f9bccd1a5d7c28703d5e60a6c3638",
-		"resume_process_id": 18968
+		"profile_sha256": "efe25ca3bce1b9304924de9ed6f62ed24684c10a4661c17227d80c2e317b3fcc",
+		"qa_startup": {
+			"engine_log": "F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/journey_resume_20256_80286083.engine.log",
+			"engine_log_sha256": "167aedfe6c528aae1a1d959472a2919fe345d5cbb9b1d241d0c1ad54c3451db2",
+			"exit_code": 0,
+			"gameplay": true,
+			"project_root": "F:/godotProject/FantasySiege",
+			"save_root": "F:/godotProject/FantasySiege/tests/.user/campaign_journey",
+			"script_sha256": {
+				"scripts/core/ProfileStore.gd": "9eba24d0dbc3d7a459710a8f762b7bc5c43450dccee0ef7b4bd7cb467cf751b4",
+				"scripts/core/QAStartupContext.gd": "fee68d14c5d2432cd6259b07b3b25ebe4a7b4962c2635b631fcfeed3925ec49f",
+				"scripts/core/UserPrefs.gd": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a"
+			},
+			"started_clock": "Time.get_unix_time_from_system quantized down to milliseconds",
+			"started_ns": 1795414782518000000,
+			"started_precision_ns": 1000000,
+			"started_unix_msec": 1795414782518,
+			"startup_report": "F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/journey_resume_20256_80286083.startup.json",
+			"startup_report_sha256": "90ef7817a418ad5c3a9a856c7e1bd27173442754993f3a26ebf7137cb3682c07"
+		},
+		"resume_process_id": 2160,
+		"startup_context": {
+			"atomic_filesystem_sandbox": false,
+			"background": true,
+			"first_loads": {
+				"preferences": {
+					"blocked": false,
+					"owner": "preferences",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/preferences.json",
+					"summary": {
+						"blocked": false,
+						"dirty": false,
+						"error_message": "",
+						"values": {
+							"damage_numbers": false,
+							"edge_scroll": true,
+							"fullscreen": false,
+							"master_volume": 0.0,
+							"music_volume": 0.45,
+							"sfx_volume": 0.7,
+							"tutorial_seen": true
+						}
+					},
+					"ticks_usec": 469337.0
+				},
+				"profile": {
+					"blocked": false,
+					"owner": "profile",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/profile.json",
+					"summary": {
+						"blocked": false,
+						"cleared": [
+							"stage_01",
+							"stage_02",
+							"stage_03",
+							"stage_04",
+							"stage_05",
+							"stage_06",
+							"stage_07",
+							"stage_08"
+						],
+						"credits": 2580.0,
+						"error_message": "",
+						"levels": {
+							"diaochan": 1.0,
+							"ember_archer": 4.0,
+							"guanyu": 4.0,
+							"iron_guard": 4.0,
+							"lubu": 1.0,
+							"moon_mage": 1.0,
+							"rivet_gunner": 1.0,
+							"rune_medic": 4.0,
+							"spirit_beast": 1.0,
+							"star_hammer": 1.0,
+							"zhaoyun": 1.0,
+							"zhugeliang": 1.0
+						},
+						"owned": [
+							"guanyu",
+							"zhaoyun",
+							"zhugeliang",
+							"diaochan",
+							"lubu",
+							"iron_guard",
+							"ember_archer",
+							"rune_medic",
+							"star_hammer",
+							"rivet_gunner",
+							"moon_mage",
+							"spirit_beast"
+						],
+						"roster": [
+							"guanyu",
+							"lubu",
+							"iron_guard",
+							"ember_archer",
+							"rune_medic",
+							"star_hammer",
+							"rivet_gunner",
+							"moon_mage"
+						],
+						"study_routes": {}
+					},
+					"ticks_usec": 506841.0
+				}
+			},
+			"operations": [
+				{
+					"action": "read",
+					"allowed": true,
+					"owner": "preferences",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/preferences.json",
+					"ticks_usec": 449067.0
+				},
+				{
+					"action": "read",
+					"allowed": true,
+					"owner": "preferences",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/preferences.json.bak",
+					"ticks_usec": 454683.0
+				},
+				{
+					"action": "read",
+					"allowed": true,
+					"owner": "profile",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/profile.json",
+					"ticks_usec": 490914.0
+				},
+				{
+					"action": "read_future_schema",
+					"allowed": true,
+					"owner": "profile",
+					"path": "F:/godotProject/FantasySiege/tests/.user/campaign_journey/profile.json",
+					"ticks_usec": 499161.0
+				}
+			],
+			"program_version": "0.1.3.0",
+			"project_root": "F:/godotProject/FantasySiege",
+			"qa_enabled": true,
+			"refused_operations": [],
+			"report_path": "F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/journey_resume_20256_80286083.startup.json",
+			"runtime_path_check": "project containment and DirAccess.is_link for existing components; launcher resolved-path/reparse/hard-link preflight required",
+			"save_root": "F:/godotProject/FantasySiege/tests/.user/campaign_journey",
+			"script_sha256": {
+				"scripts/core/ProfileStore.gd": "9eba24d0dbc3d7a459710a8f762b7bc5c43450dccee0ef7b4bd7cb467cf751b4",
+				"scripts/core/QAStartupContext.gd": "fee68d14c5d2432cd6259b07b3b25ebe4a7b4962c2635b631fcfeed3925ec49f",
+				"scripts/core/UserPrefs.gd": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a"
+			},
+			"started_ticks_usec": 440975.0,
+			"started_unix_time": 1795414783.014,
+			"valid": true,
+			"window_policy_reason": "background QA must not apply fullscreen or restore the host window",
+			"window_policy_skipped": true
+		}
 	},
 	"roster_changes": [
 		{
@@ -478,7 +648,7 @@
 				"rune_medic": 1.0,
 				"zhaoyun": 1.0
 			},
-			"wall_ms": 6273.604
+			"wall_ms": 5127.993
 		},
 		{
 			"actual_award": {
@@ -574,7 +744,7 @@
 				"rune_medic": 1.0,
 				"zhaoyun": 1.0
 			},
-			"wall_ms": 8527.636
+			"wall_ms": 8649.159
 		},
 		{
 			"actual_award": {
@@ -681,7 +851,7 @@
 				"zhaoyun": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 7500.58
+			"wall_ms": 8835.689
 		},
 		{
 			"actual_award": {
@@ -803,7 +973,7 @@
 				"zhaoyun": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 7656.043
+			"wall_ms": 9821.855
 		},
 		{
 			"actual_award": {
@@ -931,7 +1101,7 @@
 				"star_hammer": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 9817.136
+			"wall_ms": 8210.642
 		},
 		{
 			"actual_award": {
@@ -1065,7 +1235,7 @@
 				"star_hammer": 1.0,
 				"zhugeliang": 1.0
 			},
-			"wall_ms": 8741.806
+			"wall_ms": 8268.816
 		},
 		{
 			"actual_award": {
@@ -1197,7 +1367,7 @@
 				"rune_medic": 3.0,
 				"star_hammer": 1.0
 			},
-			"wall_ms": 16334.909
+			"wall_ms": 11309.356
 		},
 		{
 			"actual_award": {
@@ -1343,13 +1513,13 @@
 				"rune_medic": 4.0,
 				"star_hammer": 1.0
 			},
-			"wall_ms": 25713.277
+			"wall_ms": 9296.948
 		},
 		{
 			"actual_award": {
-				"base_credits": 260,
-				"bonus_credits": 0,
-				"credits": 260,
+				"base_credits": 260.0,
+				"bonus_credits": 0.0,
+				"credits": 260.0,
 				"first_clear": false,
 				"stage_id": "stage_08",
 				"unlock_units": []
@@ -1364,24 +1534,24 @@
 				"stage_07",
 				"stage_08"
 			],
-			"credits_after": 2840,
-			"credits_before": 2580,
+			"credits_after": 2840.0,
+			"credits_before": 2580.0,
 			"elapsed": 295.516666666727,
 			"enemy_hp": 0.0,
 			"events": {
-				"attack": 522,
-				"base_hit": 74,
-				"cast": 82,
-				"death": 47,
-				"heal": 79,
-				"hit": 710,
-				"phase": 1,
-				"pulse": 4,
-				"spawn": 74,
-				"stun": 16
+				"attack": 522.0,
+				"base_hit": 74.0,
+				"cast": 82.0,
+				"death": 47.0,
+				"heal": 79.0,
+				"hit": 710.0,
+				"phase": 1.0,
+				"pulse": 4.0,
+				"spawn": 74.0,
+				"stun": 16.0
 			},
-			"finished_signals": 1,
-			"heavy_attack_warnings": 37,
+			"finished_signals": 1.0,
+			"heavy_attack_warnings": 37.0,
 			"id": "stage_08",
 			"levels": {
 				"diaochan": 1.0,
@@ -1397,7 +1567,7 @@
 				"zhaoyun": 1.0,
 				"zhugeliang": 1.0
 			},
-			"max_active": 30,
+			"max_active": 30.0,
 			"outcome": "victory",
 			"owned_after": [
 				"guanyu",
@@ -1444,12 +1614,12 @@
 					"warning_elapsed": 170.816666666695
 				}
 			],
-			"rendered_actor_count": 0,
+			"rendered_actor_count": 0.0,
 			"revisit": true,
 			"reward_preview": {
-				"base_credits": 260,
-				"bonus_credits": 0,
-				"credits": 260,
+				"base_credits": 260.0,
+				"bonus_credits": 0.0,
+				"credits": 260.0,
 				"first_clear": false,
 				"stage_id": "stage_08",
 				"unlock_units": []
@@ -1466,28 +1636,158 @@
 			],
 			"signal_victory": true,
 			"summon_by_id": {
-				"ember_archer": 6,
-				"iron_guard": 1,
-				"moon_mage": 4,
-				"rivet_gunner": 4,
-				"rune_medic": 2,
-				"spirit_beast": 29,
-				"star_hammer": 1
+				"ember_archer": 6.0,
+				"iron_guard": 1.0,
+				"moon_mage": 4.0,
+				"rivet_gunner": 4.0,
+				"rune_medic": 2.0,
+				"spirit_beast": 29.0,
+				"star_hammer": 1.0
 			},
-			"summons": 47,
+			"summons": 47.0,
 			"verified_levels": {
-				"ember_archer": 4,
-				"iron_guard": 4,
-				"moon_mage": 1,
-				"rivet_gunner": 1,
-				"rune_medic": 4,
-				"spirit_beast": 1,
-				"star_hammer": 1
+				"ember_archer": 4.0,
+				"iron_guard": 4.0,
+				"moon_mage": 1.0,
+				"rivet_gunner": 1.0,
+				"rune_medic": 4.0,
+				"spirit_beast": 1.0,
+				"star_hammer": 1.0
 			},
-			"wall_ms": 19596.019
+			"wall_ms": 11440.337
 		}
 	],
 	"stages_sha256": "71cd135b5852d5da2cc429ed58d314b30040e70922952be0c606d633f279ef7c",
+	"startup_context": {
+		"atomic_filesystem_sandbox": false,
+		"background": true,
+		"first_loads": {
+			"preferences": {
+				"blocked": false,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/preferences.json",
+				"summary": {
+					"blocked": false,
+					"dirty": false,
+					"error_message": "",
+					"values": {
+						"damage_numbers": true,
+						"edge_scroll": true,
+						"fullscreen": false,
+						"master_volume": 0.8,
+						"music_volume": 0.45,
+						"sfx_volume": 0.7,
+						"tutorial_seen": false
+					}
+				},
+				"ticks_usec": 1013094.0
+			},
+			"profile": {
+				"blocked": false,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/profile.json",
+				"summary": {
+					"blocked": false,
+					"cleared": [],
+					"credits": 300.0,
+					"error_message": "",
+					"levels": {
+						"diaochan": 1.0,
+						"ember_archer": 1.0,
+						"guanyu": 1.0,
+						"iron_guard": 1.0,
+						"lubu": 1.0,
+						"rune_medic": 1.0,
+						"zhaoyun": 1.0,
+						"zhugeliang": 1.0
+					},
+					"owned": [
+						"guanyu",
+						"zhaoyun",
+						"zhugeliang",
+						"diaochan",
+						"lubu",
+						"iron_guard",
+						"ember_archer",
+						"rune_medic"
+					],
+					"roster": [
+						"guanyu",
+						"zhaoyun",
+						"zhugeliang",
+						"diaochan",
+						"lubu",
+						"iron_guard",
+						"ember_archer",
+						"rune_medic"
+					],
+					"study_routes": {}
+				},
+				"ticks_usec": 1377636.0
+			}
+		},
+		"operations": [
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/preferences.json",
+				"ticks_usec": 999817.0
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "preferences",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/preferences.json.bak",
+				"ticks_usec": 1011399.0
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/profile.json",
+				"ticks_usec": 1296570.0
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/profile.json",
+				"ticks_usec": 1302669.0
+			},
+			{
+				"action": "read_future_schema",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/profile.json.bak",
+				"ticks_usec": 1328021.0
+			},
+			{
+				"action": "read",
+				"allowed": true,
+				"owner": "profile",
+				"path": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb/profile.json.bak",
+				"ticks_usec": 1358694.0
+			}
+		],
+		"program_version": "0.1.3.0",
+		"project_root": "F:/godotProject/FantasySiege",
+		"qa_enabled": true,
+		"refused_operations": [],
+		"report_path": "F:/godotProject/FantasySiege/reports/qa_startup/CampaignJourney-20261123T061821125268-2dde5ac626eb/startup.json",
+		"runtime_path_check": "project containment and DirAccess.is_link for existing components; launcher resolved-path/reparse/hard-link preflight required",
+		"save_root": "F:/godotProject/FantasySiege/tests/.user/qa/CampaignJourney-20261123T061821125268-2dde5ac626eb",
+		"script_sha256": {
+			"scripts/core/ProfileStore.gd": "9eba24d0dbc3d7a459710a8f762b7bc5c43450dccee0ef7b4bd7cb467cf751b4",
+			"scripts/core/QAStartupContext.gd": "fee68d14c5d2432cd6259b07b3b25ebe4a7b4962c2635b631fcfeed3925ec49f",
+			"scripts/core/UserPrefs.gd": "c147a824cf62c776684a6fbbc58e4e5db7a705ef3ae0a137786012cff72a429a"
+		},
+		"started_ticks_usec": 992808.0,
+		"started_unix_time": 1795414703.224,
+		"valid": true,
+		"window_policy_reason": "background QA must not apply fullscreen or restore the host window",
+		"window_policy_skipped": true
+	},
 	"training": [
 		{
 			"cost": 60.0,

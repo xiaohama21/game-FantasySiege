@@ -19,4 +19,5 @@ reports/runtime/
 reports/spine_visuals/
 reports/art_environment/
 reports/native_texture_staging/
+reports/qa_startup/
 *.err

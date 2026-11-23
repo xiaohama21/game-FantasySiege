@@ -1,5 +1,7 @@
 extends SceneTree
 
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
+
 class PortraitActor extends SpineActor:
 	func _draw() -> void:
 		pass # Native body only; the UI supplies its own backdrop and pedestal.
@@ -11,14 +13,20 @@ const DIRECTORY := "res://assets/portraits"
 var failures: Array = []
 var entries: Array = []
 var viewport: SubViewport
+var background_first_invalid_sample: Dictionary = {}
+var background_started_usec := 0
+var background_host_valid_captures := 0
+var background_captures := 0
 
 func _initialize() -> void:
+	background_started_usec = Time.get_ticks_usec()
 	root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
 
 func _run() -> void:
+	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native portraits require a valid isolated QA startup")
 	# This is an offscreen artifact renderer, never a foreground/FPS test.
-	root.mode = Window.MODE_MINIMIZED
+	_record_background_sample("run_start", 0)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIRECTORY))
 	viewport = SubViewport.new()
 	viewport.size = CANVAS
@@ -83,6 +91,10 @@ func _run() -> void:
 	if adapter.is_empty(): failures.append("real offscreen renderer required")
 	if entries.size()!=12: failures.append("expected twelve native portraits, got "+str(entries.size()))
 	var report := {"program_version":str(ProjectSettings.get_setting("application/config/version","unknown")),"passed":failures.is_empty(),"visuals_sha256":FileAccess.get_sha256("res://resources/visuals.json"),"rendering_adapter":adapter,"actual_rendering_method":str(RenderingServer.call("get_current_rendering_method")) if RenderingServer.has_method("get_current_rendering_method") else "unknown","offscreen_only":true,"entries":entries,"failures":failures}
+	report.qa_startup = QA_CONTEXT.snapshot()
+	report.background_first_invalid_sample = background_first_invalid_sample
+	report.background_captures = background_captures
+	report.background_host_valid_captures = background_host_valid_captures
 	var file := FileAccess.open(DIRECTORY+"/manifest.json",FileAccess.WRITE)
 	if file!=null:
 		file.store_string(JSON.stringify(report,"\t"))
@@ -100,7 +112,20 @@ func _capture() -> Image:
 	await process_frame
 	await process_frame # Flush queued CanvasItem draws without presenting a window.
 	RenderingServer.force_draw(false)
+	background_captures += 1
+	if root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED:
+		background_host_valid_captures += 1
+	else: _record_background_sample("portrait_capture", background_captures)
 	return viewport.get_texture().get_image()
+
+func _record_background_sample(stage: String, sample: int) -> void:
+	if root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED: return
+	if background_first_invalid_sample.is_empty():
+		background_first_invalid_sample = {"stage": stage, "sample": sample,
+			"ticks_usec": Time.get_ticks_usec(), "elapsed_usec": Time.get_ticks_usec() - background_started_usec,
+			"window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode(), "cause": "unknown"}
+	if not failures.has("background portrait host was restored"):
+		failures.append("background portrait host was restored")
 
 func _valid_bounds(bounds: Rect2i,unit_id: String,phase: String) -> bool:
 	if bounds.size.x<=0 or bounds.size.y<=0:

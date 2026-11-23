@@ -1,6 +1,7 @@
 # Spine 批量应用规格
 
-> v0.21 · 2026-11-20 · GDD v0.5.8 / 程序0.1.3.0
+> v0.22 · 2026-11-20 · GDD v0.5.8 / 程序0.1.3.0
+> v0.22：所有原生探针/肖像/Playback/Mesh引擎启动共用QA根与独立日志，保留无效窗口样本；素材与性能门槛不变。
 > v0.21：干净检出完整重建；转换失败非零退出、来源清单与参数绑定、完整21ID门禁，作者状态更新在肖像生成前完成，随后只读冻结验证。
 > v0.20：原生验收默认只读生产配方，结果状态独立写报告；作者需显式update-status才改配置，且必须在肖像生成与打包前完成。修正验收重排JSON导致原字节SHA失效的管线边界，不放宽肖像或payload哈希。
 > v0.19：区分早期GL/非托管/四组历史测量与当前Mobile/Safe/托管/统一两组候选；实际图形验收采用生产普通日志，verbose宿主诊断单列保留，最终性能与差图仍待本轮报告。
@@ -177,3 +178,8 @@ Godot主Window禁止set visible=false，后台工具也不能调用它（FS-024�
 2026-11-20干净检出实际验收完成：从本项目Git提交04244668创建build/repro-04244668，初始.godot、actors、portraits和bin全部不存在。完整bootstrap十阶段成功，21套作者探针更新后冻结配方，十二肖像重新制作/导入及只读复核通过。当前atlas实际引用的84份派生资源与主项目逐字节一致，105个D69原始输入和4个捐赠运行库文件前后SHA不变，档案/来源哈希105项相符；旧工程336文件与Git状态保持不变。21完整配方语义一致，原字节差异实证仅LF/CRLF，两个真实SHA各自保留，未为凑哈希重写资源。主项目097旧纹理别名未被图集引用，未借入新检出。
 
 该检出自行构建exports/windows/FantasySiege-0.1.3.0-rebuilt-1，无主项目缓存/肖像复制。包CPU12/8558、21来源/220原始动作、十二肖像、双播放模式、2624零差像素、Art54/6973零文字溢出和独立完整旅程988均通过；80份当前运行日志无致命错误或泄漏。Python全量130项中129通过、1因Windows符号链接创建权限跳过，5类目录junction和9类hardlink哨兵测试实测通过。报告reports/rebuild_candidate_0.1.3.json，详细原文件/阶段/快照SHA证据本地保留。首次独立汇总把builder新生成reports/.gdignore误认为复制来源文件，失败报告保留；修正来源分类后重核，包及载荷manifest门禁未更改。foreground/performance/commercial/delivery_ready仍false。
+
+
+## 首次启动隔离增量
+
+设计与验收协议见[QA_STARTUP.md](QA_STARTUP.md)。当前登记设计，运行结果和新候选证据另记；candidate11已通过范围及known_startup_isolation_gap=true保持冻结。

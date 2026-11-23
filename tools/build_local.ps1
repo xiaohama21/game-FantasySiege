@@ -14,6 +14,25 @@ $packageRoot = [IO.Path]::GetFullPath($Destination)
 if (-not $packageRoot.StartsWith($exportsRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Package destination must be a subdirectory of this project exports/windows'
 }
+# Reject existing junctions before any package directory or payload is written.
+function Assert-UnlinkedPackagePath([string]$Target) {
+    $anchor = [IO.Path]::GetFullPath($projectRoot).TrimEnd([char[]]@('\', '/'))
+    $absolute = [IO.Path]::GetFullPath($Target)
+    if (-not $absolute.StartsWith($anchor + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Package path must remain inside this project'
+    }
+    $cursor = $anchor
+    $parts = @('') + @($absolute.Substring($anchor.Length).TrimStart([char[]]@('\', '/')).Split([char[]]@('\', '/'), [StringSplitOptions]::RemoveEmptyEntries))
+    foreach ($part in $parts) {
+        if ($part) { $cursor = Join-Path $cursor $part }
+        try { $entry = Get-Item -LiteralPath $cursor -Force -ErrorAction Stop }
+        catch [System.Management.Automation.ItemNotFoundException] { continue }
+        if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw ('Refusing reparse point in package destination: ' + $cursor)
+        }
+    }
+}
+Assert-UnlinkedPackagePath $packageRoot
 if ((Test-Path -LiteralPath $packageRoot) -and (Get-ChildItem -LiteralPath $packageRoot -Force | Select-Object -First 1)) {
     throw ('Package destination is not empty; preserve this build and select a new empty Destination: ' + $packageRoot)
 }
@@ -40,7 +59,7 @@ foreach ($name in @('scripts', 'scenes', 'resources', 'bin', 'assets\actors', 'a
     Copy-PayloadTree $name
 }
 New-Item -ItemType Directory -Path (Join-Path $packageRoot 'tools') -Force | Out-Null
-foreach ($name in @('bootstrap_local.py', 'spine_pipeline.py', 'spine_upgrade_38_to_43.py', 'verify_spine.py', 'run_checks.py', 'verify_package.py', 'generate_portraits.py')) {
+foreach ($name in @('bootstrap_local.py', 'spine_pipeline.py', 'spine_upgrade_38_to_43.py', 'verify_spine.py', 'run_checks.py', 'verify_package.py', 'generate_portraits.py', 'qa_launch.py', 'verify_qa_startup.py')) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot $name) -Destination (Join-Path $packageRoot 'tools') -Force
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'project.godot') -Destination $packageRoot -Force
@@ -62,7 +81,7 @@ start "Star Lantern Expedition" "%~dp0FantasySiege.exe" --path "%~dp0."
 从300星砂开始，依次远征八关；第2/4/6/8关契约新英魂，星砂用于训练，编队最多八人。
 营地“研修”：已契约且Lv.3、首通第四关后，180星砂一次解锁该英魂两条路线，之后免费切换/恢复基础，仅营地。
 关卡卡片“敌情”可查看敌军计划出场、加强波次数值、首领反制和已保存编队的战术提醒；未解锁关卡可浏览，仍需按顺序通关后出征。
-关闭后重新启动会恢复进度。独立存档位于 %APPDATA%\Godot\app_userdata\FantasySiege，不与旧游戏混用。
+关闭后重新启动会恢复进度。独立存档位于 %APPDATA%\FantasySiege，不与旧游戏混用。
 本包已完成纹理与原生素材导入；请完整保留文件夹，不单独搬动FantasySiege.exe。
 D69角色素材仅供本地学习研究，请保留本包在本地，不作商业用途。
 Godot Engine https://godotengine.org/license/ (MIT)，完整声明见GODOT_LICENSE.txt。

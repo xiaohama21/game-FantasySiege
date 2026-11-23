@@ -1,12 +1,15 @@
 extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 var report: Dictionary = {"passed": false, "animations": [], "errors": []}
 
 func _initialize() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid():
+		report.errors.append("native probe requires a valid isolated QA startup")
 	var args := OS.get_cmdline_user_args()
 	var id := args[0] if args.size() > 0 else "d69_097"
 	var report_path := args[1] if args.size() > 1 else "res://reports/spine_probe.json"
@@ -42,6 +45,7 @@ func _run() -> void:
 	_finish(report_path, 0 if report.passed else 1)
 
 func _finish(path: String, code: int) -> void:
+	report.qa_startup = QA_CONTEXT.snapshot()
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file != null:
 		file.store_string(JSON.stringify(report, "\t"))

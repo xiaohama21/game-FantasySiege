@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import verify_spine
+import qa_mock
 
 
 class NativeVerificationBoundaries(unittest.TestCase):
@@ -29,15 +30,18 @@ class NativeVerificationBoundaries(unittest.TestCase):
         self.original = b'\xef\xbb\xbf' + json.dumps(self.config, ensure_ascii=False, separators=(',', ' : ')).encode('utf-8') + b'\r\n'
         self.path = self.root / 'resources/visuals.json'
         self.path.write_bytes(self.original)
+        qa_mock.scripts(self.root)
         root_patch = patch.object(verify_spine, 'ROOT', self.root)
         root_patch.start()
         self.addCleanup(root_patch.stop)
 
     def success(self, command, **kwargs):
+        qa_mock.emit(command, self.root)
         self.assertEqual(command[command.index('--path') + 1], str(self.root))
         self.assertIn('--headless', command)
-        key = command[-2]
-        path = Path(command[-1])
+        user_start = command.index("--") + 1
+        key = command[user_start]
+        path = Path(command[user_start + 1])
         self.assertFalse(path.exists(), 'each native report must be cleared before launch')
         path.write_text(json.dumps({'passed': True, 'native': True, 'visual_id': key,
                                     'errors': [], 'animations': [{'name': 'idle', 'visible_samples': 36}]}))
@@ -76,7 +80,7 @@ class NativeVerificationBoundaries(unittest.TestCase):
             with self.subTest(failure=failure):
                 def noisy(command, **kwargs):
                     response = self.success(command, **kwargs)
-                    if command[-2] == self.keys[0]:
+                    if command[command.index("--") + 1] == self.keys[0]:
                         if failure == 'nonzero':
                             response.returncode = 1
                         else:
@@ -104,7 +108,7 @@ class NativeVerificationBoundaries(unittest.TestCase):
         key = self.keys[0]
         (self.root / 'reports/spine_probes' / (key + '.json')).write_text('{"passed":true}')
         def missing(command, **kwargs):
-            self.assertFalse(Path(command[-1]).exists())
+            self.assertFalse(Path(command[command.index("--") + 2]).exists())
             return subprocess.CompletedProcess(command, 0, stdout='SPINE_PROBE_COMPLETE {}\n', stderr='')
         code, report, _ = self.run_verify(missing, [key])
         self.assertEqual(code, 1)

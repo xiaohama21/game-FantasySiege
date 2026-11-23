@@ -1,18 +1,42 @@
 extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
+const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
 var failures: Array = []
 var background := false
 var background_host_valid_resources := 0
+var background_first_invalid_sample: Dictionary = {}
+var background_started_usec := 0
+var background_monitor_started := false
+var background_frame_sample := 0
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	background = args.has("background") or args.has("--background")
+	background_started_usec = Time.get_ticks_usec()
 	if background: root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
 
+func _process(_delta: float) -> bool:
+	if background and background_monitor_started:
+		background_frame_sample += 1
+		_record_background_sample("process_frame", background_frame_sample)
+	return false
+
+func _record_background_sample(stage: String, sample: int, visual_id: String = "") -> void:
+	if not background or (root.mode == Window.MODE_MINIMIZED and DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MINIMIZED): return
+	if background_first_invalid_sample.is_empty():
+		background_first_invalid_sample = {"stage": stage, "sample": sample, "visual_id": visual_id,
+			"ticks_usec": Time.get_ticks_usec(), "elapsed_usec": Time.get_ticks_usec() - background_started_usec,
+			"window_mode": root.mode, "display_window_mode": DisplayServer.window_get_mode(),
+			"cause": "unknown"}
+	if not failures.has("background playback host was restored"):
+		failures.append("background playback host was restored")
+
 func _run() -> void:
-	if background: root.mode = Window.MODE_MINIMIZED # Reapply after autoload window preferences.
+	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native playback requires a valid isolated QA startup")
+	background_monitor_started = background
+	_record_background_sample("run_start", 0)
 	var visual_ids: Array = Catalog.visuals().keys()
 	var args := OS.get_cmdline_user_args()
 	var production_managed := bool(ProjectSettings.get_setting("fantasy_siege/visuals/managed_mesh_redraw",false))
@@ -104,8 +128,7 @@ func _run() -> void:
 		if background:
 			if root.mode==Window.MODE_MINIMIZED and DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_MINIMIZED:
 				background_host_valid_resources += 1
-			elif not failures.has("background playback host was restored"):
-				failures.append("background playback host was restored")
+			else: _record_background_sample("native_resource", visual_ids.find(visual_id) + 1, visual_id)
 	var adapter := RenderingServer.get_video_adapter_name()
 	if visual_ids.size()!=21: failures.append("all 21 native resources required")
 	if adapter.is_empty() or DisplayServer.get_name()=="headless" or _rendering_method()=="unknown": failures.append("real renderer and actual backend required")
@@ -116,6 +139,9 @@ func _run() -> void:
 	report.actual_rendering_driver = _rendering_driver()
 	report.performance_measured = false
 	report.background_host_valid_resources = background_host_valid_resources
+	report.background_first_invalid_sample = background_first_invalid_sample
+	report.background_window_frame_samples = background_frame_sample
+	report.qa_startup = QA_CONTEXT.snapshot()
 	report.root_window_mode = root.mode
 	report.display_window_mode = DisplayServer.window_get_mode()
 	report.root_visible = root.visible

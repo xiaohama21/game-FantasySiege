@@ -17,6 +17,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import run_checks
+import qa_mock
 
 
 @lru_cache(maxsize=None)
@@ -42,12 +43,13 @@ class StrictRunnerBoundaries(unittest.TestCase):
                     path.parent.mkdir(parents=True, exist_ok=True)
                     text = "> 文档 v0.5.7 · fixture\n" if relative == "docs/GAME_DESIGN.md" else "fixture input: " + relative + "\n"
                     path.write_text(text, encoding="utf-8")
+        qa_mock.scripts(self.root)
         root_patch = patch.object(run_checks, "ROOT", self.root)
         root_patch.start()
         self.addCleanup(root_patch.stop)
 
     def case_for(self, command):
-        name = command[-1].rsplit("/", 1)[-1].removesuffix(".gd")
+        name = command[command.index("--script") + 1].rsplit("/", 1)[-1].removesuffix(".gd")
         return run_checks.CASES[name]
 
     def payload(self, case):
@@ -58,6 +60,8 @@ class StrictRunnerBoundaries(unittest.TestCase):
         data.update(dict(case.required_report_values))
         if case.name == 'MainFlow':
             data.update(self.main_flow_fixture())
+        if case.name == 'CampaignJourney':
+            data['restart'] = {'qa_startup': qa_mock.record(self.root, 'journey_child')}
         return data
 
     def main_flow_fixture(self):
@@ -82,6 +86,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
         return path
 
     def success(self, command, **kwargs):
+        qa_mock.emit(command, self.root)
         case = self.case_for(command)
         self.assertFalse((self.root / "reports" / case.report_file).exists(), "report must be cleared before launch")
         self.write_report(case, self.payload(case))
@@ -579,6 +584,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
             case = self.case_for(command)
             if case.name == "PreferencesSmoke":
                 self.assertFalse((self.root / "reports" / case.report_file).exists())
+                qa_mock.emit(command, self.root)
                 return subprocess.CompletedProcess(command, 0, stdout=case.marker, stderr="")
             return self.success(command, **kwargs)
         code, summary = self.run_main(["--visual"], omit_one)
@@ -595,6 +601,7 @@ class StrictRunnerBoundaries(unittest.TestCase):
             current = self.case_for(command)
             if current.name == case.name:
                 self.assertFalse((self.root / "reports" / case.report_file).exists())
+                qa_mock.emit(command, self.root)
                 return subprocess.CompletedProcess(command, 0, stdout=case.marker, stderr="")
             return self.success(command, **kwargs)
         code, summary = self.run_main(["--visual"], omit_study)

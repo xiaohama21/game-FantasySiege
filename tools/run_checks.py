@@ -13,6 +13,7 @@ import struct
 import subprocess
 import time
 import zlib
+import qa_launch
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_GODOT = Path("F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe")
@@ -185,8 +186,8 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
 
-def project_context() -> dict:
-    source = (ROOT / "project.godot").read_bytes()
+def project_context(root: Path | None = None) -> dict:
+    source = ((ROOT if root is None else root) / "project.godot").read_bytes()
     match = re.search(r'^\s*config/version\s*=\s*"([^"\r\n]+)"\s*$', source.decode("utf-8-sig"), re.MULTILINE)
     if match is None:
         raise ValueError("project.godot has no application config/version")
@@ -232,7 +233,9 @@ def has_completion_marker(stdout: str, case: CheckCase) -> bool:
 
 
 def _write_json(path: Path, data: dict) -> None:
+    qa_launch.assert_safe_path(path, ROOT, "reports")
     temporary = path.with_name(path.name + ".tmp")
+    qa_launch.assert_safe_path(temporary, ROOT, "reports")
     temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(path)
 
@@ -282,6 +285,9 @@ def validate_report(case: CheckCase, result: dict, expected: dict) -> None:
             result["errors"].append("report_required_value_mismatch: " + key)
     if case.name == "MainFlow":
         result["errors"].extend(main_flow_check(report))
+    if case.name == "CampaignJourney":
+        restart = report.get("restart", {})
+        result["errors"].extend(qa_launch.audit_record(restart.get("qa_startup", {}), ROOT, fatal_lines))
 
 
 def run_case(case: CheckCase, godot: Path, expected: dict, verbose_render_diagnostics: bool = False) -> dict:
@@ -300,12 +306,17 @@ def run_case(case: CheckCase, godot: Path, expected: dict, verbose_render_diagno
         "artifact_sha256": {},
     }
     output = ""
+    evidence = None
     try:
         # Deletion, not an mtime-only comparison, prevents reuse of an old PASS.
-        (ROOT / "reports" / case.report_file).unlink(missing_ok=True)
+        qa_launch.preflight_project(ROOT)
+        qa_launch.assert_safe_path(ROOT / "reports" / case.report_file, ROOT, "reports").unlink(missing_ok=True)
         if project_context() != expected:
             raise ValueError("project_changed_before_case")
         result["artifact_sha256"] = case_artifact_context(case)
+        evidence = qa_launch.prepare_launch(command, ROOT, case.name, background=case.headless)
+        command = evidence.command
+        result["command_line"] = command
         launch_options = {}
         if os.name == "nt" and not case.headless:
             startup = subprocess.STARTUPINFO()
@@ -329,12 +340,15 @@ def run_case(case: CheckCase, godot: Path, expected: dict, verbose_render_diagno
     result["finished_ns"] = time.time_ns()
     result["finished_at"] = _utc_now()
     result["duration_seconds"] = (result["finished_ns"] - result["started_ns"]) / 1_000_000_000
+    if evidence is not None:
+        result["qa_startup"] = qa_launch.validate_evidence(evidence, fatal_lines)
+        result["errors"].extend(result["qa_startup"]["errors"])
     result["fatal_log_lines"] = fatal_lines(output)
     result["diagnostic_log_lines"] = diagnostic_lines(output)
     if result["fatal_log_lines"]:
         result["errors"].append("fatal_error_or_leak_log")
     try:
-        (ROOT / "reports" / f"{case.name}.log").write_text(output, encoding="utf-8")
+        qa_launch.assert_safe_path(ROOT / "reports" / f"{case.name}.log", ROOT, "reports").write_text(output, encoding="utf-8")
         if project_context() != expected:
             result["errors"].append("project_changed_during_case")
         if case_artifact_context(case) != result["artifact_sha256"]:
@@ -362,6 +376,7 @@ def main(argv: list[str] | None = None) -> int:
         "verbose_render_diagnostics": args.verbose_render_diagnostics,
         "rendered_launch_scope": "verbose driver/resource diagnostics" if args.verbose_render_diagnostics else "production startup logging",
     }
+    qa_launch.preflight_project(ROOT)
     directory = ROOT / "reports"
     directory.mkdir(parents=True, exist_ok=True)
     summary = directory / "checks.json"

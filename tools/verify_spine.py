@@ -8,6 +8,7 @@ import subprocess
 import time
 from datetime import datetime, timezone
 import run_checks
+import qa_launch
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_GODOT = Path('F:/Godot/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe')
@@ -27,10 +28,15 @@ def _probe(godot, key, folder):
     command = [str(godot), '--headless', '--path', str(ROOT), '--script', 'res://tests/SpineProbe.gd', '--', key, str(path)]
     started_ns = time.time_ns()
     output = ''
+    evidence = None
     result = {'visual_id': key, 'source_id': key.removeprefix('d69_'), 'passed': False,
               'exit_code': None, 'animation_count': 0, 'errors': [], 'log': str(log), 'command_line': command}
     try:
-        path.unlink(missing_ok=True)
+        qa_launch.preflight_project(ROOT)
+        qa_launch.assert_safe_path(path, ROOT, 'reports').unlink(missing_ok=True)
+        evidence = qa_launch.prepare_launch(command, ROOT, "native_" + key, background=True)
+        command = evidence.command
+        result["command_line"] = command
         run = subprocess.run(command, cwd=ROOT, capture_output=True, text=True,
                              encoding='utf-8', errors='replace', timeout=50)
         output = run_checks.joined_output(run.stdout, run.stderr)
@@ -61,11 +67,14 @@ def _probe(godot, key, folder):
     except (OSError, ValueError, TypeError) as failure:
         output = run_checks.joined_output(output, str(failure))
         result['errors'].append('probe_or_report_failed: ' + str(failure))
+    if evidence is not None:
+        result['qa_startup'] = qa_launch.validate_evidence(evidence, run_checks.fatal_lines)
+        result['errors'].extend(result['qa_startup']['errors'])
     result['fatal_log_lines'] = run_checks.fatal_lines(output)
     result['diagnostic_log_lines'] = run_checks.diagnostic_lines(output)
     if result['fatal_log_lines'] or 'CrashHandler' in output:
         result['errors'].append('fatal_error_or_leak_log')
-    log.write_text(output, encoding='utf-8')
+    qa_launch.assert_safe_path(log, ROOT, 'reports').write_text(output, encoding='utf-8')
     result['passed'] = not result['errors']
     return result
 
@@ -87,6 +96,7 @@ def main(argv=None):
         if key not in config or key in selected:
             parser.error('unknown or duplicate source id: ' + key)
         selected.append(key)
+    qa_launch.preflight_project(ROOT)
     folder = ROOT / 'reports/spine_probes'
     folder.mkdir(parents=True, exist_ok=True)
     results = []
@@ -125,7 +135,7 @@ def main(argv=None):
               'config_unchanged': before_sha == after_sha, 'update_status_requested': args.update_status,
               'config_write_performed': write_performed, 'scope': 'Current selection of isolated native probes; recipe configuration is read-only unless authoring status update was explicitly requested',
               'finished_utc': datetime.now(timezone.utc).isoformat()}
-    (ROOT / 'reports/spine_verify.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+    qa_launch.assert_safe_path(ROOT / 'reports/spine_verify.json', ROOT, 'reports').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     return 0 if report['passed'] else 1
 
 if __name__ == '__main__': raise SystemExit(main())

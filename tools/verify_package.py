@@ -10,6 +10,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 import run_checks
+import qa_launch
 
 ROOT = Path(__file__).resolve().parents[1]
 BAD_LOG = ('CrashHandler',)
@@ -257,6 +258,7 @@ def native_check(detail, package):
         failures.append('Native verification must cover all 21 production resources exactly once')
     total = 0
     for item in results:
+        failures.extend(qa_launch.audit_record(item.get("qa_startup", {}), package, run_checks.fatal_lines))
         visual_id = item.get('visual_id')
         if visual_id not in visuals:
             continue
@@ -453,6 +455,12 @@ def offscreen_check(detail, name, package):
     failures = []
     if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
         failures.append('Offscreen verification requires a minimized host window')
+    if not isinstance(detail.get('background_first_invalid_sample'), dict) or detail['background_first_invalid_sample']:
+        failures.append('Offscreen verification has a missing or invalid first-window sample')
+    if type(detail.get('background_window_frame_samples')) is not int or detail['background_window_frame_samples'] <= 0:
+        failures.append('Offscreen verification must monitor actual engine frames')
+    if detail.get('display_window_mode') != 1:
+        failures.append('Offscreen verification requires a minimized DisplayServer window')
     if name == 'art_review':
         failures.extend(font_art_check(detail, package))
         failures.extend(navigation_art_check(detail, package))
@@ -462,6 +470,8 @@ def offscreen_check(detail, name, package):
         names = {item.get('name') for item in captures}
         if type(detail.get('screenshots')) is not int or detail.get('screenshots') != ART_CAPTURE_COUNT or len(captures) != ART_CAPTURE_COUNT or len(names) != ART_CAPTURE_COUNT:
             failures.append('Offscreen art must contain all ' + str(ART_CAPTURE_COUNT) + ' independent captures')
+        if detail.get('background_capture_attempts') != ART_CAPTURE_COUNT or detail.get('background_host_valid_captures') != ART_CAPTURE_COUNT:
+            failures.append('Offscreen art must keep all actual captures minimized')
         if not set(STUDY_ART_CAPTURES).issubset(names):
             failures.append('Offscreen art must include all ten study-state and studied-hero captures')
         if not set(BRIEFING_ART_CAPTURES).issubset(names):
@@ -484,6 +494,8 @@ def offscreen_check(detail, name, package):
         if detail.get('portrait_count') != 12 or detail.get('text_overflows') or detail.get('audio_shutdown_clean') is not True:
             failures.append('Offscreen art portrait/text/audio gates failed')
         for capture in captures:
+            if capture.get('background_host_valid') is not True or capture.get('root_window_mode') != 1 or capture.get('display_window_mode') != 1:
+                failures.append('Offscreen art capture host was invalid: ' + str(capture.get('name')))
             relative = str(capture.get('path', '')).removeprefix('res://')
             path = (package / relative).resolve()
             path.relative_to(package)
@@ -519,7 +531,21 @@ def suite_check(detail, package, suite, version):
     if detail.get('state') != 'complete' or detail.get('suite') != suite or len(cases) != len(expected_names) or {item.get('case') for item in cases} != expected_names or not all(item.get('passed') is True for item in cases):
         failures.append('checks must be the completed ' + str(len(expected_names)) + '-case ' + suite + ' suite')
     for name in expected_names:
+        record = next((item for item in cases if item.get("case") == name), {})
+        failures.extend(qa_launch.audit_record(record.get("qa_startup", {}), package, run_checks.fatal_lines))
         case = run_checks.CASES[name]
+        if name == 'CampaignJourney':
+            path = package / 'reports' / case.report_file
+            if not path.is_file():
+                failures.append('CampaignJourney structured report missing')
+            else:
+                report = read_json(path)
+                if record.get('report_sha256') != sha(path):
+                    failures.append('CampaignJourney structured report SHA differs')
+                if report.get('passed') is not True or report.get('failures') or report.get('phase') != 'complete' or report.get('program_version') != version or type(report.get('checks')) is not int or report['checks'] <= 0:
+                    failures.append('CampaignJourney structured report failed')
+                failures.extend(qa_launch.audit_record(report.get('restart', {}).get('qa_startup', {}), package, run_checks.fatal_lines))
+            continue
         if name == 'MainFlow':
             record = next((item for item in cases if item.get('case') == name), None)
             path = package / 'reports' / case.report_file
@@ -564,18 +590,78 @@ def main_flow_check(detail, package):
     return run_checks.main_flow_check(detail, package)
 
 
+def qa_startup_check(detail, package):
+    failures = []
+    expected = {"normal", "future", "invalid_outside", "invalid_duplicate", "invalid_missing_root",
+                "invalid_relative", "invalid_missing_report", "invalid_outside_report"}
+    cases = detail.get("cases", [])
+    if len(cases) != len(expected) or {case.get("case") for case in cases} != expected:
+        failures.append("First-autoload verification must cover all eight fresh-process modes")
+    if detail.get("real_user_unchanged") is not True or detail.get("real_player_sentinels_created") is not False or detail.get("real_user_before") != detail.get("real_user_after"):
+        failures.append("First-autoload verification must preserve actual existing user files")
+    actual_scripts = {relative: sha(package / relative) for relative in qa_launch.SCRIPT_PATHS}
+    for item in cases:
+        mode = item.get("case")
+        try:
+            if item.get("passed") is not True or item.get("errors"):
+                failures.append("First-autoload fresh process failed: " + str(mode))
+            fixture = qa_launch.assert_safe_path(Path(item["fixture_report"]), package, "reports")
+            if sha(fixture) != item.get("fixture_report_sha256"):
+                failures.append("First-autoload fixture SHA differs: " + str(mode))
+            report = read_json(fixture)
+            context = report.get("qa_startup", {})
+            expected_mode = "future" if mode == "future" else ("invalid" if str(mode).startswith("invalid_") else "normal")
+            if report.get("passed") is not True or report.get("failures") or report.get("expected") != expected_mode or context.get("script_sha256") != actual_scripts:
+                failures.append("First-autoload fixture/context differs: " + str(mode))
+            first = context.get("first_loads", {})
+            if mode == "normal":
+                prefs = first.get("preferences", {}).get("summary", {})
+                profile = first.get("profile", {}).get("summary", {})
+                if prefs.get("values", {}).get("master_volume") != 0.23 or prefs.get("values", {}).get("fullscreen") is not True or profile.get("credits") != 731 or profile.get("levels", {}).get("guanyu") != 7:
+                    failures.append("First-autoload did not read seeded values immediately")
+            elif mode == "future":
+                if any(first.get(owner, {}).get("blocked") is not True for owner in ("preferences", "profile")):
+                    failures.append("First-autoload future saves were not protected")
+            stdout = qa_launch.assert_safe_path(Path(item["stdout_stderr"]), package, "reports")
+            if sha(stdout) != item.get("stdout_stderr_sha256") or run_checks.fatal_lines(stdout.read_text(encoding="utf-8", errors="replace")):
+                failures.append("First-autoload stdout evidence differs/fatal: " + str(mode))
+            evidence = item.get("launch_evidence", {})
+            if mode in ("invalid_missing_report", "invalid_outside_report"):
+                if context.get("qa_enabled") is not True or context.get("valid") is not False or context.get("operations") or not context.get("refused_operations"):
+                    failures.append("Invalid first-autoload context performed save I/O")
+                if evidence.get("startup_report_written") is not False:
+                    failures.append("Invalid startup report destination used fallback")
+                engine = qa_launch.assert_safe_path(Path(evidence["engine_log"]), package, "reports")
+                if sha(engine) != evidence.get("engine_log_sha256") or run_checks.fatal_lines(engine.read_text(encoding="utf-8", errors="replace")):
+                    failures.append("Invalid first-autoload engine log differs/fatal")
+            else:
+                failures.extend(qa_launch.audit_record(evidence, package, run_checks.fatal_lines, expect_valid=expected_mode != "invalid"))
+            for saved in item.get("seeded", {}).values():
+                path = qa_launch.assert_safe_path(Path(saved["path"]), package, "tests/.user")
+                if sha(path) != saved.get("sha256"):
+                    failures.append("First-autoload seeded save bytes changed")
+        except (OSError, ValueError, TypeError, KeyError) as failure:
+            failures.append("First-autoload evidence unreadable: " + str(failure))
+    return failures
+
+
 def execute(package, name, command, marker, reports, version, timeout, hidden_render=False):
     started = datetime.now(timezone.utc).isoformat()
     started_ns = time.time_ns()
     log_path = package / 'reports' / ('package_' + name + '.log')
     output = ''
     run = None
+    evidence = None
     try:
+        qa_launch.preflight_project(package)
         for relative in reports:
-            (package / relative).unlink(missing_ok=True)
+            qa_launch.assert_safe_path(package / relative, package, 'reports').unlink(missing_ok=True)
         if name == 'checks':
             for path in (package / 'reports/runtime').glob('[0-9][0-9]_*.png'):
                 path.unlink()
+        if '--script' in command:
+            evidence = qa_launch.prepare_launch(command, package, name, background=hidden_render or name == 'art_review')
+            command = evidence.command
         launch_options = {}
         if os.name == 'nt' and name not in ('checks', 'checks_background', 'native', 'portraits'):
             startup = subprocess.STARTUPINFO()
@@ -598,6 +684,8 @@ def execute(package, name, command, marker, reports, version, timeout, hidden_re
                 errors.append('wrong report program version: ' + str(reported))
             if detail.get('passed') is not True or detail.get('failures'):
                 errors.append('structured report failed')
+            if name == 'qa_startup':
+                errors.extend(qa_startup_check(detail, package))
             if name == 'checks':
                 errors.extend(suite_check(detail, package, 'full', version))
             if name == 'checks_background':
@@ -632,7 +720,11 @@ def execute(package, name, command, marker, reports, version, timeout, hidden_re
                   'reports': reports, 'started_utc': started,
                   'diagnostic_log_lines': run_checks.diagnostic_lines(output),
                   'finished_utc': datetime.now(timezone.utc).isoformat()}
-    log_path.write_text(output, encoding='utf-8')
+    if evidence is not None:
+        result['qa_startup'] = qa_launch.validate_evidence(evidence, run_checks.fatal_lines)
+        result['errors'].extend(result['qa_startup']['errors'])
+        result['passed'] = result['passed'] and result['qa_startup']['passed']
+    qa_launch.assert_safe_path(log_path, package, 'reports').write_text(output, encoding='utf-8')
     result['log'] = str(log_path.relative_to(package))
     result['hidden_render'] = hidden_render
     result['command_line'] = command
@@ -647,6 +739,7 @@ def main(argv=None):
     parser.add_argument('--phase', choices=('full', 'background', 'offscreen'), default='full')
     args = parser.parse_args(argv)
     package = args.package.resolve()
+    qa_launch.preflight_project(package)
     godot = args.godot.resolve() if args.godot else package / 'FantasySiege.exe'
     report_name = {'full': 'package_verification.json', 'background': 'package_background.json', 'offscreen': 'package_offscreen.json'}[args.phase]
     output_path = package / 'reports' / report_name
@@ -703,6 +796,9 @@ def main(argv=None):
             ('art_review', render + ['--script', 'res://tests/ArtReview.gd'],
              'ART_REVIEW_COMPLETE', ['reports/art_review_local.json'], 240),
         ]
+    if args.phase != 'offscreen':
+        plans.insert(0, ('qa_startup', [python, str(package / 'tools/verify_qa_startup.py'), '--project', str(package), '--godot', str(godot)],
+                         'QA_STARTUP_VERIFICATION_COMPLETE', ['reports/qa_startup_verification_local.json'], 400))
     results = []
     for name, command, marker, reports, timeout in plans:
         results.append(execute(package, name, command, marker, reports, version, timeout, hidden_render=args.phase == 'offscreen'))
@@ -714,6 +810,13 @@ def main(argv=None):
     native_results = native.get('results', [])
     if args.phase != 'offscreen' or native:
         audit.extend(native_check(native, package))
+    if args.phase != 'offscreen':
+        for phase in ('textures', 'native'):
+            path = package / 'reports' / ('bootstrap_' + phase + '_startup.json')
+            if not path.is_file():
+                audit.append('Editor import engine-log evidence missing: ' + phase)
+            else:
+                audit.extend(qa_launch.audit_record(read_json(path), package, run_checks.fatal_lines))
     flow_path = package / 'reports/main_flow.json'
     flow = read_json(flow_path) if args.phase == 'full' and flow_path.exists() else {}
     if args.phase == 'full':
@@ -741,6 +844,7 @@ def main(argv=None):
              'program_version': version, 'package': str(package), 'godot': str(godot), 'manifest_sha256': sha(manifest_path),
              'production_policy': policy,
              'performance_verified': passed and args.phase == 'full',
+             'known_startup_isolation_gap': False if passed else None,
              'native_probe_reused': bool(native) and args.phase == 'offscreen',
              'units_sha256': sha(package / 'resources/units.json'), 'stages_sha256': sha(package / 'resources/stages.json'),
              'cases': results, 'audit_failures': audit, 'native_resources': len(native_results),

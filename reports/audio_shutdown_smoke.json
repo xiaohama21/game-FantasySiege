@@ -1,6 +1,6 @@
 {
 	"checks": 6,
-	"mixer_drain_seconds": 0.037,
+	"mixer_drain_seconds": 0.034,
 	"passed": true,
 	"playback_references_released": true,
 	"players_after_shutdown": 0,

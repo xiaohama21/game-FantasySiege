@@ -56,3 +56,5 @@
 ## 首次启动隔离增量
 
 设计与验收协议见[QA_STARTUP.md](QA_STARTUP.md)。当前登记设计，运行结果和新候选证据另记；candidate11已通过范围及known_startup_isolation_gap=true保持冻结。
+
+2026-11-23：candidate13首次隔离、后台、原生/离屏和独立旅程已实测通过，明细见QA_STARTUP及DELIVERY；候选12严格拒绝且冻结。持续目标继续，前台MainFlow、Main24/64/2倍速与最终full验收仍按用户安排延期；不因本轮通过缩小原完成定义。

@@ -44,6 +44,14 @@ candidate12后台阶段通过，两个Playback在run_start/sample0即Window与Di
 
 监控保持到视口释放与音频关闭等待结束，随后采终态、停止监控并生成最终报告和退出码。不得先写passed再忽略清理阶段新增失败，末尾真实无效样本继续进入first-invalid证据。
 
+## 候选13实测结果
+
+2026-11-23，0d601c0源码制作的candidate13独立两阶段导入、首次启动8模式98项、后台CPU12/8919、窗口时序Smoke9项、21来源220动作、双Playback、2624次零差RGBA及Art56/13642全部通过；有效最小化取景与所有被监控帧均合格，Mesh监控持续至清理/音频关闭后。12张肖像实际重制24次取景全部合格，PNG与保留的旧字节一致，新manifest含制作宿主证据并在包内冻结。
+
+独立旅程993项通过，首八关及末关重访、十二英魂、3500收益/960训练/2840余额、进程重启首次checkpoint恢复完整。源码复跑997比首次干净包多4次清理既有隔离档文件的检查；九次战斗数据一致，整数/阶段/经济/指纹门禁保持严格，不能硬套复跑计数。177 Python测试176通过/1 Windows文件symlink权限跳过，真实junction/hardlink与制作目标守卫测试均通过。105份包内日志严格致命错误/泄漏审计无异常，真实用户目录46份已有文件/日志、旧工程336哈希/Git及本项目main保持不变。
+
+来源提交dfb2645/b1eab46/0d601c0，候选12失败包保留。此处与后续README/交付结果记录是对冻结包的补充，不就地修改包内设计文档或将其称为后来文档字节。当前known_startup_isolation_gap=false；delivery_ready、foreground_verified、performance_verified和commercial_release_verified仍false。证据reports/startup_candidate_0.1.3.json、startup_verification_local.json及同包frozen/独立报告。
+
 ## 源码验证进度
 
 2026-11-23恢复开发后，8个真实新进程模式共98项通过，正常预置音量0.23、全屏偏好与关羽Lv7/731星砂均在首次自动加载时读到；future初读保护和六类非法参数拒绝通过，真实用户目录已有文件/日志哈希不变。CPU12/8919及各用例初读路径/操作证据通过。旅程修复FS061后997项通过，独立resume首次即读到完整checkpoint，末关重访后十二英魂/八关/2840星砂；checks为整数、program_version及子日志SHA独立复核通过。

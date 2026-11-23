@@ -178,6 +178,46 @@ class QALaunchBoundaries(unittest.TestCase):
             os.rmdir(junction)
 
 
+class BackgroundHostBoundaries(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix='fantasysiege_background_setup_')
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+
+    def test_single_ready_request_accepts_asynchronous_confirmation(self):
+        setup = qa_mock.background_setup(self.root)
+        self.assertEqual(qa_launch.background_host_check(setup, self.root), [])
+        self.assertEqual(setup['trace'][4]['window_mode'], 0, 'request_after may precede OS confirmation')
+
+    def test_missing_duplicate_or_forged_setup_is_rejected(self):
+        self.assertTrue(qa_launch.background_host_check(None, self.root))
+        for key, value in [('initialized', False), ('initialize_calls', 2), ('request_count', 2),
+                           ('request_count', True), ('helper_sha256', 'forged'), ('errors', ['failed'])]:
+            with self.subTest(key=key):
+                setup = qa_mock.background_setup(self.root)
+                setup[key] = value
+                self.assertTrue(qa_launch.background_host_check(setup, self.root))
+
+    def test_readiness_stage_order_and_monitor_start_must_precede_samples(self):
+        for change in (lambda data: data['trace'][3].update(root_ready=False),
+                       lambda data: data['trace'][2].update(stage='request_before'),
+                       lambda data: data.update(monitor_start_ticks_usec=4),
+                       lambda data: data.update(confirmed_frame=2),
+                       lambda data: data['trace'][4].update(ticks_usec=2)):
+            setup = qa_mock.background_setup(self.root)
+            change(setup)
+            self.assertTrue(qa_launch.background_host_check(setup, self.root))
+
+    def test_confirmed_and_sampling_modes_cannot_be_relaxed(self):
+        for index in (-2, -1):
+            for key in ('window_mode', 'display_window_mode'):
+                for value in (0, 3, True):
+                    with self.subTest(index=index, key=key, value=value):
+                        setup = qa_mock.background_setup(self.root)
+                        setup['trace'][index][key] = value
+                        self.assertTrue(qa_launch.background_host_check(setup, self.root))
+
+
 class LauncherFirstWriteBoundaries(unittest.TestCase):
     """Real filesystem links must be rejected before a launcher touches output."""
 

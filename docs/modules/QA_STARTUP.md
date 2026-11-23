@@ -1,6 +1,7 @@
 # 验收进程首次启动隔离
 
-> v0.1 · 2026-11-20 · GDD v0.5.11 / 程序0.1.3.0
+> v0.2 · 2026-11-23 · GDD v0.5.12 / 程序0.1.3.0
+> v0.2：候选12首次run_start已是普通窗口而被拒绝；拆分原生窗口初始化、一次最小化设置及之后持续监控，保留实际时序证据。
 > v0.1：登记首次自动加载前的存档隔离、独立引擎日志、真实新进程证据与窗口异常诊断；candidate11保持冻结。
 
 ## 问题与边界
@@ -30,6 +31,16 @@ CampaignJourney的独立resume进程同样传QA根和独立引擎日志/启动�
 本地制作还须在复制前拒绝exports/新候选目标链和bin/windows运行库目标上的现有链接或硬链接；不能等候选包bootstrap才发现已经写出项目。首写前预检与受控运行相配合，外部素材和旧项目始终只读。
 
 本轮不增加玩法/货币/存档schema，不执行用户延期的前台MainFlow、Main24/64/2倍速，也不将本轮后台通过标为delivery_ready、performance_verified或commercial_ready。
+
+## 后台原生窗口启动
+
+candidate12后台阶段通过，两个Playback在run_start/sample0即Window与DisplayServer均为普通窗口、有效资源0/21，Mesh与Art离屏阶段同样被拒绝；包、日志和所有失败取景保留。此前_initialize调用最小化不足以建立采样所需窗口状态，具体引擎时序需独立真实进程确认，不归因于用户或偏好。
+
+共享QABackgroundHost在deferred运行、根Window准备完成后发出一次最小化请求，记录请求前、请求后和布局帧后的模式/ready/时间；两种窗口模式确认最小化后才开始监控/取景。初始化与验收样本明确分开，不能把启动设置前的状态称为中途恢复。开始后不再改变窗口模式；任何实际无效帧/取景继续记录并失败，不重试最小化掩盖。普通前台夹具不调用此后台设置。
+
+独立BackgroundHostSmoke在隐藏原生进程记录旧_initialize请求与run_start状态，再检验ready后的单次请求；不跑前台或帧率验收，不主动制造可见恢复。报告包含共享助手SHA、初始化轨迹、请求数与采样开始标识；工具和包门禁核对助手及状态证据。candidate12/GDD0.5.11冻结，不就地改包；新候选以GDD0.5.12重新导入和后台/离屏/旅程验证。
+
+2026-11-23真实启动探针已复现：legacy_initialize_after时root_ready=false、节点mode=MINIMIZED但DisplayServer仍WINDOWED；run_start时root_ready=true且两者均WINDOWED。ready后共享助手只请求一次，立即得到两者MINIMIZED，下一帧确认后开始监控。最终9项检查、三帧实际监控以及当前GDD/fixture/helper SHA门禁均通过。原生API验证表明早期请求没有改变真实窗口，新请求在窗口准备后生效；不把历史中途变化归于这个已确认的初始时序。
 
 ## 源码验证进度
 

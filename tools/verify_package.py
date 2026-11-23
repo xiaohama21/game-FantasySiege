@@ -452,7 +452,7 @@ def navigation_art_check(detail, package):
 
 
 def offscreen_check(detail, name, package):
-    failures = []
+    failures = qa_launch.background_host_check(detail.get('background_host_setup'), package)
     if type(detail.get('root_window_mode')) is not int or detail.get('root_window_mode') != 1:
         failures.append('Offscreen verification requires a minimized host window')
     if not isinstance(detail.get('background_first_invalid_sample'), dict) or detail['background_first_invalid_sample']:
@@ -521,6 +521,55 @@ def offscreen_check(detail, name, package):
         viewports = detail.get('viewports', [])
         if len(viewports) != 2 or any(item.get('size') != [1000, 760] or item.get('transparent_bg') is not True or item.get('disable_3d') is not True for item in viewports):
             failures.append('Offscreen mesh requires two full transparent 2D viewports')
+    return failures
+
+
+def background_host_smoke_check(detail, package):
+    failures = qa_launch.background_host_check(detail.get('background_host_setup'), package)
+    if not isinstance(detail.get('failures'), list) or detail['failures']:
+        failures.append('Background host smoke reported errors')
+    if detail.get('foreground_verified') is not False or detail.get('performance_measured') is not False:
+        failures.append('Background host smoke must exclude foreground and performance validation')
+    if type(detail.get('checks')) is not int or detail['checks'] <= 0:
+        failures.append('Background host smoke requires a positive integer check count')
+    trace = detail.get('legacy_initialize_trace')
+    state = detail.get('legacy_run_start_state')
+    if not isinstance(trace, list) or len(trace) != 2 or any(not isinstance(item, dict) for item in trace) or not isinstance(state, dict):
+        failures.append('Background host smoke legacy timing comparison missing')
+    else:
+        for item in trace + [state]:
+            if any(type(item.get(key)) is not int for key in ('ticks_usec', 'window_mode', 'display_window_mode')):
+                failures.append('Background host smoke legacy mode/time missing')
+        reset = state.get('window_mode') != 1 or state.get('display_window_mode') != 1
+        if type(detail.get('legacy_early_request_reset')) is not bool or detail['legacy_early_request_reset'] != reset:
+            failures.append('Background host smoke legacy reset conclusion differs')
+        if [item.get('stage') for item in trace] != ['legacy_initialize_before', 'legacy_initialize_after'] or state.get('stage') != 'legacy_run_start':
+            failures.append('Background host smoke legacy stage identity differs')
+    if detail.get('legacy_request_count') != 1 or detail.get('production_request_count') != 1:
+        failures.append('Background host smoke request scopes differ')
+    if not isinstance(detail.get('background_first_invalid_sample'), dict) or detail['background_first_invalid_sample']:
+        failures.append('Background host smoke monitored an invalid window sample')
+    frames = detail.get('monitored_frames')
+    if not isinstance(frames, list) or len(frames) < 2 or any(not isinstance(item, dict) for item in frames):
+        failures.append('Background host smoke must monitor two actual frames')
+    else:
+        setup = detail.get('background_host_setup')
+        monitor = setup.get('monitor_start_ticks_usec') if isinstance(setup, dict) else None
+        for index, sample in enumerate(frames):
+            if sample.get('stage') != 'monitored_frame' or type(sample.get('sample')) is not int or sample['sample'] != index + 1 or sample.get('root_ready') is not True:
+                failures.append('Background host smoke frame identity/readiness differs')
+            if type(sample.get('window_mode')) is not int or sample['window_mode'] != 1 or type(sample.get('display_window_mode')) is not int or sample['display_window_mode'] != 1:
+                failures.append('Background host smoke frame was not minimized')
+            if type(sample.get('ticks_usec')) is not int or type(monitor) is not int or sample['ticks_usec'] < monitor:
+                failures.append('Background host smoke monitored before initialization')
+    if type(detail.get('root_window_mode')) is not int or detail['root_window_mode'] != 1 or type(detail.get('display_window_mode')) is not int or detail['display_window_mode'] != 1 or detail.get('actual_rendering_driver') != 'vulkan' or type(detail.get('rendering_adapter')) is not str or not detail['rendering_adapter'] or type(detail.get('display_server')) is not str or detail['display_server'] == 'headless':
+        failures.append('Background host smoke requires a minimized native Vulkan host')
+    document = (package / 'docs/GAME_DESIGN.md').read_text(encoding='utf-8-sig')
+    header = re.search(r'^> 文档 v([^\s]+)\s+·', document, re.MULTILINE)
+    if header is None or detail.get('gdd_version') != header.group(1) or detail.get('gdd_sha256') != sha(package / 'docs/GAME_DESIGN.md'):
+        failures.append('Background host smoke GDD differs from this package')
+    if detail.get('fixture_sha256') != sha(package / 'tests/BackgroundHostSmoke.gd'):
+        failures.append('Background host smoke fixture SHA differs')
     return failures
 
 
@@ -686,6 +735,8 @@ def execute(package, name, command, marker, reports, version, timeout, hidden_re
                 errors.append('structured report failed')
             if name == 'qa_startup':
                 errors.extend(qa_startup_check(detail, package))
+            if name == 'background_host':
+                errors.extend(background_host_smoke_check(detail, package))
             if name == 'checks':
                 errors.extend(suite_check(detail, package, 'full', version))
             if name == 'checks_background':
@@ -696,7 +747,7 @@ def execute(package, name, command, marker, reports, version, timeout, hidden_re
                 errors.extend(playback_check(detail, package, project_policy(package), name == 'playback'))
             if name == 'mesh_redraw':
                 errors.extend(mesh_redraw_check(detail, package, project_policy(package)))
-            if hidden_render or name == 'art_review':
+            if (hidden_render or name == 'art_review') and name != 'background_host':
                 errors.extend(offscreen_check(detail, name, package))
             elif name in ('playback', 'playback_unmanaged', 'mesh_redraw') and detail.get('background') is True:
                 errors.append('Full verification cannot reuse an offscreen Spine report')
@@ -787,6 +838,8 @@ def main(argv=None):
                   run_checks.CPU_CASES[-1] + ' PASS', ['reports/checks.json'], sum(run_checks.CASES[name].timeout for name in run_checks.CPU_CASES) + 60), plans[1], plans[2]]
     elif args.phase == 'offscreen':
         plans = [
+            ('background_host', render + ['--script', 'res://tests/BackgroundHostSmoke.gd'],
+             'BACKGROUND_HOST_SMOKE_COMPLETE', ['reports/background_host_smoke_local.json'], 60),
             ('playback', render + ['--script', 'res://tests/SpinePlayback.gd', '--', 'background'],
              'SPINE_PLAYBACK_COMPLETE', ['reports/spine_playback.json'], 240),
             ('playback_unmanaged', render + ['--script', 'res://tests/SpinePlayback.gd', '--', 'unmanaged', 'background'],
@@ -845,6 +898,8 @@ def main(argv=None):
              'production_policy': policy,
              'performance_verified': passed and args.phase == 'full',
              'known_startup_isolation_gap': False if passed else None,
+             'background_host_initialization_verified': passed and args.phase == 'offscreen',
+             'qa_startup_module_version': '0.2',
              'native_probe_reused': bool(native) and args.phase == 'offscreen',
              'units_sha256': sha(package / 'resources/units.json'), 'stages_sha256': sha(package / 'resources/stages.json'),
              'cases': results, 'audit_failures': audit, 'native_resources': len(native_results),

@@ -2,6 +2,8 @@ extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
 const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
+const HOST = preload("res://scripts/core/QABackgroundHost.gd")
+var background_host := HOST.new()
 const SIZE := Vector2i(1000,760)
 var failures: Array = []
 var records: Array = []
@@ -23,7 +25,6 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	background = args.has("background") or args.has("--background")
 	background_started_usec = Time.get_ticks_usec()
-	if background: root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
 
 func _process(_delta: float) -> bool:
@@ -44,12 +45,20 @@ func _record_background_sample(stage: String, sample: int, label: String = "") -
 
 func _run() -> void:
 	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native mesh comparison requires a valid isolated QA startup")
-	background_monitor_started = background
-	_record_background_sample("run_start", 0)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(folder))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports/spine_visuals/mesh_redraw"))
 	root.size = Vector2i(1280,720)
 	if background:
+		if not await background_host.initialize(self):
+			failures.append("background comparison host initialization was not confirmed")
+			await _complete({"program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")),
+				"passed": false, "failures": failures, "background": true, "performance_measured": false,
+				"resource_count": 0, "raw_animation_count": 0, "comparisons": 0, "background_host_valid_captures": 0,
+				"scope": "No RGBA sampling started because host initialization failed"})
+			return
+		background_started_usec = int(background_host.snapshot().monitor_start_ticks_usec)
+		background_monitor_started = true
+		_record_background_sample("sampling_start", 0)
 		if DisplayServer.get_name()=="headless" or RenderingServer.get_video_adapter_name().is_empty() or _rendering_driver()!="vulkan":
 			failures.append("background pixel comparison requires a real Vulkan renderer")
 			await _complete({"program_version":str(ProjectSettings.get_setting("application/config/version","unknown")),"passed":false,"failures":failures,"background":true,"performance_measured":false,"actual_rendering_method":_rendering_method(),"actual_rendering_driver":_rendering_driver(),"rendering_adapter":RenderingServer.get_video_adapter_name(),"resource_count":0,"raw_animation_count":0,"comparisons":0,"background_host_valid_captures":0,"scope":"Background Vulkan offscreen pixel verification could not start; no performance measured"})
@@ -171,6 +180,7 @@ func _run() -> void:
 
 func _complete(report: Dictionary) -> void:
 	report.qa_startup = QA_CONTEXT.snapshot()
+	report.background_host_setup = background_host.snapshot()
 	report.background_first_invalid_sample = background_first_invalid_sample
 	report.background_window_frame_samples = background_frame_sample
 	var file := FileAccess.open(folder+"/mesh_redraw.json",FileAccess.WRITE)

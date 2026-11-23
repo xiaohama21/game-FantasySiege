@@ -36,3 +36,20 @@ def record(project, label="mock"):
     evidence = qa_launch.prepare_launch(["unused", "--path", str(project), "--script", "res://tests/mock.gd"], project, label)
     emit(evidence.command, project)
     return qa_launch.validate_evidence(evidence)
+
+
+def background_setup(project):
+    helper = project / qa_launch.BACKGROUND_HOST_SCRIPT
+    if not helper.exists():
+        helper.parent.mkdir(parents=True, exist_ok=True)
+        helper.write_text('mock background initialization helper\n', encoding='utf-8')
+    stages = ['deferred_entry', 'root_ready', 'ready_frame', 'request_before',
+              'request_after', 'confirmation_frame', 'sampling_begin']
+    trace = []
+    for index, stage in enumerate(stages):
+        trace.append({'stage': stage, 'ticks_usec': index + 1, 'frame': 0 if index < 2 else 1,
+                      'root_ready': index > 0, 'window_mode': 1 if index >= 5 else 0,
+                      'display_window_mode': 1 if index >= 5 else 0, 'window_visible': True, 'focused': False})
+    return {'initialized': True, 'initialize_calls': 1, 'request_count': 1,
+            'helper_sha256': qa_launch.sha(helper), 'errors': [], 'trace': trace,
+            'confirmed_frame': 1, 'monitor_start_ticks_usec': 6}

@@ -1,6 +1,8 @@
 extends SceneTree
 
 const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
+const HOST = preload("res://scripts/core/QABackgroundHost.gd")
+var background_host := HOST.new()
 
 class PortraitActor extends SpineActor:
 	func _draw() -> void:
@@ -17,17 +19,30 @@ var background_first_invalid_sample: Dictionary = {}
 var background_started_usec := 0
 var background_host_valid_captures := 0
 var background_captures := 0
+var background_monitor_started := false
+var background_frame_samples := 0
 
 func _initialize() -> void:
 	background_started_usec = Time.get_ticks_usec()
-	root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
+
+func _process(_delta: float) -> bool:
+	if background_monitor_started:
+		background_frame_samples += 1
+		_record_background_sample("process_frame", background_frame_samples)
+	return false
 
 func _run() -> void:
 	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native portraits require a valid isolated QA startup")
 	# This is an offscreen artifact renderer, never a foreground/FPS test.
-	_record_background_sample("run_start", 0)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIRECTORY))
+	if not await background_host.initialize(self):
+		failures.append("background portrait host initialization was not confirmed")
+		await _finish()
+		return
+	background_started_usec = int(background_host.snapshot().monitor_start_ticks_usec)
+	background_monitor_started = true
+	_record_background_sample("sampling_start", 0)
 	viewport = SubViewport.new()
 	viewport.size = CANVAS
 	viewport.world_2d = World2D.new()
@@ -87,14 +102,19 @@ func _run() -> void:
 				print("PORTRAIT_SAVED ",unit_id," ",portrait.get_width(),"x",portrait.get_height())
 		actor.queue_free()
 		await process_frame
+	await _finish()
+
+func _finish() -> void:
 	var adapter := RenderingServer.get_video_adapter_name()
 	if adapter.is_empty(): failures.append("real offscreen renderer required")
 	if entries.size()!=12: failures.append("expected twelve native portraits, got "+str(entries.size()))
 	var report := {"program_version":str(ProjectSettings.get_setting("application/config/version","unknown")),"passed":failures.is_empty(),"visuals_sha256":FileAccess.get_sha256("res://resources/visuals.json"),"rendering_adapter":adapter,"actual_rendering_method":str(RenderingServer.call("get_current_rendering_method")) if RenderingServer.has_method("get_current_rendering_method") else "unknown","offscreen_only":true,"entries":entries,"failures":failures}
 	report.qa_startup = QA_CONTEXT.snapshot()
+	report.background_host_setup = background_host.snapshot()
 	report.background_first_invalid_sample = background_first_invalid_sample
 	report.background_captures = background_captures
 	report.background_host_valid_captures = background_host_valid_captures
+	report.background_window_frame_samples = background_frame_samples
 	var file := FileAccess.open(DIRECTORY+"/manifest.json",FileAccess.WRITE)
 	if file!=null:
 		file.store_string(JSON.stringify(report,"\t"))
@@ -102,7 +122,7 @@ func _run() -> void:
 	else:
 		report.passed = false
 		report.failures.append("could not write portrait manifest")
-	viewport.queue_free()
+	if is_instance_valid(viewport): viewport.queue_free()
 	await process_frame
 	if root.has_node("GameAudio"): await root.get_node("GameAudio").shutdown()
 	print("SPINE_PORTRAITS_COMPLETE ",JSON.stringify(report))

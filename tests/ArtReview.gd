@@ -2,6 +2,8 @@ extends SceneTree
 
 ## Real Main composition in a hidden offscreen viewport. Never measures performance.
 const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
+const HOST = preload("res://scripts/core/QABackgroundHost.gd")
+var background_host := HOST.new()
 const SIZE := Vector2i(1280, 720)
 const DIRECTORY := "res://tests/.user/art_review"
 const OUTPUT := "res://reports/runtime"
@@ -140,7 +142,6 @@ func audit_ui_fonts(context: String) -> void:
 
 func _initialize() -> void:
 	background_started_usec = Time.get_ticks_usec()
-	root.mode = Window.MODE_MINIMIZED
 	call_deferred("run")
 
 func _process(_delta: float) -> bool:
@@ -438,13 +439,19 @@ func run() -> void:
 	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid():
 		await finish()
 		return
-	background_monitor_started = true
-	_record_background_sample("run_start", 0)
 	if DisplayServer.get_name() == "headless":
 		check(false, "ArtReview requires a real renderer for offscreen images; omit --headless")
 		await finish()
 		return
 	check(not RenderingServer.get_video_adapter_name().is_empty(), "real renderer available for offscreen composition")
+	var initialized: bool = await background_host.initialize(self)
+	check(initialized, "ready-stage single background request was confirmed before art sampling")
+	if not initialized:
+		await finish()
+		return
+	background_started_usec = int(background_host.snapshot().monitor_start_ticks_usec)
+	background_monitor_started = true
+	_record_background_sample("sampling_start", 0)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIRECTORY))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
 	var profile = root.get_node("ProfileStore")
@@ -586,7 +593,7 @@ func finish() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://reports"))
 	var report := {"passed": failures.is_empty(), "checks": checks, "failures": failures, "program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")), "project_sha256": project_sha256, "units_sha256": FileAccess.get_sha256("res://resources/units.json"), "visuals_sha256": FileAccess.get_sha256("res://resources/visuals.json"), "stages_sha256": FileAccess.get_sha256("res://resources/stages.json"), "studies_sha256": FileAccess.get_sha256("res://resources/studies.json"), "briefings_sha256": FileAccess.get_sha256("res://resources/briefings.json"), "briefing_script_sha256": FileAccess.get_sha256("res://scripts/core/BattleBriefing.gd"), "main_sha256": FileAccess.get_sha256("res://scripts/ui/Main.gd"), "stat_badge_sha256": FileAccess.get_sha256("res://scripts/ui/StatBadge.gd"), "battle_script_sha256": FileAccess.get_sha256("res://scripts/combat/SiegeBattle.gd"), "scope": "Hidden offscreen SubViewport rendering of actual Main.tscn: character portraits, readable UI, camp, squads, eight battle briefings including lower scroll/locked/studied states, summon cards, both chapter edges, native gallery, fully visible selected card lists and actual saved summon slots, two failed-settings/temporary-return states and four actual battle-result states. Uses isolated presentation fixtures; does not verify progression, foreground interaction, frame rate or performance.", "isolation": DIRECTORY, "root_visible": root.visible, "root_window_mode": root.mode, "root_focused": root.has_focus(), "rendering_adapter": RenderingServer.get_video_adapter_name(), "screenshots": captures.size(), "captures": captures, "portrait_count": portrait_records.size(), "portraits": portrait_records.values(), "text_labels_audited": text_labels_audited, "text_overflows": text_records, "native_gallery_previews": native_viewers, "native_battle_instances_audited": native_battle_instances, "audio_shutdown_clean": audio.shutdown_clean}
 	report.merge(font_context)
-	report.merge({"qa_startup": QA_CONTEXT.snapshot(), "background_first_invalid_sample": background_first_invalid_sample,
+	report.merge({"qa_startup": QA_CONTEXT.snapshot(), "background_host_setup": background_host.snapshot(), "background_first_invalid_sample": background_first_invalid_sample,
 		"background_window_frame_samples": background_frame_samples, "background_capture_attempts": background_capture_attempts,
 		"background_host_valid_captures": background_host_valid_captures, "display_window_mode": DisplayServer.window_get_mode()})
 	report.merge({"settings_panel_sha256": settings_panel_sha256, "settings_navigation": settings_navigation})

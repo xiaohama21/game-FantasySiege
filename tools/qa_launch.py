@@ -19,6 +19,7 @@ SCRIPT_PATHS = (
 )
 REPARSE_POINT = 0x400
 QA_FLAGS = ("--qa-save-root", "--qa-startup-report", "--qa-background")
+BACKGROUND_HOST_SCRIPT = "scripts/core/QABackgroundHost.gd"
 
 
 def sha(path: Path) -> str:
@@ -292,3 +293,55 @@ def validate_evidence(evidence: LaunchEvidence, fatal_validator=None, *, expect_
     record["errors"] = audit_record(record, evidence.project, fatal_validator, expect_valid=expect_valid)
     record["passed"] = not record["errors"]
     return record
+
+
+def background_host_check(setup: dict, project: Path) -> list[str]:
+    """Separate the single initialization request from subsequent host samples."""
+    errors = []
+    if not isinstance(setup, dict):
+        return ["Background host initialization evidence missing"]
+    if setup.get("initialized") is not True:
+        errors.append("Background host was not initialized")
+    for key in ("initialize_calls", "request_count"):
+        if type(setup.get(key)) is not int or setup[key] != 1:
+            errors.append("Background host requires exactly one " + key)
+    if not isinstance(setup.get("errors"), list) or setup["errors"]:
+        errors.append("Background host initialization reported errors")
+    try:
+        if setup.get("helper_sha256") != sha(Path(project) / BACKGROUND_HOST_SCRIPT):
+            errors.append("Background host helper SHA differs")
+    except OSError as failure:
+        errors.append("Background host helper unavailable: " + str(failure))
+    if type(setup.get("monitor_start_ticks_usec")) is not int or setup["monitor_start_ticks_usec"] <= 0:
+        errors.append("Background host monitor start missing")
+    if type(setup.get("confirmed_frame")) is not int or setup["confirmed_frame"] < 1:
+        errors.append("Background host confirmation frame missing")
+    trace = setup.get("trace")
+    if not isinstance(trace, list) or len(trace) < 7 or any(not isinstance(item, dict) for item in trace):
+        return errors + ["Background host initialization trace missing"]
+    stages = [item.get("stage") for item in trace]
+    if stages[:5] != ["deferred_entry", "root_ready", "ready_frame", "request_before", "request_after"] or stages[-1] != "sampling_begin" or any(stage != "confirmation_frame" for stage in stages[5:-1]):
+        errors.append("Background host initialization stage order differs")
+    previous_tick, previous_frame = -1, -1
+    for index, item in enumerate(trace):
+        if any(type(item.get(key)) is not int for key in ("ticks_usec", "frame", "window_mode", "display_window_mode")):
+            errors.append("Background host trace time/frame/mode malformed")
+            continue
+        if any(type(item.get(key)) is not bool for key in ("root_ready", "window_visible", "focused")):
+            errors.append("Background host trace readiness/visibility/focus malformed")
+        if item["ticks_usec"] < previous_tick or item["frame"] < previous_frame or item["ticks_usec"] < 0 or item["frame"] < 0:
+            errors.append("Background host initialization trace regressed")
+        previous_tick, previous_frame = item["ticks_usec"], item["frame"]
+        if index > 0 and item.get("root_ready") is not True:
+            errors.append("Background host requested or sampled before root ready")
+    confirmed, sampling = trace[-2], trace[-1]
+    for item in (confirmed, sampling):
+        if item.get("window_mode") != 1 or item.get("display_window_mode") != 1:
+            errors.append("Background host sampling did not begin minimized")
+    if confirmed.get("frame") != setup.get("confirmed_frame"):
+        errors.append("Background host confirmation frame differs from trace")
+    monitor = setup.get("monitor_start_ticks_usec")
+    if type(monitor) is int and type(confirmed.get("ticks_usec")) is int and type(sampling.get("ticks_usec")) is int:
+        if not confirmed["ticks_usec"] <= monitor <= sampling["ticks_usec"]:
+            errors.append("Background host monitoring began before confirmation")
+    return errors

@@ -150,9 +150,29 @@ class PackageVerificationBoundaries(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
             extra_hashes[key] = verify_package.sha(path)
-        return {'root_window_mode': 1, 'display_window_mode': 1, 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2, 'background_capture_attempts': len(captures), 'background_host_valid_captures': len(captures), 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
+        return {'root_window_mode': 1, 'display_window_mode': 1, 'background_host_setup': qa_mock.background_setup(self.root), 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2, 'background_capture_attempts': len(captures), 'background_host_valid_captures': len(captures), 'screenshots': len(captures), 'captures': captures, 'portrait_count': 12,
                 'text_overflows': [], 'audio_shutdown_clean': True, 'studies_sha256': verify_package.sha(study_path), **extra_hashes,
                 **self.font_fixture(), **self.navigation_fixture(captures, identities)}
+
+    def background_smoke_fixture(self):
+        document = self.root / 'docs/GAME_DESIGN.md'
+        document.parent.mkdir(parents=True, exist_ok=True)
+        document.write_text('> 文档 v0.5.12 · fixture\n', encoding='utf-8')
+        fixture = self.root / 'tests/BackgroundHostSmoke.gd'
+        fixture.parent.mkdir(parents=True, exist_ok=True)
+        fixture.write_text('mock native window fixture\n', encoding='utf-8')
+        legacy = [{'stage': 'legacy_initialize_before', 'ticks_usec': 1, 'window_mode': 0, 'display_window_mode': 0},
+                  {'stage': 'legacy_initialize_after', 'ticks_usec': 2, 'window_mode': 1, 'display_window_mode': 1}]
+        samples = [{'stage': 'monitored_frame', 'sample': index + 1, 'ticks_usec': 8 + index,
+                    'window_mode': 1, 'display_window_mode': 1, 'root_ready': True} for index in range(2)]
+        return {'passed': True, 'checks': 8, 'failures': [], 'program_version': '0.1.3.0',
+                'background_host_setup': qa_mock.background_setup(self.root), 'legacy_initialize_trace': legacy,
+                'legacy_run_start_state': {'stage': 'legacy_run_start', 'ticks_usec': 3, 'window_mode': 0, 'display_window_mode': 0},
+                'legacy_early_request_reset': True, 'legacy_request_count': 1, 'production_request_count': 1,
+                'monitored_frames': samples, 'background_first_invalid_sample': {}, 'root_window_mode': 1,
+                'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'rendering_adapter': 'mock GPU',
+                'display_server': 'windows', 'foreground_verified': False, 'performance_measured': False,
+                'gdd_version': '0.5.12', 'gdd_sha256': verify_package.sha(document), 'fixture_sha256': verify_package.sha(fixture)}
 
     def navigation_fixture(self, captures, identities):
         roster = identities[:8]
@@ -501,7 +521,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
 
     def test_offscreen_playback_requires_minimized_vulkan_without_performance(self):
         good = {'background': True, 'performance_measured': False, 'root_window_mode': 1,
-                'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'background_host_valid_resources': 21, 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2}
+                'display_window_mode': 1, 'background_host_setup': qa_mock.background_setup(self.root), 'actual_rendering_driver': 'vulkan', 'background_host_valid_resources': 21, 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2}
         self.assertEqual(verify_package.offscreen_check(good, 'playback', self.root), [])
         for key, value in [('background', False), ('performance_measured', True), ('root_window_mode', 0),
                            ('display_window_mode', 0), ('actual_rendering_driver', 'opengl3'),
@@ -512,7 +532,7 @@ class PackageVerificationBoundaries(unittest.TestCase):
     def test_offscreen_mesh_requires_every_capture_and_full_transparent_viewports(self):
         viewport = {'size': [1000, 760], 'transparent_bg': True, 'disable_3d': True}
         good = {'background': True, 'performance_measured': False, 'root_window_mode': 1,
-                'display_window_mode': 1, 'actual_rendering_driver': 'vulkan', 'comparisons': 2624,
+                'display_window_mode': 1, 'background_host_setup': qa_mock.background_setup(self.root), 'actual_rendering_driver': 'vulkan', 'comparisons': 2624,
                 'background_host_valid_captures': 2624, 'viewports': [viewport, viewport.copy()], 'background_first_invalid_sample': {}, 'background_window_frame_samples': 2}
         self.assertEqual(verify_package.offscreen_check(good, 'mesh_redraw', self.root), [])
         for key, value in [('background_host_valid_captures', 2623), ('comparisons', 220),
@@ -883,9 +903,9 @@ class PackageVerificationBoundaries(unittest.TestCase):
              redirect_stdout(io.StringIO()):
             code = verify_package.main(['--package', str(self.root), '--phase', 'offscreen'])
         self.assertEqual(code, 0)
-        self.assertEqual([item[0] for item in observed], ['playback', 'playback_unmanaged', 'mesh_redraw', 'art_review'])
+        self.assertEqual([item[0] for item in observed], ['background_host', 'playback', 'playback_unmanaged', 'mesh_redraw', 'art_review'])
         self.assertTrue(all(item[2] for item in observed))
-        self.assertTrue(all('background' in command for name, command, _ in observed if name != 'art_review'))
+        self.assertTrue(all('background' in command for name, command, _ in observed if name not in ('art_review', 'background_host')))
         self.assertEqual(payload.call_count, 2)
         self.assertEqual(portraits.call_count, 2)
         summary = json.loads((self.root / 'reports/package_offscreen.json').read_text())
@@ -894,6 +914,32 @@ class PackageVerificationBoundaries(unittest.TestCase):
         self.assertFalse(summary['performance_verified'])
         self.assertEqual(summary['verification_phase'], 'offscreen')
         self.assertEqual((self.root / 'reports/package_verification.json').read_text(), 'keep-full-result')
+
+    def test_background_smoke_scope_and_initialization_are_required(self):
+        good = self.background_smoke_fixture()
+        self.assertEqual(verify_package.background_host_smoke_check(good, self.root), [])
+        for key, value in [('foreground_verified', True), ('performance_measured', True), ('checks', 8.0),
+                           ('background_host_setup', None), ('legacy_early_request_reset', False)]:
+            with self.subTest(key=key):
+                self.assertTrue(verify_package.background_host_smoke_check({**good, key: value}, self.root))
+
+    def test_background_smoke_rejects_early_or_invalid_monitored_samples(self):
+        for change in (lambda data: data['monitored_frames'][0].update(ticks_usec=1),
+                       lambda data: data['monitored_frames'][0].update(window_mode=0),
+                       lambda data: data.update(monitored_frames=[]),
+                       lambda data: data.update(background_first_invalid_sample={'sample': 1, 'window_mode': 0})):
+            report = self.background_smoke_fixture()
+            change(report)
+            self.assertTrue(verify_package.background_host_smoke_check(report, self.root))
+
+    def test_background_smoke_requires_current_document_fixture_and_helper(self):
+        for key in ('gdd_version', 'gdd_sha256', 'fixture_sha256'):
+            report = self.background_smoke_fixture()
+            report[key] = 'forged'
+            self.assertTrue(verify_package.background_host_smoke_check(report, self.root))
+        report = self.background_smoke_fixture()
+        (self.root / verify_package.qa_launch.BACKGROUND_HOST_SCRIPT).write_text('changed helper', encoding='utf-8')
+        self.assertIn('Background host helper SHA differs', verify_package.background_host_smoke_check(report, self.root))
 
     def test_background_suite_requires_all_cpu_checks(self):
         logic = self.suite_fixture('logic')

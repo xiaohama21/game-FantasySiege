@@ -2,6 +2,8 @@ extends SceneTree
 
 const Actor = preload("res://scripts/visuals/SpineActor.gd")
 const QA_CONTEXT = preload("res://scripts/core/QAStartupContext.gd")
+const HOST = preload("res://scripts/core/QABackgroundHost.gd")
+var background_host := HOST.new()
 var failures: Array = []
 var background := false
 var background_host_valid_resources := 0
@@ -14,7 +16,6 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	background = args.has("background") or args.has("--background")
 	background_started_usec = Time.get_ticks_usec()
-	if background: root.mode = Window.MODE_MINIMIZED
 	call_deferred("_run")
 
 func _process(_delta: float) -> bool:
@@ -35,8 +36,6 @@ func _record_background_sample(stage: String, sample: int, visual_id: String = "
 
 func _run() -> void:
 	if not QA_CONTEXT.enabled() or not QA_CONTEXT.valid(): failures.append("native playback requires a valid isolated QA startup")
-	background_monitor_started = background
-	_record_background_sample("run_start", 0)
 	var visual_ids: Array = Catalog.visuals().keys()
 	var args := OS.get_cmdline_user_args()
 	var production_managed := bool(ProjectSettings.get_setting("fantasy_siege/visuals/managed_mesh_redraw",false))
@@ -52,6 +51,16 @@ func _run() -> void:
 		policy = "managed_candidate"
 		report_path = "res://reports/performance_0.1.3/playback_managed.json"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(report_path.get_base_dir()))
+	if background:
+		if not await background_host.initialize(self):
+			failures.append("background playback host initialization was not confirmed")
+			_finish(report_path, {"program_version": str(ProjectSettings.get_setting("application/config/version", "unknown")),
+				"passed": false, "failures": failures, "native_visuals": 0, "native_visual_ids": [],
+				"playback_policy": policy, "managed_mesh_redraw": managed, "scope": "No native sampling started because host initialization failed"})
+			return
+		background_started_usec = int(background_host.snapshot().monitor_start_ticks_usec)
+		background_monitor_started = true
+		_record_background_sample("sampling_start", 0)
 	for visual_id: String in visual_ids:
 		var number := visual_id.trim_prefix("d69_")
 		var actor := Actor.new()
@@ -135,7 +144,11 @@ func _run() -> void:
 	if background and _rendering_driver()!="vulkan": failures.append("background playback requires an actual Vulkan rendering driver")
 	if background and (background_host_valid_resources!=visual_ids.size() or root.mode!=Window.MODE_MINIMIZED or DisplayServer.window_get_mode()!=DisplayServer.WINDOW_MODE_MINIMIZED): failures.append("background host must stay minimized for every native resource")
 	var report := {"program_version":str(ProjectSettings.get_setting("application/config/version","unknown")),"passed":failures.is_empty(),"failures":failures,"native_visuals":visual_ids.size(),"native_visual_ids":visual_ids,"playback_policy":policy,"production_managed_mesh_redraw":production_managed,"production_policy_override":managed!=production_managed,"managed_mesh_redraw":managed,"rendering_adapter":adapter,"real_renderer":not adapter.is_empty() and DisplayServer.get_name()!="headless","actual_rendering_method":_rendering_method(),"production_renderer":str(ProjectSettings.get_setting("rendering/renderer/rendering_method","unknown")),"render_thread_model":_render_thread_model(),"tested_speeds":[0,1,2],"tested_sample_rates":[30,60],"tested_frame_groups":[2,3,4],"tested_input_deltas":[1.0/60.0,0.05],"speed_clock":"deterministic four input deltas with real native skeleton update","action_pause_resume":"real engine frame timers","group_switch_keeps_pending_delta":true,"reconfigure_and_free":true}
+	_finish(report_path, report)
+
+func _finish(report_path: String, report: Dictionary) -> void:
 	report.background = background
+	report.background_host_setup = background_host.snapshot()
 	report.actual_rendering_driver = _rendering_driver()
 	report.performance_measured = false
 	report.background_host_valid_resources = background_host_valid_resources

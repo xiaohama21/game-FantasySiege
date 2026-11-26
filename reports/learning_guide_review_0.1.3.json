@@ -1,0 +1,35 @@
+{
+  "program_version": "0.1.3.0",
+  "candidate": 15,
+  "review_date": "2026-11-26",
+  "package": "exports/windows/FantasySiege-0.1.3.0-candidate-15",
+  "scope": "独立目检本地学习包内首关指南的三张 1280×720 后台静帧。",
+  "capture_report": "reports/art_review_local.json",
+  "capture_report_sha256": "123a3c05773c658ea2416bf32f9aeb29c23c42e32b983c8cb466616a8d346589",
+  "reviewed": [
+    {
+      "file": "reports/runtime/art_guide_summon.png",
+      "sha256": "84acc5c9cae6f7d93fddeb631d84bd238ac2b356d006685f7290a40dd666d82d",
+      "page": 1,
+      "title": "点亮第一支队伍",
+      "observation": "低费前排、远程及按 1—8 召唤的三行说明完整可读。页码 1 / 3、灰显的“上一页”、“跳过”和“下一页”均在面板内。"
+    },
+    {
+      "file": "reports/runtime/art_guide_camera.png",
+      "sha256": "f7ac08bf4ec30e22dbce4d4a0b02753d78e00dfd2337dc94b0806549c0ec1aee",
+      "page": 2,
+      "title": "巡视更远的战场",
+      "observation": "← / →、左键拖动、边缘移动、跟随战线和空格暂停及其限制均可读。四行正文与故事、页码、翻页按钮间留有空隙。"
+    },
+    {
+      "file": "reports/runtime/art_guide_pulse.png",
+      "sha256": "d6b79dfe8d7bacdd304ecee65761c000e1de59599018648abcad127a2429508e",
+      "page": 3,
+      "title": "抓住反攻的窗口",
+      "observation": "P、80能量和35秒均在首行；眩晕打断、基地胜利条件和星砂用途可读。末页“开始远征”完整，无背景 HUD 或其他按钮遮挡。"
+    }
+  ],
+  "capture_manifest_matches": 3,
+  "comparison_to_candidate_14": "三张 PNG 的文件指纹均已变化。将两版图片解码为 RGB 后逐像素比较，指南面板矩形（左330、上170、宽620、高370）内三页均相同；变化出现在面板之外。",
+  "passed": true
+}

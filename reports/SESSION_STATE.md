@@ -119,3 +119,5 @@ Source新战报190与ResultUI221 PASS，首次非class测试推断类型编译�
 本轮重新检查冻结文件，确认 c05a36b0/GDD v0.5.13 的候选14已于上次暂停前完成干净制作、后台/离屏以及独立九战旅程。补做包内哈希与指南三张图的独立核验，详见 `reports/guide_{authoring,package,visual_review}_0.1.3.json`。候选14位于 `build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14`。
 
 开工在版本分支 `0.1.3` 上执行 `git pull --ff-only`，7897代理拒绝连接，首次直连 GitHub 443 超时。稍后直连 `ls-remote` 确认远程 `0.1.3=0d601c0`、`main=5340a0b`，再次直连 `git pull --ff-only` 成功（Already up to date）。GDD v0.5.14 的 FS-066 修正启动规范报告标签，随后从新目录验候选15。前台和性能仍按用户安排延期。
+
+候选15已交付后台范围，启动 `exports/windows/FantasySiege-0.1.3.0-candidate-15/开始游戏.cmd`。构建提交 `7eab511` 已于本轮直连推送并用 `ls-remote` 核实，main 仍为 `5340a0b`。独立检出十阶段制作 → 清单261文件 → 交付目录新缓存双导入 → 包内后台13组9056项 → 离屏59图14260项/2624像素零差 → 新档八关及重启重访993项，均通过。详细 SHA、报告和运行目录见 `reports/learning_candidate_0.1.3.json`。仅继续后台时无需重跑这些已核实阶段。下次获准使用桌面后从此候选进行正常窗口流程、实际键鼠/听感和24/64人及双倍速终验；完整 `verify_package.py --phase full` 会使用前台窗口。

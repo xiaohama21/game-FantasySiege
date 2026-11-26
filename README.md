@@ -6,9 +6,9 @@
 
 Windows 学习包内可直接双击同目录的 **开始游戏.cmd**。以下路径和验收记录以源码仓库为起点，随包 README 是构建时的快照。
 
-- 程序 **0.1.3.0**，版本分支 `0.1.3`。候选14（GDD v0.5.13）从干净检出完成十阶段制作、13组后台用例和完整八关旅程。新手指南的召唤、镜头与脉冲三页均已逐张复核。正常窗口流程、24/64人战斗性能、双倍速及人工听感待验。
+- 当前本地学习包为 **0.1.3.0 候选15**（GDD v0.5.14，分支 `0.1.3`）。[双击开始游戏](exports/windows/FantasySiege-0.1.3.0-candidate-15/开始游戏.cmd)。
 
-- 当前已验入口为[候选14 · 开始游戏](build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14/开始游戏.cmd)。GDD v0.5.14 已登记下一候选修正验包报告中的启动规范版本。[候选14制作记录](reports/guide_authoring_0.1.3.json) · [包内验收](reports/guide_package_0.1.3.json) · [指南逐页复核](reports/guide_visual_review_0.1.3.json)。
+- 候选15从干净检出完成十阶段制作，在上述目录自行导入并通过9056项后台检查、59张界面取景和993项章节旅程检查。八关首通后重启读档，12名英魂与全部通关进度恢复，重访末关后余额2840星砂。8种启动隔离场景通过，验包报告的规范版本及哈希与同包文档一致。前台操作、24/64人及双倍速性能、人工听感待验。[候选15验收报告](reports/learning_candidate_0.1.3.json)。
 - 保留关羽、赵云、诸葛亮、貂蝉、吕布；其他角色及敌人从Spine重新设计。
 - 十二英魂、九种敌军、两章八关；四次首通解锁、首通/重访收益、三属性训练、八人编队、schema1/2至3迁移与独立存档已完成。
 - 星灯远征美术体系；所有角色拥有力量、敏捷、智力与一个主属性。
@@ -33,7 +33,7 @@ Windows 学习包内可直接双击同目录的 **开始游戏.cmd**。以下路
 
 在 Windows 学习包内，双击与本说明同目录的 **开始游戏.cmd**。包自带 Godot，保留整个文件夹即可离线游玩。玩家存档位于 `%APPDATA%\FantasySiege`；验收从首次加载就使用项目内的 `tests/.user` 和独立引擎日志。源码检出的本机包入口见上方“当前状态”。
 
-历史基础包 `0.1.1.2` 和候选4至13保留各自的验收记录。候选13的首次启动隔离和离屏取景见[候选13报告](reports/startup_candidate_0.1.3.json)。
+历史基础包 `0.1.1.2` 和候选4至14保留各自的验收记录。候选13的[首次启动隔离](reports/startup_candidate_0.1.3.json)、候选14的[干净制作](reports/guide_authoring_0.1.3.json)、[包内验收](reports/guide_package_0.1.3.json)及[指南目检](reports/guide_visual_review_0.1.3.json)可独立追溯。
 
 源码工程包含`play.ps1`、`bootstrap_local.ps1`及`build_local.ps1`；这些源码命令不是包内启动步骤。包内`tools`提供Python制作/验收工具，完整制作需要另提供本地学习源包/运行库，运行游戏无需调用。后台复验可在本包根目录执行`python tools/verify_package.py --package <本包绝对目录> --phase background`或`--phase offscreen`；不得把这两个阶段当作前台完整验收。
 

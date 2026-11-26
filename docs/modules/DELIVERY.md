@@ -1,6 +1,7 @@
 # Windows本地学习版交付
 
-> v0.24 · 2026-11-26 · GDD v0.5.14 / 程序0.1.3.0
+> v0.25 · 2026-11-26 · GDD v0.5.14 / 程序0.1.3.0
+> v0.25：候选15前台终验使用已独立导入、载荷逐字节相同的原始构建包，保留交付目录中已经归档的后台和离屏报告。
 > v0.24：归档候选14在独立检出中的制作、指南和章节证据。候选14的验包工具写死了启动隔离规范版本；下一候选须从本包规范正式版本行读取版本，并在阶段报告中保存该文件的 SHA-256。候选重新在主工程 exports/windows 的新目录导入和验收。
 > v0.23：统一当前与历史入口，明确源码/包内命令，补完整制作工具闭包及当前无缓存制作验证。
 > v0.22：candidate12后台通过、离屏首窗无效拒绝并冻结；新候选核对后台初始化/助手SHA后独立复验。
@@ -179,3 +180,31 @@ candidate11自行导入并验包：CPU12/8919、StudyUI1514（导航327、6种to
 后台和离屏两份报告均绑定包内 QA_STARTUP v0.4 及其 SHA-256。完整文档、截图与运行记录的哈希见 `reports/learning_candidate_0.1.3.json`。正常窗口 MainFlow、24/64人及64人双倍速、实体输入与人工听感仍待验；本地学习包保留在版本分支，D69素材与原生库只在本机使用。
 
 独立查看最终交付目录的三张指南图，召唤快捷键、镜头控制、脉冲消耗与冷却、末页“开始远征”均能完整读到。与候选14相比，三页截图均只有指南面板外的画面像素发生变化。逐图记录见 `reports/learning_guide_review_0.1.3.json`。
+
+### 继续候选15的前台终验
+
+完整验包会重新生成指南、八关旅程、原生动作及画面报告，还会写入与离屏阶段同名的59张截图。直接在交付目录执行会使已经归档的哈希失去对应文件。原始构建包和交付包的261项文件及构建清单已逐项比对，两个包各有自己的导入缓存。原始构建包两份引擎导入日志的路径和哈希已核对，尚无 `package_verification.json`。
+
+桌面可用于前台验收时，在 PowerShell 执行下列命令。工具使用这个构建包的引擎、隔离存档与完整门槛。结果写到 `$qaPackage/reports/package_verification.json`，与本节记录的共同清单哈希对应。
+
+```powershell
+$qaPackage = 'F:/godotProject/FantasySiege/build/repro-7eab511898f8-candidate15/exports/windows/FantasySiege-0.1.3.0-candidate-15'
+python -B "$qaPackage/tools/verify_package.py" --package "$qaPackage" --phase full
+```
+
+人工键鼠与听感在另一场正常游戏中记录。以下命令沿用包内 `qa_launch` 为这场试玩建立新的测试存档及日志。可在首关用鼠标点选、用数字键召唤、拖动镜头，并实际试听音乐、召唤和脉冲音效；另记执行了哪些操作、听到了什么。进程退出后打印的结果仅用于确认隔离路径和日志。
+
+```powershell
+@'
+import subprocess, sys
+from pathlib import Path
+package = Path(sys.argv[1]).resolve()
+sys.path.insert(0, str(package / 'tools'))
+import qa_launch, run_checks
+session = qa_launch.prepare_launch([str(package / 'FantasySiege.exe'), '--path', str(package)], package, 'manual_input_audio')
+game = subprocess.run(session.command, cwd=package)
+result = qa_launch.validate_evidence(session, run_checks.fatal_lines)
+print('Isolation:', result['passed'], 'Engine log:', result['engine_log'], 'Errors:', result['errors'])
+sys.exit(game.returncode or int(not result['passed']))
+'@ | python -B - $qaPackage
+```

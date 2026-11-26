@@ -45,6 +45,28 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
+def qa_startup_document(package, manifest):
+    relative = 'docs/modules/QA_STARTUP.md'
+    if not isinstance(manifest, dict) or not isinstance(manifest.get('files'), list):
+        raise ValueError('Build manifest must list its payload files')
+    entries = [entry for entry in manifest['files'] if isinstance(entry, dict) and entry.get('path') == relative]
+    if len(entries) != 1:
+        raise ValueError('Expected one build manifest entry for ' + relative)
+    path = (package / relative).resolve()
+    if not path.is_relative_to(package):
+        raise ValueError('QA_STARTUP.md resolves outside the package')
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if entries[0].get('sha256') != digest or entries[0].get('bytes') != len(raw):
+        raise ValueError('Build manifest differs from ' + relative)
+    lines = (line.strip() for line in raw.decode('utf-8-sig').splitlines() if line.strip())
+    title, declaration = next(lines, ''), next(lines, '')
+    header = re.fullmatch(r'> v([0-9]+(?:\.[0-9]+)+)\s+·\s+[0-9]{4}-[0-9]{2}-[0-9]{2}\s+·\s+.+', declaration)
+    if not title.startswith('# ') or not header:
+        raise ValueError('Invalid version header in ' + relative)
+    return {'qa_startup_module_version': header.group(1), 'qa_startup_module_sha256': digest}
+
+
 def payload_check(package, manifest):
     failures = []
     try:
@@ -864,9 +886,15 @@ def main(argv=None):
     report_name = {'full': 'package_verification.json', 'background': 'package_background.json', 'offscreen': 'package_offscreen.json'}[args.phase]
     output_path = package / 'reports' / report_name
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps({'passed': False, 'phase': 'preparing', 'package': str(package)}), encoding='utf-8')
+    preparing = {'passed': False, 'phase': 'preparing', 'verification_phase': args.phase, 'package': str(package)}
+    output_path.write_text(json.dumps(preparing), encoding='utf-8')
     manifest_path = package / 'reports/build_manifest.json'
-    manifest = read_json(manifest_path)
+    try:
+        manifest = read_json(manifest_path)
+        startup_document = qa_startup_document(package, manifest)
+    except (OSError, ValueError) as failure:
+        output_path.write_text(json.dumps({**preparing, 'audit_failures': [str(failure)]}, ensure_ascii=False), encoding='utf-8')
+        raise SystemExit(str(failure)) from failure
     version = re.search(r'config/version="([^"]+)"', (package / 'project.godot').read_text(encoding='utf-8')).group(1)
     if version != manifest['program_version']:
         raise SystemExit('Package manifest program version does not match project')
@@ -924,7 +952,7 @@ def main(argv=None):
     results = []
     for name, command, marker, reports, timeout in plans:
         results.append(execute(package, name, command, marker, reports, version, timeout, hidden_render=args.phase == 'offscreen'))
-        output_path.write_text(json.dumps({'passed': False, 'phase': 'running', 'program_version': version,
+        output_path.write_text(json.dumps({**preparing, **startup_document, 'phase': 'running', 'program_version': version,
                                           'cases': results}, ensure_ascii=False, indent=2), encoding='utf-8')
 
     audit = payload_check(package, manifest) + portrait_check(package, version)
@@ -968,7 +996,7 @@ def main(argv=None):
              'performance_verified': passed and args.phase == 'full',
              'known_startup_isolation_gap': False if passed else None,
              'background_host_initialization_verified': passed and args.phase == 'offscreen',
-             'qa_startup_module_version': '0.2',
+             **startup_document,
              'native_probe_reused': bool(native) and args.phase == 'offscreen',
              'units_sha256': sha(package / 'resources/units.json'), 'stages_sha256': sha(package / 'resources/stages.json'),
              'cases': results, 'audit_failures': audit, 'native_resources': len(native_results),

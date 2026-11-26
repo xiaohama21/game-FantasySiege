@@ -4,9 +4,11 @@
 
 ## 当前状态
 
-- GDD v0.5.13（设计待验增量）；程序0.1.3.0在分支0.1.3持续开发。candidate13已通过首次启动隔离8进程/98项、后台CPU12/8919、窗口启动9项、21来源220动作、2624零差像素、Art56/13642及独立旅程993项；Noto Sans SC实际400/600和12张同源肖像不变。原目标保持运行，前台MainFlow/24/64/2倍速性能仍延期。
+Windows 学习包内可直接双击同目录的 **开始游戏.cmd**。以下路径和验收记录以源码仓库为起点，随包 README 是构建时的快照。
 
-- 当前本地学习包：exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd。程序存档位于%APPDATA%\FantasySiege；QA首次自动加载即使用项目tests/.user，全部验收引擎日志独立。程序修复已同步0.1.3，最后文档/报告提交的远程状态因网络失败待确认；main未推进；受限素材和原生库仍仅本地。报告reports/startup_candidate_0.1.3.json。candidate12首窗失效及所有历史候选/失败证据冻结保留。
+- 程序 **0.1.3.0**，版本分支 `0.1.3`。候选14（GDD v0.5.13）从干净检出完成十阶段制作、13组后台用例和完整八关旅程。新手指南的召唤、镜头与脉冲三页均已逐张复核。正常窗口流程、24/64人战斗性能、双倍速及人工听感待验。
+
+- 当前已验入口为[候选14 · 开始游戏](build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14/开始游戏.cmd)。GDD v0.5.14 已登记下一候选修正验包报告中的启动规范版本。[候选14制作记录](reports/guide_authoring_0.1.3.json) · [包内验收](reports/guide_package_0.1.3.json) · [指南逐页复核](reports/guide_visual_review_0.1.3.json)。
 - 保留关羽、赵云、诸葛亮、貂蝉、吕布；其他角色及敌人从Spine重新设计。
 - 十二英魂、九种敌军、两章八关；四次首通解锁、首通/重访收益、三属性训练、八人编队、schema1/2至3迁移与独立存档已完成。
 - 星灯远征美术体系；所有角色拥有力量、敏捷、智力与一个主属性。
@@ -29,9 +31,9 @@
 
 完整重建须提供Godot：`python tools/bootstrap_local.py --source-root <本地D69目录> --runtime-from <只读Spine运行库bin目录> --godot <Godot控制台exe>`。工具完成21套转换、原生作者验证、十二透明肖像制作/导入及冻结后的只读复核，任何一步失败均停止并保留reports/bootstrap_local.json证据。省略--godot只完成转换；--import-only只导入已经存在的素材。生成完成后执行`tools/build_local.ps1 -Destination <本项目exports/windows下的新空目录>`，包使用自己的缓存，保留旧候选。
 
-当前运行入口：`exports/windows/FantasySiege-0.1.3.0-candidate-13/开始游戏.cmd`。自带Godot，可直接双击；无需Python、Godot编辑器或网络。保持整个包目录，存档在`%APPDATA%\FantasySiege`。这是已验证后台范围的本地学习候选，前台/性能仍待后续。
+在 Windows 学习包内，双击与本说明同目录的 **开始游戏.cmd**。包自带 Godot，保留整个文件夹即可离线游玩。玩家存档位于 `%APPDATA%\FantasySiege`；验收从首次加载就使用项目内的 `tests/.user` 和独立引擎日志。源码检出的本机包入口见上方“当前状态”。
 
-历史基础包`0.1.1.2`以及candidate4至12均只保留各自范围；不作为当前启动入口，失败副本和历史证据不删除。
+历史基础包 `0.1.1.2` 和候选4至13保留各自的验收记录。候选13的首次启动隔离和离屏取景见[候选13报告](reports/startup_candidate_0.1.3.json)。
 
 源码工程包含`play.ps1`、`bootstrap_local.ps1`及`build_local.ps1`；这些源码命令不是包内启动步骤。包内`tools`提供Python制作/验收工具，完整制作需要另提供本地学习源包/运行库，运行游戏无需调用。后台复验可在本包根目录执行`python tools/verify_package.py --package <本包绝对目录> --phase background`或`--phase offscreen`；不得把这两个阶段当作前台完整验收。
 

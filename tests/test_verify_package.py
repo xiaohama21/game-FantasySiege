@@ -404,6 +404,55 @@ class PackageVerificationBoundaries(unittest.TestCase):
         manifest['files'][0]['path'] = '../outside.gd'
         self.assertIn('outside package', verify_package.payload_check(self.root, manifest)[0])
 
+    def qa_document_fixture(self, declaration):
+        relative = 'docs/modules/QA_STARTUP.md'
+        document = self.root / relative
+        document.parent.mkdir(parents=True, exist_ok=True)
+        text = '# 验收进程首次启动隔离\r\n\r\n' + declaration + '\r\n> v0.2：历史记录\r\n'
+        document.write_bytes(text.encode('utf-8-sig'))
+        entry = {'path': relative, 'bytes': document.stat().st_size, 'sha256': verify_package.sha(document)}
+        return document, {'program_version': '0.1.3.0', 'files': [entry]}
+
+    def test_invalid_packaged_qa_document_stops_before_running_cases(self):
+        for kind, phase, expected in (('absent', 'background', 'QA_STARTUP.md'),
+                                      ('unlisted', 'offscreen', 'one build manifest entry'),
+                                      ('no manifest', 'full', 'build_manifest.json'),
+                                      ('no file list', 'background', 'list its payload files'),
+                                      ('duplicate', 'full', 'one build manifest entry'),
+                                      ('different bytes', 'background', 'manifest differs'),
+                                      ('history only', 'full', 'version header'),
+                                      ('invalid version', 'offscreen', 'version header')):
+            with self.subTest(kind=kind):
+                header = '> v0.3 · 2026-11-23 · GDD v0.5.13 / 程序0.1.3.0'
+                if kind == 'history only':
+                    header = '> v0.3：旧版说明'
+                elif kind == 'invalid version':
+                    header = header.replace('v0.3', 'v0..3')
+                document, manifest = self.qa_document_fixture(header)
+                if kind == 'absent':
+                    document.unlink()
+                elif kind == 'unlisted':
+                    manifest['files'].clear()
+                elif kind == 'no file list':
+                    del manifest['files']
+                elif kind == 'duplicate':
+                    manifest['files'] *= 2
+                elif kind == 'different bytes':
+                    document.write_bytes(document.read_bytes().replace(b'v0.3', b'v0.4'))
+                manifest_path = self.root / 'reports/build_manifest.json'
+                if kind == 'no manifest':
+                    manifest_path.unlink(missing_ok=True)
+                else:
+                    manifest_path.write_text(json.dumps(manifest))
+                with patch.object(verify_package, 'execute') as execute, self.assertRaisesRegex(SystemExit, expected):
+                    verify_package.main(['--package', str(self.root), '--phase', phase])
+                execute.assert_not_called()
+                filename = 'package_verification.json' if phase == 'full' else 'package_' + phase + '.json'
+                summary = verify_package.read_json(self.root / 'reports' / filename)
+                self.assertFalse(summary['passed'])
+                self.assertEqual(summary['verification_phase'], phase)
+                self.assertRegex(summary['audit_failures'][0], expected)
+
     def test_only_exact_verbose_existing_nvapi_profile_is_diagnostic(self):
         message = 'NVAPI: Error creating application: NVAPI_EXECUTABLE_ALREADY_IN_USE(code -167)'
         self.assertEqual(verify_package.run_checks.fatal_lines(message), [])
@@ -933,7 +982,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
         self.native_fixture()
         (self.root / 'resources/units.json').write_text('{}')
         (self.root / 'resources/stages.json').write_text('[]')
-        (self.root / 'reports/build_manifest.json').write_text(json.dumps({'program_version': '0.1.3.0', 'files': []}))
+        document, manifest = self.qa_document_fixture('> v7.12 · 2026-11-23 · GDD v0.5.13 / 程序0.1.3.0')
+        (self.root / 'reports/build_manifest.json').write_text(json.dumps(manifest))
         # An unrelated incomplete full-run report must not affect this phase.
         (self.root / 'reports/main_flow.json').write_text('invalid stale full report')
         (self.root / 'reports/package_verification.json').write_text('keep-full-result')
@@ -959,6 +1009,8 @@ class PackageVerificationBoundaries(unittest.TestCase):
         self.assertFalse(summary['delivery_ready'])
         self.assertFalse(summary['performance_verified'])
         self.assertEqual(summary['verification_phase'], 'offscreen')
+        self.assertEqual(summary['qa_startup_module_version'], '7.12')
+        self.assertEqual(summary['qa_startup_module_sha256'], verify_package.sha(document))
         self.assertEqual((self.root / 'reports/package_verification.json').read_text(), 'keep-full-result')
 
     def test_background_smoke_scope_and_initialization_are_required(self):

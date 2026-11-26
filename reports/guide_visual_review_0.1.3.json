@@ -1,0 +1,45 @@
+{
+  "program_version": "0.1.3.0",
+  "candidate": 14,
+  "review_date": "2026-11-26",
+  "scope": "逐张查看干净检出导出的候选14包内三张首关操作指南原尺寸截图，检查实际显示的规则、页码、按钮、字形及遮挡。",
+  "capture_directory_in_package": "reports/runtime",
+  "capture_manifest_in_package": "reports/art_review_local.json",
+  "reviewed": [
+    {
+      "file": "art_guide_summon.png",
+      "sha256": "7bb114bc6680922f2bacb67fd692a106a64ee1266224496103a7aaea9249a85f",
+      "size": [1280, 720],
+      "page": "1 / 3",
+      "title": "点亮第一支队伍",
+      "visible_operations": "能量自动恢复，先召唤低费前排，再补远程。英魂自动行进与交战、可以重复召唤；点击卡片或按 1—8 召唤对应位置的英魂。",
+      "navigation": ["上一页（灰显）", "跳过", "下一页"],
+      "visual_observation": "正文三行，数字 1—8 与同一行的操作说明清楚。暖白面板与暗下的战场能区分，标题、页码、故事和底部三个按钮均完整可见。",
+      "passed": true
+    },
+    {
+      "file": "art_guide_camera.png",
+      "sha256": "305390699ec3659a7f52fe66b872604aef5aa67f130e960b44305cd9c2f54231",
+      "size": [1280, 720],
+      "page": "2 / 3",
+      "title": "巡视更远的战场",
+      "visible_operations": "两屏战场可用鼠标左键拖动、方向键 ← / → 或鼠标靠近边缘巡视。“跟随战线”回到交战处；空格暂停或继续，暂停时不能召唤或释放脉冲。",
+      "navigation": ["上一页", "跳过", "下一页"],
+      "visual_observation": "正文四行，左右方向箭头可辨，末行的暂停限制完整。正文与故事之间留有间距；页码和底部三个按钮没有被暗色 HUD 或其他控件覆盖。",
+      "passed": true
+    },
+    {
+      "file": "art_guide_pulse.png",
+      "sha256": "a0733a18841ec5314d27873aa99939a170e8ec0e55f94ae2b00aed57ad73c643",
+      "size": [1280, 720],
+      "page": "3 / 3",
+      "title": "抓住反攻的窗口",
+      "visible_operations": "P 释放星灯脉冲，消耗80能量、冷却35秒；脉冲打击最前方敌军，使其晕眩并打断尚未命中的攻击。重击预警时预留能量，摧毁右侧基地获胜后用星砂训练和整备编队。",
+      "navigation": ["上一页", "跳过", "开始远征"],
+      "visual_observation": "P、80能量、35秒均在首行清楚可读。换行后的晕眩说明和胜利后的操作完整；右下角“开始远征”四字居中，描边完整，与“跳过”之间有空隙。",
+      "passed": true
+    }
+  ],
+  "coverage_limit": "本次独立目检覆盖上述三个 1280×720 的后台静帧。前台键鼠流程、音效及 24/64 人战斗帧率另行验收。",
+  "passed": true
+}

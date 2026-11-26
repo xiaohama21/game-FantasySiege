@@ -1,0 +1,123 @@
+{
+  "scope": "候选14的独立干净检出、完整制作及包内制作产物。仅本地学习版。",
+  "passed": true,
+  "verified_on": "2026-11-26",
+  "program_version": "0.1.3.0",
+  "source_commit": "c05a36b07beaa506aaba41252d791b0066812a4e",
+  "checkout": "build/repro-c05a36b0-authoring",
+  "package": "build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14",
+  "initial_git_status_clean": true,
+  "initial_absent": [
+    ".godot",
+    "assets/actors",
+    "assets/portraits",
+    "bin"
+  ],
+  "clone_no_hardlinks": true,
+  "bootstrap": {
+    "stages": [
+      "runtime_copy",
+      "scan",
+      "convert",
+      "tune",
+      "runtime_import",
+      "native_author",
+      "portraits_generate",
+      "portraits_import",
+      "native_readonly",
+      "portraits_readonly"
+    ],
+    "stage_artifacts_verified": 17,
+    "source_ids_converted": 21,
+    "independent_editor_imports": [
+      "textures",
+      "native",
+      "portraits"
+    ]
+  },
+  "source_integrity": {
+    "external_files_unchanged_before_after_and_now": 105,
+    "source_archives_against_provenance": 105,
+    "donor_files_unchanged_before_after_and_now": 4,
+    "runtime_assets_matching_primary_checkout_and_package": 84,
+    "runtime_asset_digest_map_sha256": "fa16caf7a82c60629ad37c395c7cde9a2ec218b29b36c01c39864cf19c0a26bd",
+    "digest_map_format": "SHA-256 of sorted compact UTF-8 JSON {project-relative path: lowercase SHA-256}."
+  },
+  "native_and_recipes": {
+    "author_sources": 21,
+    "read_only_sources": 21,
+    "unique_engine_logs": 42,
+    "recipe_count": 21,
+    "frozen_checkout_and_package_sha256": "03818afa9bfc27d0c9e987a166d891aad15a87d9a678136a5a163399638df9ec",
+    "primary_sha256": "f5f9cc9b1551633fd18fa09023832ed86ea2756a9dfb92bfcb488bbaef5017d9",
+    "primary_matches_after_line_ending_normalization": true,
+    "read_only_check_preserved_frozen_bytes": true
+  },
+  "portraits": {
+    "heroes": 12,
+    "valid_minimized_captures": 24,
+    "read_only_recheck_and_package_pngs_match": true
+  },
+  "packaged_authoring_tools": {
+    "verified": [
+      "tools/bootstrap_local.py",
+      "tools/generate_portraits.py",
+      "tools/qa_launch.py",
+      "tools/run_checks.py",
+      "tools/spine_pipeline.py",
+      "tools/spine_upgrade_38_to_43.py",
+      "tools/tune_visuals.py",
+      "tools/verify_spine.py"
+    ],
+    "matching_bootstrap_and_manifest_sha256": true,
+    "primary_checkouts_differ_only_by_line_endings_for": [
+      "tools/bootstrap_local.py",
+      "tools/generate_portraits.py",
+      "tools/run_checks.py",
+      "tools/tune_visuals.py",
+      "tools/verify_spine.py"
+    ]
+  },
+  "old_project": {
+    "baseline_files_unchanged": 336,
+    "git_head_branch_status_unchanged": true
+  },
+  "evidence": [
+    {
+      "path": "reports/current_authoring_execution_local.json",
+      "sha256": "959f9e9e0736c8c5042ca1da8c595e48ee33a404b36dacb05c0cdbc7bb5c0ffb"
+    },
+    {
+      "path": "reports/rebuild_inputs_local.json",
+      "sha256": "48fdd71bcafbaba247a3816a672bce2d65b4dc79f36b87cc60694251c89ef318"
+    },
+    {
+      "path": "build/repro-c05a36b0-authoring/reports/bootstrap_local.json",
+      "sha256": "2964c111f8a4e07c08e5517044b6630dfb892b4a126a4246cc970ad096519878"
+    },
+    {
+      "path": "build/repro-c05a36b0-authoring/reports/runtime/bootstrap/1795423625180325800/native_author_spine_verify.json",
+      "sha256": "6eb366065e1fbb6a0e88e50222fe7ccd5341488ee0f1ae93c9a6ee30b95c441c"
+    },
+    {
+      "path": "build/repro-c05a36b0-authoring/reports/runtime/bootstrap/1795423625180325800/native_readonly_spine_verify.json",
+      "sha256": "05a29ca61c866257588ecca4ac8e12039ed46814f819e1bed40b1522124a11fe"
+    },
+    {
+      "path": "build/repro-c05a36b0-authoring/assets/portraits/manifest.json",
+      "sha256": "fe07d7834331f58a28f592b200cbe495cb7b4224e8938165a6277ea14394b816"
+    },
+    {
+      "path": "build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14/reports/build_manifest.json",
+      "sha256": "b073f6997bcf6a2ef0250531e0e2b9f48f22d944be117319705258157603819e"
+    },
+    {
+      "path": "docs/reviews/source_snapshot.json",
+      "sha256": "3d2b729b712dcf161003c8d533ecd4d94886ba465100500197c6a69463766633"
+    },
+    {
+      "path": "docs/reviews/source_verification.json",
+      "sha256": "8340c704d59d9a1aaaa3f3e5a01f5bc992cb081577c43c3f0a102ec870f4a8a0"
+    }
+  ]
+}

@@ -113,3 +113,9 @@ Source新战报190与ResultUI221 PASS，首次非class测试推断类型编译�
 当前设计推进GDD0.5.13：原完整目标审计确认包漏tune_visuals（FS064），需补制作工具闭包；当前完整空检出bootstrap尚缺组合证据；首关三页指南在CPU12/Art56中跳过，需GuideUISmoke/Art59补当前字体和保存保护。真实前台MainFlow/24/64/2倍速及人工听感仍按用户延期，不再反复请求、不将后台证据升级。
 
 后台运行统一tools/run_checks.py（QA初读与--log-file）及verify_package.py --phase background/offscreen，不要直接使用历史未隔离Godot --script命令。完整检出制作使用bootstrap_local.py --source-root <只读D69> --runtime-from <只读bin> --godot <控制台exe>；需保持转换、作者、配方冻结、肖像和只读复核顺序。暂无GPU进程在运行，新测试代码仍由代理实现，之后所有Godot/GPU由root串行。
+
+## 2026-11-26 从“会话001”接续
+
+本轮重新检查冻结文件，确认 c05a36b0/GDD v0.5.13 的候选14已于上次暂停前完成干净制作、后台/离屏以及独立九战旅程。补做包内哈希与指南三张图的独立核验，详见 `reports/guide_{authoring,package,visual_review}_0.1.3.json`。候选14位于 `build/repro-c05a36b0-authoring/exports/windows/FantasySiege-0.1.3.0-candidate-14`。
+
+开工在版本分支 `0.1.3` 上执行 `git pull --ff-only`，7897代理拒绝连接，首次直连 GitHub 443 超时。稍后直连 `ls-remote` 确认远程 `0.1.3=0d601c0`、`main=5340a0b`，再次直连 `git pull --ff-only` 成功（Already up to date）。GDD v0.5.14 的 FS-066 修正启动规范报告标签，随后从新目录验候选15。前台和性能仍按用户安排延期。
